@@ -1,0 +1,97 @@
+from flask import Flask,render_template,request,session
+from flask import redirect,url_for
+from psychopy import data
+import csv, os, sys
+import generator
+
+_thisDir = os.path.dirname(os.path.abspath(__file__)).decode(sys.getfilesystemencoding())
+os.chdir(_thisDir)
+
+app = Flask(__name__)
+@app.route("/survey1/<participant>", methods = ["GET","POST"])
+def survey1(participant):
+	if request.method == "GET":
+		questions = generator.get_q1()
+		return render_template('survey1.html', participant=participant, questions=questions)
+	else:
+		# create csv file
+		questions = generator.get_q1()
+		with open(_thisDir + '/survey_data/' + participant + '_survey1.csv', 'a') as csvfile:
+			writer = csv.writer(csvfile)
+			writer.writerow(['Time Completed:', data.getDateStr()])
+			for i in range(0,len(questions)):
+				writer.writerow((questions[i], request.form['a'+str(i+1)]))
+		with open(_thisDir + '/survey_data/' + participant + '_survey2.csv', 'wb') as csvfile:
+			writer = csv.writer(csvfile)
+			writer.writerow(['Time Started:', data.getDateStr()])
+		return redirect(url_for('survey2',participant=participant))
+
+@app.route("/survey2/<participant>", methods = ["GET","POST"])
+def survey2(participant):
+	if request.method == "GET":
+		questions = generator.get_q2()
+		return render_template('survey2.html', participant=participant, questions=questions)
+	else:
+		# create csv file
+		questions = generator.get_q2()
+		with open(_thisDir + '/survey_data/' + participant + '_survey2.csv', 'a') as csvfile:
+			writer = csv.writer(csvfile)
+			writer.writerow(['Time Completed:', data.getDateStr()])
+			for i in range(0,len(questions)):
+				writer.writerow([questions[i], request.form['a'+str(i+1)]])
+		return redirect('/thank_you')
+
+@app.route("/questionnaire/<participant>", methods = ["GET","POST"])
+def questionnaire(participant):
+	if request.method == "GET":
+		return render_template('questionnaire.html', participant=participant)
+	else:
+		# create csv file
+		with open(_thisDir + '/questionnaire_data/' + participant + '_questionnaire.csv', 'a') as csvfile:
+			writer = csv.writer(csvfile)
+			writer.writerow(['Time Completed:', data.getDateStr()])
+			writer.writerow(["What were you supposed to do in this experiment?", request.form['a1']])
+			writer.writerow(["What do you think was being tested in this experiment?", request.form['a2']])
+			writer.writerow(["How do you think you did, overall?", request.form['a3']])
+			writer.writerow(["Describe any strategies that you used to determine whether or not to buy the food items in the purchase choice task.", request.form['a4']])
+			writer.writerow(["Do you have any dietary restrictions? (i.e. Are there any foods you regularly exclude from your diet?)", request.form['a5']])
+			writer.writerow(["Yes, I restrict the following from my diet:", request.form['a5_1']])
+			writer.writerow(["If yes, for the following reasons:", request.form['a5_2']])
+			writer.writerow(["How hungry are you right now?", request.form['a6']])
+			writer.writerow(["Do you watch what you eat?", request.form['a7']])
+			writer.writerow(["Do you enjoy eating junk food?", request.form['a8']])
+			writer.writerow(["What is your approximate height?", str(request.form['a9_1']) + "ft " + str(request.form['a9_2']) + "in"])
+			writer.writerow(["What is your approximate weight?", str(request.form['a10']) + "lbs"])
+			writer.writerow(["Any other comments? Ways that you think the task could be made easier?", request.form['a11']])
+		return redirect('/thank_you')
+
+@app.route("/thank_you")
+def thank_you():
+	return render_template('thank_you.html')
+
+@app.route("/", methods = ["GET","POST"])
+def login():
+    if request.method == "GET":
+        return render_template('login.html')
+    else:
+		participant = request.form['participant']
+		if request.form['task'] == 'Surveys':
+			if not os.path.exists('survey_data'):
+				os.makedirs('survey_data')
+			with open(_thisDir + '/survey_data/' + participant + '_survey1.csv', 'wb') as csvfile:
+				writer = csv.writer(csvfile)
+				writer.writerow(['Time Started:', data.getDateStr()])
+			return redirect(url_for('survey1',participant=participant))
+		elif request.form['task'] == 'Questionnaire':
+			participant = request.form['participant']
+			if not os.path.exists('questionnaire_data'):
+				os.makedirs('questionnaire_data')
+			with open(_thisDir + '/questionnaire_data/' + participant + '_questionnaire.csv', 'wb') as csvfile:
+				writer = csv.writer(csvfile)
+				writer.writerow(['Time Started:', data.getDateStr()])
+			return redirect(url_for('questionnaire',participant=participant))
+
+if __name__ == "__main__":
+    app.debug = True
+    app.secret_key="Don't store this on github"
+    app.run(host = '0.0.0.0', port = 8000, threaded = True)

@@ -1,0 +1,23 @@
+html, body {
+  width:  100%;
+  height: 100%;
+  margin: 0px;
+  overflow: hidden;
+}
+
+title {
+	font-family: "Arial"
+}
+
+h1 {
+	font-family: "Arial"
+}
+
+p {
+	font-family: "Arial"
+}
+
+body {
+	background-color: #ffffff;
+    /*background-color: #999999;*/
+}
