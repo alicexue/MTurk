@@ -11,7 +11,6 @@ var specialKeys = [];
 
 var expResults = [];
 var allTrials = [];
-//var trialResults = {};
 
 var expErrors = [];
 
@@ -45,7 +44,8 @@ var maxTrialDuration = 400000; // in ms
 var scale;
 
 var push_trial_info = function push_trial_info() {
-	var currTrial = new trial(currTrialN, stimuli, maxTrialDuration);
+	var currTrial = new trial(currTrialN, stimuli, maxTrialDuration, ['rt','rsp']);
+	// ['rt','rsp','selected']
 	allTrials.push(currTrial);
 
 	// send stimuli here to trialInfo, set special keys inside trialInfo
@@ -162,7 +162,6 @@ var next_trial = function next_trial() {
 	}
 }
 
-// FOR BUTTON PRESSES
 /*
   * Does all clean up for trial
   * Clear trialTimer

@@ -2,20 +2,21 @@ console.log("loaded components.js");
 
 // trial class should store the stimuli array, ['trialN', 'trialStartTime', 'trialEndTime', 'stimulus', 'rsp', 'rt']
 var trial = class trial {
-	constructor(trialN, stimuli, maxTrialTime) {
+	constructor(trialN, stimuli, maxTrialTime, results) {
 		this.trialN = trialN;
 		this.stimuli = stimuli;
 		this.maxTrialTime = maxTrialTime;
 		this.receivedResponse = false;
-		this.results = new trialResults();
+		this.results = new trialResults(results);
 	}
 }
 
 var trialResults = class trialResults {
-	constructor() {
-		this.rt = 'None';
-		this.rsp = 'None';
-		this.selected = 'None';
+	constructor(resultTypes) {
+		var i;
+		for (i=0;i<resultTypes.length;i++) {
+			this[resultTypes[i]] = 'None';
+		}
 	}
 }
 
@@ -69,8 +70,8 @@ var imageStimulus = class imageStimulus {
 		this.imgObject.setAttribute("id", id);
 		this.src = src;
 		this.key = key; // keyboard key for selection
-		this.width = 'NaN';
-		this.height = 'NaN';
+		this.width = NaN;
+		this.height = NaN;
 	}
 
 	// position can be a string, like the ones in get_img_position
@@ -239,7 +240,7 @@ var ratingScale = class ratingScale {
 	}
 
 	drawSelector(x, y, color) {
-		var width = window.innerWidth*.02;
+		var width = this.ratingBarWidth*.03;
 		var height = window.innerHeight*0.04;
 		this.selectorWidth = width;
 		this.selectorHeight = height;
@@ -267,7 +268,7 @@ var ratingScale = class ratingScale {
 		var fontsize = 25;
 		for (i = 0; i <= nTicks; i++) {
 			var label = document.createElementNS("http://www.w3.org/2000/svg", "text");
-			label.setAttribute("x",((i*nScaleValues/nRatingValues)+this.ratingBarX - 10).toString());
+			label.setAttribute("x",((i*nScaleValues/nRatingValues)+this.ratingBarX - fontsize + 5).toString());
 			label.setAttribute("y",(this.ratingBarY + this.ratingBarHeight + fontsize).toString());
 			label.setAttribute("font-family","Arial");
 			label.setAttribute("font-size",fontsize.toString());

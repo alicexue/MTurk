@@ -87,15 +87,10 @@ def experiment():
 		with open(_thisDir + '/data/' + 'test_data_stimuli.csv', 'wb') as csvfile:
 			writer = csv.writer(csvfile)
 			writer.writerow(stimuliHeader)
-			print "stimuli"
-			print stimuliHeader
 
 			for trialStimuli in allStimuliInfo:
 				writer.writerow(trialStimuli)
 
-
-		for error in expErrors:
-			print error
 		return redirect(url_for('thankyou'))
 
 @app.route("/", methods = ["GET","POST"])
