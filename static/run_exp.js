@@ -231,7 +231,6 @@ const CENTER = 'CENTER';
 */
 var draw_trial_display = function draw(trialVariables) {
 	// condition is a dictionary - each key can be used to set trial conditions
-	console.log(new trialResults())
 	var imgFolder = '/static/stim/';
 	stimulus1 = trialVariables['stimulus1'];
 	stimulus2 = trialVariables['stimulus2'];
@@ -526,6 +525,7 @@ function errorMsgInfo(msg,trialN,timeExp) {
 const BLACK = "#000000";
 const RED = "#ff0000";
 const GREEN = "#00cc00";
+var box;
 /*
   * Creates an svg box at the center of the screen
   * Use case: Turns green when user responds
@@ -533,12 +533,15 @@ const GREEN = "#00cc00";
   * @param {string} color: a hex value to change the color
 */
 var set_confirmation_color = function set_confirmation_color(color) {
-	var centerX = canvas.width / 2;
-	var centerY = canvas.height / 2;
+	if (box!=null) {
+		svg.removeChild(box);
+	}
+	var centerX = window.innerWidth / 2;
+	var centerY = window.innerHeight / 2;
 
 	var confirmBoxSide = window.innerWidth * 0.02;
 
-	var box = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+	box = document.createElementNS("http://www.w3.org/2000/svg", "rect");
 	box.setAttribute("x",(centerX - confirmBoxSide/2).toString());
 	box.setAttribute("y",(centerY).toString());
 	box.setAttribute("width",confirmBoxSide.toString());
