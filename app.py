@@ -29,56 +29,73 @@ def experiment():
 		for i in range(0,len(stimuli1)):
 			expVariables.append({"stimulus1":stimuli1[i],'stimulus2':stimuli2[i]})
 
-
 		return render_template('experiment.html',expVariables=expVariables)
 	else:
-		x = json.loads(request.form['experimentResults'])
-
 		expResults = json.loads(request.form['experimentResults'])
 		expErrors = json.loads(request.form['experimentErrors'])
-		
 		keys = expResults[0].keys()
 
 		if not os.path.exists('data'):
 			os.makedirs('data')
-		with open(_thisDir + '/data/' + 'test_data.csv', 'wb') as csvfile:
-			writer = csv.writer(csvfile)
-			header = []
+
+		header = []
+		stimuliHeader = []
+		for key in keys:
+			if key == 'results':
+				resultKeys = expResults[0]['results'].keys()
+				for resultKey in resultKeys:
+					header.append(resultKey)
+
+			elif key != 'stimuli':
+				header.append(key)
+			else:
+				stimuli = expResults[0]['stimuli']
+				stimulusKeys = expResults[0]['stimuli'][0].keys()
+				for i in range(0,len(stimuli)):
+					for stimulusKey in stimulusKeys:
+						stimuliHeader.append('stimulus'+str(i)+'_'+stimulusKey)
+
+		allTrialOutput = []
+		allStimuliInfo = []
+		for trial in expResults:
+			trialOutput = []
+			stimuliInfo = []
 			for key in keys:
 				if key == 'results':
-					resultKeys = expResults[0]['results'].keys()
-					for resultKey in resultKeys:
-						header.append(resultKey)
-				elif key == 'stimuli':
-					stimuli = expResults[0]['stimuli']
-					stimulusKeys = expResults[0]['stimuli'][0].keys()
-					for i in range(0,len(stimuli)):
-						for stimulusKey in stimulusKeys:
-							header.append('stimulus'+str(i)+'_'+stimulusKey)
+					results = trial['results']
+					for resultKey in results:
+						trialOutput.append(str(results[resultKey]))
+
+				elif key != 'stimuli':
+					trialOutput.append(str(trial[key]))
 				else:
-					header.append(key)
+					stimuli = trial['stimuli']
+					for i in range(0,len(stimuli)):
+						stimulus = stimuli[i]
+						for stimulusKey in stimulusKeys:
+							stimuliInfo.append(str(stimulus[stimulusKey]))
+			allTrialOutput.append(trialOutput)
+			allStimuliInfo.append(stimuliInfo)
 
+		with open(_thisDir + '/data/' + 'test_data.csv', 'wb') as csvfile:
+			writer = csv.writer(csvfile)
 			writer.writerow(header)
-			
-			for trial in expResults:
-				trialOutput = []
-				for key in keys:
-					if key == 'results':
-						results = trial['results']
-						for resultKey in results:
-							trialOutput.append(str(results[resultKey]))
-					elif key == 'stimuli':
-						stimuli = trial['stimuli']
-						for i in range(0,len(stimuli)):
-							stimulus = stimuli[i]
-							for stimulusKey in stimulusKeys:
-								trialOutput.append(str(stimulus[stimulusKey]))
-					else:
-						trialOutput.append(str(trial[key]))
-				writer.writerow(trialOutput)
 
-			for error in expErrors:
-				print error
+			for trial in allTrialOutput:
+				writer.writerow(trial)
+
+		with open(_thisDir + '/data/' + 'test_data_stimuli.csv', 'wb') as csvfile:
+			writer = csv.writer(csvfile)
+			writer.writerow(stimuliHeader)
+			print "stimuli"
+			print stimuliHeader
+
+			for trialStimuli in allStimuliInfo:
+				writer.writerow(trialStimuli)
+
+
+		for error in expErrors:
+			print error
 		return redirect(url_for('thankyou'))
 
 @app.route("/", methods = ["GET","POST"])

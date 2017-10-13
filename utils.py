@@ -8,7 +8,7 @@ def get_stimuli():
 	get array of stimuli from the directory name stim
 	'''
 	stimuli = []
-	for stimulusFile in os.listdir(_thisDir + '/static/stim/'):
+	for stimulusFile in os.listdir(_thisDir + '/static/stim/demo/'):
 		if stimulusFile.endswith(".bmp"): 
 			stimuli.append(stimulusFile[:-4])
 	return stimuli

@@ -21,11 +21,13 @@
 
 		<input type="hidden" id="experimentErrors" name="experimentErrors" value="[]">
 
+		<script src="{{ url_for('static', filename='components.js') }}"></script>
+
 		<script src="{{ url_for('static', filename='run_exp.js') }}"></script>
 
 		<script>
-			set_trial_variables({{expVariables|tojson}});
-			//draw_trial_display(expVariables[currTrialN]); // starts with currTrial=0 from run_exp.js
+			set_trial_variables({{expVariables|tojson}}); 
+			// curly brackets are for jinja2 templates, which returns expVariables from app.py
 			start_experiment();
 		</script>
 	</form>
