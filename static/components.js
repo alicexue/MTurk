@@ -92,11 +92,14 @@ var imageStimulus = class imageStimulus {
 		var imageStim = this;
 		this.trialN = currTrialN;
 		var img = this.imgObject;
+
 		this.loaded = false;
+		console.log(allTrials)
+
 
 		if (typeof position === 'string') {
 			this.positionName = position;
-			this.positionCoords = ['NaN','NaN'];
+			this.positionCoords = [NaN, NaN];
 		} else if (Array.isArray(position)) {
 			this.positionName = '';
 			this.positionCoords = position;
@@ -320,7 +323,7 @@ var ratingScale = class ratingScale {
 
 		t2 = evt.timeStamp;
 		allTrials[currTrialN].results.rt = t2 - t1;
-		allTrials[currTrialN].results.receivedResponse = true;
+		allTrials[currTrialN].receivedResponse = true;
 		allTrials[currTrialN].results.rsp = rating;
 		allTrials[currTrialN].trialEndTime = t2;
 		end_trial();

@@ -1,9 +1,9 @@
 stimulus0_src,stimulus0_positionName,stimulus0_positionCoords,stimulus0_height,stimulus0_width,stimulus0_trialN,stimulus0_key,stimulus0_id,stimulus0_loaded,stimulus0_imgObject,stimulus1_src,stimulus1_positionName,stimulus1_positionCoords,stimulus1_height,stimulus1_width,stimulus1_trialN,stimulus1_key,stimulus1_id,stimulus1_loaded,stimulus1_imgObject
-/static/stim/demo/PopTartsCinnamon.bmp,LEFT,"[u'NaN', u'NaN']",None,None,0,u,PopTartsCinnamon,False,{},/static/stim/demo/Twinkie.bmp,RIGHT,"[u'NaN', u'NaN']",None,None,0,i,Twinkie,False,{}
-/static/stim/demo/CornPops.bmp,LEFT,"[u'NaN', u'NaN']",None,None,1,u,CornPops,False,{},/static/stim/demo/wildberrynerds.bmp,RIGHT,"[540.28, 176.5]",350.6625,467.55,1,i,wildberrynerds,True,{}
-/static/stim/demo/FrootLoops.bmp,LEFT,"[31.72, 176.5]",350.6625,467.55,2,u,FrootLoops,True,{},/static/stim/demo/Lindt_small.bmp,RIGHT,"[540.28, 176.5]",350.6625,467.55,2,i,Lindt_small,True,{}
-/static/stim/demo/wildberrynerds.bmp,LEFT,"[31.72, 176.5]",350.6625,467.55,3,u,wildberrynerds,True,{},/static/stim/demo/FrootLoops.bmp,RIGHT,"[540.28, 176.5]",350.6625,467.55,3,i,FrootLoops,True,{}
-/static/stim/demo/Twinkie.bmp,LEFT,"[u'NaN', u'NaN']",None,None,4,u,Twinkie,False,{},/static/stim/demo/PopTartsCinnamon.bmp,RIGHT,"[u'NaN', u'NaN']",None,None,4,i,PopTartsCinnamon,False,{}
-/static/stim/demo/Jollyrancherred.bmp,LEFT,"[31.72, 176.5]",350.6625,467.55,5,u,Jollyrancherred,True,{},/static/stim/demo/Jollyrancherred.bmp,RIGHT,"[540.28, 176.5]",350.6625,467.55,5,i,Jollyrancherred,True,{}
-/static/stim/demo/Lindt_small.bmp,LEFT,"[31.72, 176.5]",350.6625,467.55,6,u,Lindt_small,True,{},/static/stim/demo/CornPops.bmp,RIGHT,"[u'NaN', u'NaN']",None,None,6,i,CornPops,False,{}
-/static/stim/demo/ApplePie.bmp,LEFT,"[31.72, 176.5]",350.6625,467.55,7,u,ApplePie,True,{},/static/stim/demo/ApplePie.bmp,RIGHT,"[540.28, 176.5]",350.6625,467.55,7,i,ApplePie,True,{}
+/static/stim/demo/FrootLoops.bmp,LEFT,"[None, None]",None,None,0,u,FrootLoops,False,{},/static/stim/demo/wildberrynerds.bmp,RIGHT,"[540.28, 176.5]",350.6625,467.55,0,i,wildberrynerds,True,{}
+/static/stim/demo/ApplePie.bmp,LEFT,"[31.72, 176.5]",350.6625,467.55,1,u,ApplePie,True,{},/static/stim/demo/PopTartsCinnamon.bmp,RIGHT,"[540.28, 176.5]",350.6625,467.55,1,i,PopTartsCinnamon,True,{}
+/static/stim/demo/Twinkie.bmp,LEFT,"[31.72, 176.5]",350.6625,467.55,2,u,Twinkie,True,{},/static/stim/demo/ApplePie.bmp,RIGHT,"[540.28, 176.5]",350.6625,467.55,2,i,ApplePie,True,{}
+/static/stim/demo/PopTartsCinnamon.bmp,LEFT,"[31.72, 176.5]",350.6625,467.55,3,u,PopTartsCinnamon,True,{},/static/stim/demo/Twinkie.bmp,RIGHT,"[540.28, 176.5]",350.6625,467.55,3,i,Twinkie,True,{}
+/static/stim/demo/CornPops.bmp,LEFT,"[None, None]",None,None,4,u,CornPops,False,{},/static/stim/demo/Jollyrancherred.bmp,RIGHT,"[None, None]",None,None,4,i,Jollyrancherred,False,{}
+/static/stim/demo/Jollyrancherred.bmp,LEFT,"[None, None]",None,None,5,u,Jollyrancherred,False,{},/static/stim/demo/Lindt_small.bmp,RIGHT,"[540.28, 176.5]",350.6625,467.55,5,i,Lindt_small,True,{}
+/static/stim/demo/wildberrynerds.bmp,LEFT,"[31.72, 176.5]",350.6625,467.55,6,u,wildberrynerds,True,{},/static/stim/demo/FrootLoops.bmp,RIGHT,"[None, None]",None,None,6,i,FrootLoops,False,{}
+/static/stim/demo/Lindt_small.bmp,LEFT,"[31.72, 176.5]",350.6625,467.55,7,u,Lindt_small,True,{},/static/stim/demo/CornPops.bmp,RIGHT,"[None, None]",None,None,7,i,CornPops,False,{}

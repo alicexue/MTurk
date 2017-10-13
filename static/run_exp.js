@@ -58,7 +58,7 @@ var push_trial_info = function push_trial_info() {
 		}
 	}
 
-	console.log("Trial " + currTrialN + " " + stimulus1 + ", " + stimulus2);
+	
 	t1 = performance.now(); // start timer for this trial
 	trialTimer = setTimeout(end_trial,maxTrialDuration);
 	allTrials[currTrialN].trialN = currTrialN;
@@ -72,9 +72,12 @@ var push_trial_info = function push_trial_info() {
 */
 var draw_trial_display = function draw(trialVariables) {
 	// condition is a dictionary - each key can be used to set trial conditions
+
 	var imgFolder = '/static/stim/demo/';
-	stimulus1 = trialVariables['stimulus1'];
-	stimulus2 = trialVariables['stimulus2'];
+	var stimulus1 = trialVariables['stimulus1'];
+	var stimulus2 = trialVariables['stimulus2'];
+
+	console.log("Trial " + currTrialN + " " + stimulus1 + ", " + stimulus2);
 
 	var img1 = new imageStimulus(stimulus1, imgFolder + stimulus1 + ".bmp", 'u');
 	img1.drawImage('LEFT');
@@ -82,6 +85,12 @@ var draw_trial_display = function draw(trialVariables) {
 
 	var img2 = new imageStimulus(stimulus2, imgFolder + stimulus2 + ".bmp", 'i');
 	img2.drawImage('RIGHT');
+
+	stimuli = [img1, img2];
+
+	if (allTrials.length == currTrialN) {
+		push_trial_info();
+	}
 
 	set_confirmation_color(BLACK);
 
@@ -92,11 +101,7 @@ var draw_trial_display = function draw(trialVariables) {
 	}
 	scale.drawRatingScale(); // draws/redraws scale
 
-	stimuli = [img1, img2];
-
-	if (allTrials.length == currTrialN) {
-		push_trial_info();
-	}
+	
 
 }
 
@@ -126,7 +131,7 @@ var checkKeyPress = function(e) {
 				} 
 			}
 			allTrials[currTrialN].results.rt = t2 - t1;
-			allTrials[currTrialN].results.receivedResponse = true;
+			allTrials[currTrialN].receivedResponse = true;
 			allTrials[currTrialN].results.rsp = e.key;
 			allTrials[currTrialN].trialEndTime = t2;
 			end_trial();
@@ -170,6 +175,11 @@ var next_trial = function next_trial() {
   * Sets timer for confirmation and iterates to next trial at the end of confirmation
 */
 var end_trial = function end_trial() {
+	var i;
+	for (i=0;i<stimuli.length;i++) {
+		allTrials[currTrialN]['stimulus'+(i+1).toString()+'Loaded'] = stimuli[i].loaded;
+	}
+
 	var color;
 	clearTimeout(trialTimer);
 	if (allTrials[currTrialN].results == null) {
