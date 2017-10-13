@@ -36,7 +36,7 @@ def experiment():
 		expResults = json.loads(request.form['experimentResults'])
 		expErrors = json.loads(request.form['experimentErrors'])
 
-		store_data.organize_data(expResults, 'auction_data.csv', 'auction_stimuli.csv');
+		store_data.organize_data(expResults, 'exp_data.csv', 'exp_stimuli.csv');
 
 		return redirect(url_for('thankyou'))
 
@@ -60,9 +60,9 @@ def auction():
 		expResults = json.loads(request.form['experimentResults'])
 		expErrors = json.loads(request.form['experimentErrors'])
 		
-		store_data.organize_data(expResults, 'choice_data.csv', 'choice_stimuli.csv');
+		store_data.organize_data(expResults, 'auction_data.csv', 'auction_stimuli.csv');
 		
-		return redirect(url_for('choicetask'))
+		return redirect(url_for('choicetask_instructions'))
 
 
 @app.route("/choicetask", methods = ["GET","POST"])
@@ -97,72 +97,31 @@ def choicetask():
 	else:
 		expResults = json.loads(request.form['experimentResults'])
 		expErrors = json.loads(request.form['experimentErrors'])
-		keys = expResults[0].keys()
-
-		if not os.path.exists('data'):
-			os.makedirs('data')
-
-		header = []
-		stimuliHeader = []
-		for key in keys:
-			if key == 'results':
-				resultKeys = expResults[0]['results'].keys()
-				for resultKey in resultKeys:
-					header.append(resultKey)
-
-			elif key != 'stimuli':
-				header.append(key)
-			else:
-				stimuli = expResults[0]['stimuli']
-				stimulusKeys = expResults[0]['stimuli'][0].keys()
-				for i in range(0,len(stimuli)):
-					for stimulusKey in stimulusKeys:
-						stimuliHeader.append('stimulus'+str(i+1)+'_'+stimulusKey)
-
-		allTrialOutput = []
-		allStimuliInfo = []
-		for trial in expResults:
-			trialOutput = []
-			stimuliInfo = []
-			for key in keys:
-				if key == 'results':
-					results = trial['results']
-					for resultKey in results:
-						trialOutput.append(str(results[resultKey]))
-
-				elif key != 'stimuli':
-					trialOutput.append(str(trial[key]))
-				else:
-					stimuli = trial['stimuli']
-					for i in range(0,len(stimuli)):
-						stimulus = stimuli[i]
-						for stimulusKey in stimulusKeys:
-							stimuliInfo.append(str(stimulus[stimulusKey]))
-			allTrialOutput.append(trialOutput)
-			allStimuliInfo.append(stimuliInfo)
-
-		with open(_thisDir + '/data/' + 'test_data.csv', 'wb') as csvfile:
-			writer = csv.writer(csvfile)
-			writer.writerow(header)
-
-			for trial in allTrialOutput:
-				writer.writerow(trial)
-
-		with open(_thisDir + '/data/' + 'test_data_stimuli.csv', 'wb') as csvfile:
-			writer = csv.writer(csvfile)
-			writer.writerow(stimuliHeader)
-
-			for trialStimuli in allStimuliInfo:
-				writer.writerow(trialStimuli)
-
+		
+		store_data.organize_data(expResults, 'choice_data.csv', 'choice_stimuli.csv');
+		
 		return redirect(url_for('thankyou'))
 
-@app.route("/", methods = ["GET","POST"])
-def instructions():
+@app.route("/auction_instructions", methods = ["GET","POST"])
+def auction_instructions():
 	if request.method == "GET":
-		return render_template('instructions.html')
+		return render_template('auction_instructions.html')
 	else:
 		return redirect(url_for('auction'))
+
+@app.route("/choicetask_instructions", methods = ["GET","POST"])
+def choicetask_instructions():
+	if request.method == "GET":
+		return render_template('choicetask_instructions.html')
+	else:
+		return redirect(url_for('choicetask'))
+
+@app.route("/", methods = ["GET","POST"])
+def consent_form():
+	if request.method == "GET":
+		return render_template('consent_form.html')
+	else:
+		return redirect(url_for('auction_instructions'))
 
 @app.route("/thankyou", methods = ["GET"])
 def thankyou():

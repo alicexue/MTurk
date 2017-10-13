@@ -68,15 +68,13 @@ var push_trial_info = function push_trial_info() {
 */
 var draw_trial_display = function draw(trialVariables) {
 	// condition is a dictionary - each key can be used to set trial conditions
-	console.log(trialVariables);
 	var imgFolder = '/static/stim/demo/';
 	var stimulus1 = trialVariables['stimulus1'];
 	var stim1Bid = trialVariables['stim1Bid'];
 	var stimulus2 = trialVariables['stimulus2'];
 	var stim2Bid = trialVariables['stim2Bid'];
 
-	console.log("Trial " + currTrialN + " " + stimulus1 + ", " + stimulus2);
-	console.log("Trial " + currTrialN + " " + stim1Bid.toString() + ", " + stimulus2 + stim2Bid.toString());
+	console.log("Trial " + currTrialN + " " + stimulus1 + " " + stim1Bid.toString() + ", " + stimulus2 + " " + stim2Bid.toString());
 
 	var img1 = new imageStimulus(stimulus1, imgFolder + stimulus1 + ".bmp", 'u');
 	img1.drawImage('LEFT');
