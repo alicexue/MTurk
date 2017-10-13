@@ -1,0 +1,9 @@
+stimulus0_src,stimulus0_positionName,stimulus0_positionCoords,stimulus0_height,stimulus0_width,stimulus0_trialN,stimulus0_key,stimulus0_id,stimulus0_loaded,stimulus0_imgObject
+/static/stim/demo/Jollyrancherred.bmp,CENTER,"[181.5, 130.5]",222.4125,296.55,0,None,Jollyrancherred,True,{}
+/static/stim/demo/PopTartsCinnamon.bmp,CENTER,"[181.5, 130.5]",222.4125,296.55,1,None,PopTartsCinnamon,True,{}
+/static/stim/demo/CornPops.bmp,CENTER,"[181.5, 130.5]",222.4125,296.55,2,None,CornPops,True,{}
+/static/stim/demo/ApplePie.bmp,CENTER,"[181.5, 130.5]",222.4125,296.55,3,None,ApplePie,True,{}
+/static/stim/demo/wildberrynerds.bmp,CENTER,"[181.5, 130.5]",222.4125,296.55,4,None,wildberrynerds,True,{}
+/static/stim/demo/FrootLoops.bmp,CENTER,"[181.5, 130.5]",222.4125,296.55,5,None,FrootLoops,True,{}
+/static/stim/demo/Lindt_small.bmp,CENTER,"[181.5, 130.5]",222.4125,296.55,6,None,Lindt_small,True,{}
+/static/stim/demo/Twinkie.bmp,CENTER,"[181.5, 130.5]",222.4125,296.55,7,None,Twinkie,True,{}

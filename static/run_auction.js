@@ -1,4 +1,4 @@
-console.log("run_exp.js");
+console.log("run_auction.js");
 var expVariables; 
 
 var recordAllKeyPresses = true;
@@ -45,7 +45,6 @@ var scale;
 
 var push_trial_info = function push_trial_info() {
 	var currTrial = new trial(currTrialN, stimuli, maxTrialDuration, ['rt','rsp']);
-	// ['rt','rsp','selected']
 	allTrials.push(currTrial);
 
 	// send stimuli here to trialInfo, set special keys inside trialInfo
@@ -57,7 +56,7 @@ var push_trial_info = function push_trial_info() {
 
 		}
 	}
-	
+
 	t1 = performance.now(); // start timer for this trial
 	trialTimer = setTimeout(end_trial,maxTrialDuration);
 	allTrials[currTrialN].trialN = currTrialN;
@@ -74,24 +73,17 @@ var draw_trial_display = function draw(trialVariables) {
 
 	var imgFolder = '/static/stim/demo/';
 	var stimulus1 = trialVariables['stimulus1'];
-	var stimulus2 = trialVariables['stimulus2'];
 
-	console.log("Trial " + currTrialN + " " + stimulus1 + ", " + stimulus2);
+	console.log("Trial " + currTrialN + " " + stimulus1);
 
-	var img1 = new imageStimulus(stimulus1, imgFolder + stimulus1 + ".bmp", 'u');
-	img1.drawImage('LEFT');
-	// img.drawImage([0, 0]);
+	var img1 = new imageStimulus(stimulus1, imgFolder + stimulus1 + ".bmp", null);
+	img1.drawImage('CENTER');
 
-	var img2 = new imageStimulus(stimulus2, imgFolder + stimulus2 + ".bmp", 'i');
-	img2.drawImage('RIGHT');
-
-	stimuli = [img1, img2];
+	stimuli = [img1];
 
 	if (allTrials.length == currTrialN) {
 		push_trial_info();
 	}
-
-	set_confirmation_color(BLACK);
 
 	if (scale == null) { // set up scale for first trial
 		scale = new ratingScale(0,3,1,.01);
@@ -99,9 +91,6 @@ var draw_trial_display = function draw(trialVariables) {
 		scale.resetScale(); // removes current scale
 	}
 	scale.drawRatingScale(); // draws/redraws scale
-
-	
-
 }
 
 var start_experiment = function start_experiment() {
@@ -183,15 +172,11 @@ var end_trial = function end_trial() {
 	clearTimeout(trialTimer);
 	if (allTrials[currTrialN].results == null) { // did not respond
 		t2 = performance.now();
-		color = RED;
 		drawNextTrial = true;
 		allTrials[currTrialN].results.rsp = 'None';
 		allTrials[currTrialN].results.rt = t2 - t1;
 		allTrials[currTrialN].trialEndTime = t2;
-	} else {
-		color = GREEN;
 	}
-	set_confirmation_color(color);
 	confirmTimer = setTimeout(next_trial,confirmationTime);
 }
 

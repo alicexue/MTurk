@@ -1,4 +1,4 @@
-console.log("run_exp.js");
+console.log("run_choicetask.js");
 var expVariables; 
 
 var recordAllKeyPresses = true;
@@ -41,11 +41,8 @@ var t1, t2;
 var trialTimer;
 var maxTrialDuration = 400000; // in ms
 
-var scale;
-
 var push_trial_info = function push_trial_info() {
-	var currTrial = new trial(currTrialN, stimuli, maxTrialDuration, ['rt','rsp']);
-	// ['rt','rsp','selected']
+	var currTrial = new trial(currTrialN, stimuli, maxTrialDuration, ['rt','rsp','selected']);
 	allTrials.push(currTrial);
 
 	// send stimuli here to trialInfo, set special keys inside trialInfo
@@ -71,37 +68,34 @@ var push_trial_info = function push_trial_info() {
 */
 var draw_trial_display = function draw(trialVariables) {
 	// condition is a dictionary - each key can be used to set trial conditions
-
+	console.log(trialVariables);
 	var imgFolder = '/static/stim/demo/';
 	var stimulus1 = trialVariables['stimulus1'];
+	var stim1Bid = trialVariables['stim1Bid'];
 	var stimulus2 = trialVariables['stimulus2'];
+	var stim2Bid = trialVariables['stim2Bid'];
 
 	console.log("Trial " + currTrialN + " " + stimulus1 + ", " + stimulus2);
+	console.log("Trial " + currTrialN + " " + stim1Bid.toString() + ", " + stimulus2 + stim2Bid.toString());
 
 	var img1 = new imageStimulus(stimulus1, imgFolder + stimulus1 + ".bmp", 'u');
 	img1.drawImage('LEFT');
-	// img.drawImage([0, 0]);
+	img1.bid = stim1Bid;
 
 	var img2 = new imageStimulus(stimulus2, imgFolder + stimulus2 + ".bmp", 'i');
 	img2.drawImage('RIGHT');
-
+	img2.bid = stim2Bid;
+	
 	stimuli = [img1, img2];
 
 	if (allTrials.length == currTrialN) {
 		push_trial_info();
 	}
 
+	allTrials[currTrialN]['stimulus1Bid'] = stim1Bid;
+	allTrials[currTrialN]['stimulus2Bid'] = stim2Bid;
+
 	set_confirmation_color(BLACK);
-
-	if (scale == null) { // set up scale for first trial
-		scale = new ratingScale(0,3,1,.01);
-	} else {
-		scale.resetScale(); // removes current scale
-	}
-	scale.drawRatingScale(); // draws/redraws scale
-
-	
-
 }
 
 var start_experiment = function start_experiment() {

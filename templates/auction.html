@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Experiment</title>
+	<link href="/static/style.css" rel="stylesheet">
+</head>
+<body>
+	<center>
+	<form id="exp" method="POST">
+
+		<div>
+		<canvas id="myCanvas" style="padding: 0; margin: auto; display: block; position: absolute; top: 0; bottom: 0; left: 0; right: 0;">
+		</canvas>
+		</div>
+
+		<div>
+		<svg id="mySVG" style="padding: 0; margin: auto; display: block; position: absolute; top: 0; bottom: 0; left: 0; right: 0; width: 100%"></svg>
+		</div>
+
+		<input type="hidden" id="experimentResults" name="experimentResults" value="[]">
+
+		<input type="hidden" id="experimentErrors" name="experimentErrors" value="[]">
+
+		<script src="{{ url_for('static', filename='components.js') }}"></script>
+
+		<script src="{{ url_for('static', filename='run_auction.js') }}"></script>
+
+		<script>
+			set_trial_variables({{expVariables|tojson}}); 
+			// curly brackets are for jinja2 templates, which returns expVariables from app.py
+			start_experiment();
+		</script>
+	</form>
+	</center>
+</body>
+</html>

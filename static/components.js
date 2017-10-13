@@ -94,8 +94,6 @@ var imageStimulus = class imageStimulus {
 		var img = this.imgObject;
 
 		this.loaded = false;
-		console.log(allTrials)
-
 
 		if (typeof position === 'string') {
 			this.positionName = position;
@@ -298,7 +296,6 @@ var ratingScale = class ratingScale {
 	}
 
 	recordRating(evt) {
-		console.log(evt)
 		// (max-min) / increment => number of possible values
 		var nRatingValues = (this.max - this.min)/this.increment;
 		var nScaleValues = this.ratingBarWidth/this.increment;

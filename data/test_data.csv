@@ -1,9 +1,0 @@
-stimulus2Loaded,trialEndTime,maxTrialTime,receivedResponse,rt,rsp,trialStartTime,trialN,stimulus1Loaded,stimulus1,stimulus0
-True,1544.76,400000,True,1386.275,1.79,158.485,0,False,wildberrynerds,FrootLoops
-True,2388.655,400000,True,335.815,1.47,2052.84,1,True,PopTartsCinnamon,ApplePie
-True,3216.815,400000,True,321.54,0.84,2895.275,2,True,ApplePie,Twinkie
-True,4005.61,400000,True,281.155,0.4,3724.455,3,True,Twinkie,PopTartsCinnamon
-False,4770.49,400000,True,256.78,1.27,4513.71,4,False,Jollyrancherred,CornPops
-True,5697.31,400000,True,414.875,2.1,5282.435,5,False,Lindt_small,Jollyrancherred
-False,6588.495,400000,True,383.115,2.58,6205.38,6,True,FrootLoops,wildberrynerds
-False,7416.695,400000,True,321,2.89,7095.695,7,True,CornPops,Lindt_small
