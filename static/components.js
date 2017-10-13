@@ -294,6 +294,7 @@ var ratingScale = class ratingScale {
 	}
 
 	recordRating(evt) {
+		console.log(evt)
 		// (max-min) / increment => number of possible values
 		var nRatingValues = (this.max - this.min)/this.increment;
 		var nScaleValues = this.ratingBarWidth/this.increment;
@@ -315,6 +316,12 @@ var ratingScale = class ratingScale {
 		rating = rating*this.increment;
 
 		console.log(rating);
+
+		t2 = evt.timeStamp;
+		allTrials[currTrialN].results.rt = t2 - t1;
+		allTrials[currTrialN].results.receivedResponse = true;
+		allTrials[currTrialN].results.rsp = rating;
+		allTrials[currTrialN].trialEndTime = t2;
 		end_trial();
 	}
 
