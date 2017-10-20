@@ -74,10 +74,12 @@ def choicetask():
 		# trialVariables should be an array of dictionaries 
 		# each element of the array represents the condition for one trial
 		# set the variable conditions to the array of conditions
-		stimuli1 = get_stimuli()
-		random.shuffle(stimuli1)
-		stimuli2 = get_stimuli()
-		random.shuffle(stimuli2)
+		#stimuli1 = get_stimuli()
+		#random.shuffle(stimuli1)
+		#stimuli2 = get_stimuli()
+		#random.shuffle(stimuli2)
+
+		stimuli1, stimuli2 = get_two_stimuli_lists()
 
 		stim1Bids = [];
 		stim2Bids = [];

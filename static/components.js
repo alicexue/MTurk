@@ -11,12 +11,26 @@ var trial = class trial {
 	}
 }
 
+/*
+ * Stores trial results
+*/
 var trialResults = class trialResults {
 	constructor(resultTypes) {
 		var i;
 		for (i=0;i<resultTypes.length;i++) {
 			this[resultTypes[i]] = 'None';
 		}
+	}
+}
+
+
+var windowResizeInfo = class windowResizeInfo {
+	constructor(time, initWidth, initHeight, finalWidth, finalHeight) {
+		this.time = time;
+		this.initWidth = initWidth;
+		this.initHeight = initHeight;
+		this.finalWidth = finalWidth;
+		this.finalHeight = finalHeight;
 	}
 }
 
@@ -35,17 +49,8 @@ function keyPressInfo(key,trialN,timePressedExp,timePressedTrial) {
 }
 
 /*
-  * @constructor for error message information
-  * @param {string} msg: information about the error (ex: img didn\t load)
-  * @param {int} trialN: the trial in which error occurred
-  * @param {float} timeExp: time error was registered by browser
+ *** IMAGES ***
 */
-function errorMsgInfo(msg,trialN,timeExp) {
-	this.msg = msg,
-	this.trialN = trialN,
-	this.timeExp = timeExp
-}
-
 /*
   * Class for image stimulus
   * Creates an image and assigns it an id, source, key value
@@ -112,11 +117,11 @@ var imageStimulus = class imageStimulus {
 			var scaledWidthPercent = 0.45;
 			var scaledWidth = canvas.width * scaledWidthPercent;
 			var scaledHeight = img.height/img.width * canvas.width * scaledWidthPercent;
-			console.log(scaledWidth/img.width)
-			console.log(scaledHeight/img.height)
 
-			while (scaledWidth/img.width <= .50) {
-				alert('Please make your browser window bigger, and then press "ok".')
+			// if (scaledWidth/img.width <= .30 || scaledHeight + 50 >= canvas.height) {
+			while (scaledHeight + 50 >= canvas.height) {
+				alert('Please make your browser window bigger, and then press "OK".')
+				console.log("opened alert")
 				var winWidth = window.innerWidth;
 				var winHeight = window.innerHeight;
 				canvas.width = winWidth;
@@ -154,13 +159,6 @@ var imageStimulus = class imageStimulus {
 
 			ctx.drawImage(img, positionCoords[0], positionCoords[1], scaledWidth, scaledHeight);
 
-		};
-		img.onerror = function() {
-			var errorTime = performance.now();
-			var errorInfo = new errorMsgInfo(img.id + ' didn\'t load', trialN, errorTime);
-			expErrors.push(errorInfo)
-			console.log("IMAGE DIDN\'T LOAD. Trial " + trialN + ", " + img.id);
-			// send error messages back to server if image didn't load (error may come up later)
 		};
 		img.setAttribute("src", this.src);
 	}
@@ -205,8 +203,10 @@ var get_img_position = function get_img_position(img, positionName) {
 	return positionCoords;
 }
 
+/*
+ *** RATING SCALE ***
+*/
 var ratingScale = class ratingScale {
-
 	constructor(min, max, tickIncrement, increment) {
 		if (min >= max) {
 			alert("Invalid parameters for ratingScale! min must be smaller than max");
@@ -226,16 +226,25 @@ var ratingScale = class ratingScale {
 		this.increment = increment;
 	}
 
+	/*
+	 * Draws rating bar and selector
+	*/
 	drawRatingScale() {
 		this.drawRatingBar();
 		var right = this.ratingBarX + this.ratingBarWidth;
 		var left = this.ratingBarX;
-		var randPos = Math.random() * (right - left) + left;
+
+		// set initial position of selector at random
+		var randPos = Math.random() * (right - left) + left; 
 		this.drawSelector(randPos, 0, "blue");
 
 		this.drawTickLabels();
 	}
 
+	/*
+	 * Draws rectangle svg as rating bar
+	 * Adds listener to rating bar (will call moveSelector when mouse is on top of rating bar)
+	*/
 	drawRatingBar() {
 		var width = canvas.width/2;
 		var height = canvas.height*0.04;
@@ -257,6 +266,9 @@ var ratingScale = class ratingScale {
 		this.ratingScale.appendChild(r);
 	}
 
+	/*
+	 * Draws rectangle svg as rating bar
+	*/
 	drawSelector(x, y, color) {
 		var width = this.ratingBarWidth*.03;
 		var height = canvas.height*0.04;
@@ -276,8 +288,11 @@ var ratingScale = class ratingScale {
 		this.ratingScale.appendChild(r);
 	}
 
+	/*
+	 * Draws labels below the rating scale 
+	 * Position and number of labels determined by increment, max, and min set in constructor
+	*/
 	drawTickLabels() {
-
 		var nRatingValues = (this.max - this.min)/this.increment;
 		var nScaleValues = this.ratingBarWidth/this.increment;
 		var nTicks = (this.max - this.min)*this.tickIncrement;
@@ -299,19 +314,19 @@ var ratingScale = class ratingScale {
 		this.tickLabels = tickLabels;
 	}
 
+	/*
+	 * Reposition selector to mouse position over rating bar
+	*/
 	updateSelector(evt) {
-		// OPTION 1
 		var originalX = parseInt(this.selector.getAttribute("x"));
-		var x = evt.clientX - originalX - this.selectorWidth/2; // why is it prevX?
+		var x = evt.clientX - originalX - this.selectorWidth/2; 
 		var y = 0; // relative to rating bar
 		this.selector.setAttribute("transform", "translate(" + (x).toString() + "," + (y).toString() + ")");
-
-		// OPTION 2
-		//var x = evt.clientX;
-		//this.selector.setAttribute("x", x.toString())
-		//this.selector.setAttribute("y", y.toString())
 	}
 
+	/*
+	 * Determine rating, set trial results, and end the trial
+	*/
 	recordRating(evt) {
 		// (max-min) / increment => number of possible values
 		var nRatingValues = (this.max - this.min)/this.increment;
@@ -338,12 +353,15 @@ var ratingScale = class ratingScale {
 		t2 = evt.timeStamp;
 		allTrials[currTrialN].results.rt = t2 - t1;
 		allTrials[currTrialN].receivedResponse = true;
-		allTrials[currTrialN].results.rsp = rating;
+		allTrials[currTrialN].results.rating = rating;
 		allTrials[currTrialN].trialEndTime = t2;
 		allTrials[currTrialN].trialDuration = t2 - t1;
 		end_trial();
 	}
 
+	/*
+	 * Remove scale from 
+	*/
 	resetScale() {
 		if (this.bar != null) {
 			this.ratingScale.removeChild(this.bar);
@@ -359,11 +377,18 @@ var ratingScale = class ratingScale {
 	}
 }
 
+/*
+ * Intermediary function called when mouse is over rating bar
+ * Calls updateSelector for the scale
+*/
 var moveSelector = function moveSelector(evt) {
-	//console.log(evt);
 	scale.updateSelector(evt);
 }
 
+/*
+ * Intermediary function called when mouse clicks rating bar
+ * Calls recordRating for the scale
+*/
 var getRating = function(evt) {
 	scale.recordRating(evt);
 }
@@ -371,12 +396,15 @@ var getRating = function(evt) {
 const BLACK = "#000000";
 const RED = "#ff0000";
 const GREEN = "#00cc00";
+/*
+ *** CONFIRMATION BOX ***
+*/
 var box;
 /*
   * Creates an svg box at the center of the screen
   * Use case: Turns green when user responds
   * Use case: Turns red when trial timed out and no response was received
-  * @param {string} color: a hex value to change the color
+  * @param {string} color: a hex value to set the box color 
 */
 var set_confirmation_color = function set_confirmation_color(color) {
 	if (box!=null) {

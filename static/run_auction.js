@@ -14,17 +14,6 @@ var allTrials = [];
 
 var expErrors = [];
 
-
-
-window.onload = get_ip;
-var get_ip = function get_ip(e) {
-	console.log("hello")
-	$.getJSON("https://api.ipify.org/?format=json", function(e) {
-	    console.log(e.ip);
-	});
-}
-
-
 /*
   * Called from script in experiment.html to initialize expVariables
   * @param {array} inputExpVariables: each element is a dictionary containing trial information
@@ -47,23 +36,6 @@ var svg = document.getElementById("mySVG");
 svg.setAttribute("width", (winWidth).toString());
 svg.setAttribute("height", (winHeight).toString());
 
-var needToResizeWindow = false;
-
-window.onresize = function() {
-	resizeWindow();
-}
-
-var resizeWindow = function resizeWindow() {
-	var winWidth = window.innerWidth;
-	var winHeight = window.innerHeight;
-	canvas.width = winWidth;
-	canvas.height = winHeight;
-	ctx = document.getElementById('myCanvas').getContext('2d');
-	svg.setAttribute("width", (winWidth).toString());
-	svg.setAttribute("height", (winHeight).toString());
-	draw_trial_display(expVariables[currTrialN]);
-}
-
 var confirmationTime = 500; // in ms
 var confirmTimer;
 
@@ -73,31 +45,11 @@ var maxTrialDuration = 400000; // in ms
 
 var scale;
 
-var push_trial_info = function push_trial_info() {
-	var currTrial = new trial(currTrialN, stimuli, maxTrialDuration, ['rt','rsp']);
-	allTrials.push(currTrial);
-
-	console.log(currTrial)
-	console.log(allTrials)
-
-	// send stimuli here to trialInfo, set special keys inside trialInfo
-
-	for (var i in stimuli) {
-		if (stimuli[i].key != null) {
-			specialKeys.push(stimuli[i].key);
-
-		}
-	}
-
-	t1 = performance.now(); // start timer for this trial
-	trialTimer = setTimeout(end_trial,maxTrialDuration);
-
-	allTrials[currTrialN].trialStartTime = t1;
-
-	for (var i in stimuli) {
-		allTrials[currTrialN]['stimulus' + parseInt(i+1,10)] = stimuli[i].id;
-	}
-	
+/*
+ * Called in the HTML
+*/
+var start_experiment = function start_experiment() {
+	draw_trial_display(expVariables[currTrialN]); 
 }
 
 /*
@@ -107,12 +59,6 @@ var push_trial_info = function push_trial_info() {
 */
 var draw_trial_display = function draw_trial_display(trialVariables) {
 	// condition is a dictionary - each key can be used to set trial conditions
-
-	/*
-	if (needToResizeWindow) {
-		resizeWindow();
-	}
-	*/
 
 	var imgFolder = '/static/stim/demo/';
 	var stimulus1 = trialVariables['stimulus1'];
@@ -136,13 +82,35 @@ var draw_trial_display = function draw_trial_display(trialVariables) {
 	scale.drawRatingScale(); // draws/redraws scale
 }
 
-var start_experiment = function start_experiment() {
-	//ctx.clearRect(0,0,canvas.width,canvas.height);
-	draw_trial_display(expVariables[currTrialN]); 
+/*
+ * Initializes set of trial information and adds to allTrials
+ * Checks for any special key presses (associated with stimuli) and adds to specialKeys
+ * Gets start time of trial
+*/
+var push_trial_info = function push_trial_info() {
+	var currTrial = new trial(currTrialN, stimuli, maxTrialDuration, ['rt','rating']);
+	allTrials.push(currTrial);
+
+	// send stimuli here to trialInfo, set special keys inside trialInfo
+	var i;
+	for (i=0;i<stimuli.length;i++) {
+		if (stimuli[i].key != null) {
+			specialKeys.push(stimuli[i].key);
+		}
+	}
+
+	t1 = performance.now(); // start timer for this trial
+	trialTimer = setTimeout(end_trial,maxTrialDuration);
+
+	allTrials[currTrialN].trialStartTime = t1;
+
+	for (var i in stimuli) {
+		allTrials[currTrialN]['stimulus' + parseInt(i+1,10)] = stimuli[i].id;
+	}
 }
 
 /*
-  * Checks key presses and moves to next trial
+  * Checks key presses and moves to next trial if key press is valid
   * If recordAllKeyPresses is true, gets and stores key press information
   * Checks array of special keys
   * 	- if current key pressed is in specialKey, moves to next trial
@@ -150,13 +118,12 @@ var start_experiment = function start_experiment() {
 var checkKeyPress = function(e) {
 	var timePressed = e.timeStamp;
 	t2 = timePressed;
-	// should check if timepressed is after trial starts
-	if (specialKeys.indexOf(e.key) > -1 && currTrialN == allTrials.length - 1) { 
+	if (specialKeys.indexOf(e.key) > -1 && currTrialN == allTrials.length - 1) { // key press is valid
 		clearTimeout(trialTimer);
 		clearTimeout(confirmTimer);
-		// see http://keycode.info/ for key codes
 		if (currTrialN < expVariables.length) {
-			for (var i in stimuli) {
+			var i;
+			for (i=0;i<stimuli.length;i++) {
 				if (e.key == stimuli[i].key) {
 					allTrials[currTrialN].results.selected = stimuli[i].id;
 				} 
@@ -202,7 +169,6 @@ var next_trial = function next_trial() {
   * Does all clean up for trial
   * Clear trialTimer
   * Get trial duration / reaction time
-  * Changes color of confirmation box
   * Sets timer for confirmation and iterates to next trial at the end of confirmation
 */
 var end_trial = function end_trial() {
@@ -211,7 +177,6 @@ var end_trial = function end_trial() {
 		allTrials[currTrialN]['stimulus' + parseInt(i+1,10) + 'Loaded'] = stimuli[i].loaded;
 	}
 
-	var color;
 	clearTimeout(trialTimer);
 	if (allTrials[currTrialN].results == null) { // did not respond
 		t2 = performance.now();
@@ -221,8 +186,26 @@ var end_trial = function end_trial() {
 		allTrials[currTrialN].trialEndTime = t2;
 		allTrials[currTrialN].trialDuration = t2 - t1;
 	}
-	confirmTimer = setTimeout(next_trial,confirmationTime);
+	confirmTimer = setTimeout(next_trial,confirmationTime); 
 }
 
+/*
+ * Called when change in window size is detected
+ * Changes width and height of canvas and svg to that of window
+*/
+var resizeWindow = function resizeWindow() {
+	var winWidth = window.innerWidth;
+	var winHeight = window.innerHeight;
+	canvas.width = winWidth;
+	canvas.height = winHeight;
+	ctx = document.getElementById('myCanvas').getContext('2d');
+	svg.setAttribute("width", (winWidth).toString());
+	svg.setAttribute("height", (winHeight).toString());
+	draw_trial_display(expVariables[currTrialN]);
+}
+
+window.onresize = function() {
+	resizeWindow();
+}
 
 window.addEventListener("keydown", checkKeyPress);

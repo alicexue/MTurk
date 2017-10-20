@@ -34,21 +34,6 @@ var svg = document.getElementById("mySVG");
 svg.setAttribute("width", (window.innerWidth).toString());
 svg.setAttribute("height", (window.innerHeight).toString());
 
-window.onresize = function() {
-	resizeWindow();
-}
-
-var resizeWindow = function resizeWindow() {
-	var winWidth = window.innerWidth;
-	var winHeight = window.innerHeight;
-	canvas.width = winWidth;
-	canvas.height = winHeight;
-	ctx = document.getElementById('myCanvas').getContext('2d');
-	svg.setAttribute("width", (winWidth).toString());
-	svg.setAttribute("height", (winHeight).toString());
-	draw_trial_display(expVariables[currTrialN]);
-}
-
 var confirmationTime = 500; // in ms
 var confirmTimer;
 
@@ -56,25 +41,9 @@ var t1, t2;
 var trialTimer;
 var maxTrialDuration = 400000; // in ms
 
-var push_trial_info = function push_trial_info() {
-	var currTrial = new trial(currTrialN, stimuli, maxTrialDuration, ['rt','rsp','selected']);
-	allTrials.push(currTrial);
-	console.log(currTrial)
-	console.log(allTrials)
-	// send stimuli here to trialInfo, set special keys inside trialInfo
 
-	for (var i in stimuli) {
-		allTrials[currTrialN]['stimulus' + parseInt(i+1,10)] = stimuli[i].id;
-		if (stimuli[i].key != null) {
-			specialKeys.push(stimuli[i].key);
-
-		}
-	}
-	
-	t1 = performance.now(); // start timer for this trial
-	trialTimer = setTimeout(end_trial,maxTrialDuration);
-	allTrials[currTrialN].trialN = currTrialN;
-	allTrials[currTrialN].trialStartTime = t1;
+var start_experiment = function start_experiment() {
+	draw_trial_display(expVariables[currTrialN]); 
 }
 
 /*
@@ -113,9 +82,27 @@ var draw_trial_display = function draw(trialVariables) {
 	set_confirmation_color(BLACK);
 }
 
-var start_experiment = function start_experiment() {
-	//ctx.clearRect(0,0,canvas.width,canvas.height);
-	draw_trial_display(expVariables[currTrialN]); 
+
+var push_trial_info = function push_trial_info() {
+	var currTrial = new trial(currTrialN, stimuli, maxTrialDuration, ['rt','rsp','selected']);
+	allTrials.push(currTrial);
+	console.log(currTrial)
+	console.log(allTrials)
+	// send stimuli here to trialInfo, set special keys inside trialInfo
+
+	var i;
+	for (i = 0; i < stimuli.length; i++) { 
+		allTrials[currTrialN]['stimulus' + parseInt(i+1,10)] = stimuli[i].id;
+		if (stimuli[i].key != null) {
+			specialKeys.push(stimuli[i].key);
+
+		}
+	}
+	
+	t1 = performance.now(); // start timer for this trial
+	trialTimer = setTimeout(end_trial,maxTrialDuration);
+	allTrials[currTrialN].trialN = currTrialN;
+	allTrials[currTrialN].trialStartTime = t1;
 }
 
 /*
@@ -133,7 +120,8 @@ var checkKeyPress = function(e) {
 		clearTimeout(confirmTimer);
 		// see http://keycode.info/ for key codes
 		if (currTrialN < expVariables.length) {
-			for (var i in stimuli) {
+			var i;
+			for (i=0;i<stimuli.length;i++) {
 				if (e.key == stimuli[i].key) {
 					allTrials[currTrialN].results.selected = stimuli[i].id;
 				} 
@@ -162,10 +150,9 @@ var checkKeyPress = function(e) {
 var next_trial = function next_trial() {
 	currTrialN+=1; // iterate to next trial
 	ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-	if (currTrialN < expVariables.length) {
+	if (currTrialN < expVariables.length) { // experiment has not ended 
 		draw_trial_display(expVariables[currTrialN]);
-	} else {
-		
+	} else { // experiment has ended
 		var strExpResults = JSON.stringify(allTrials);
 		document.getElementById('experimentResults').value = strExpResults;
 
@@ -206,5 +193,22 @@ var end_trial = function end_trial() {
 	confirmTimer = setTimeout(next_trial,confirmationTime);
 }
 
+/*
+ * Called when change in window size is detected
+ * Changes width and height of canvas and svg to that of window
+*/
+var resizeWindow = function resizeWindow() {
+	var winWidth = window.innerWidth;
+	var winHeight = window.innerHeight;
+	canvas.width = winWidth;
+	canvas.height = winHeight;
+	ctx = document.getElementById('myCanvas').getContext('2d');
+	svg.setAttribute("width", (winWidth).toString());
+	svg.setAttribute("height", (winHeight).toString());
+	draw_trial_display(expVariables[currTrialN]);
+}
 
+window.onresize = function() {
+	resizeWindow();
+}
 window.addEventListener("keydown", checkKeyPress);

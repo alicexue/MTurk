@@ -35,7 +35,6 @@ svg.setAttribute("width", (window.innerWidth).toString());
 svg.setAttribute("height", (window.innerHeight).toString());
 
 window.onresize = function() {
-	console.log("HELLO")
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
 	ctx = document.getElementById('myCanvas').getContext('2d');

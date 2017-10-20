@@ -1,5 +1,6 @@
 import os, sys
 import csv
+import random
 
 _thisDir = os.path.dirname(os.path.abspath(__file__)).decode(sys.getfilesystemencoding())
 os.chdir(_thisDir)
@@ -14,6 +15,22 @@ def get_stimuli():
 			stimuli.append(stimulusFile[:-4])
 	return stimuli
 
+def get_two_stimuli_lists():
+	stimuli1 = get_stimuli()
+	random.shuffle(stimuli1)
+	stimuli2 = get_stimuli()
+	random.shuffle(stimuli2)
+	for i in range(0,len(stimuli1)):
+		if stimuli1[i] == stimuli2[i]:
+			newIndex = random.randint(0,len(stimuli1)-1)
+			while newIndex == i or stimuli1[newIndex] == stimuli2[newIndex]:
+				newIndex = random.randint(0,len(stimuli1)-1)
+			oldStimulus = stimuli2[i]
+			stimuli2[i] = stimuli2[newIndex]
+			stimuli2[newIndex] = oldStimulus
+	return stimuli1, stimuli2
+
+get_two_stimuli_lists()
 
 def get_bid_responses(csv_name):
 	'''
@@ -30,7 +47,7 @@ def get_bid_responses(csv_name):
 			if rowN == 0:
 				varN = 0
 				stimIndex = variables.index('stimulus1')
-				bidIndex = variables.index('rsp')
+				bidIndex = variables.index('rating')
 			else:
 				stimulus = variables[stimIndex]
 				bid = variables[bidIndex]
