@@ -9,11 +9,13 @@ def organize_data(expResults, data_csv_name, stimuli_csv_name):
 		os.makedirs('data')
 
 	keys = expResults[0].keys()
+	keys = list(reversed(keys))
 	header = []
 	stimuliHeader = []
 	for key in keys:
 		if key == 'results':
 			resultKeys = expResults[0]['results'].keys()
+			resultKeys = list(reversed(resultKeys))
 			for resultKey in resultKeys:
 				header.append(resultKey)
 
@@ -22,6 +24,7 @@ def organize_data(expResults, data_csv_name, stimuli_csv_name):
 		else:
 			stimuli = expResults[0]['stimuli']
 			stimulusKeys = expResults[0]['stimuli'][0].keys()
+			stimulusKeys = list(reversed(stimulusKeys))
 			for i in range(0,len(stimuli)):
 				for stimulusKey in stimulusKeys:
 					stimuliHeader.append('stimulus'+str(i+1)+'_'+stimulusKey)

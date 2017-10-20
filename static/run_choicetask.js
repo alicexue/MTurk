@@ -1,4 +1,4 @@
-console.log("run_choicetask.js");
+console.log("loaded run_choicetask.js");
 var expVariables; 
 
 var recordAllKeyPresses = true;
@@ -34,6 +34,21 @@ var svg = document.getElementById("mySVG");
 svg.setAttribute("width", (window.innerWidth).toString());
 svg.setAttribute("height", (window.innerHeight).toString());
 
+window.onresize = function() {
+	resizeWindow();
+}
+
+var resizeWindow = function resizeWindow() {
+	var winWidth = window.innerWidth;
+	var winHeight = window.innerHeight;
+	canvas.width = winWidth;
+	canvas.height = winHeight;
+	ctx = document.getElementById('myCanvas').getContext('2d');
+	svg.setAttribute("width", (winWidth).toString());
+	svg.setAttribute("height", (winHeight).toString());
+	draw_trial_display(expVariables[currTrialN]);
+}
+
 var confirmationTime = 500; // in ms
 var confirmTimer;
 
@@ -44,11 +59,12 @@ var maxTrialDuration = 400000; // in ms
 var push_trial_info = function push_trial_info() {
 	var currTrial = new trial(currTrialN, stimuli, maxTrialDuration, ['rt','rsp','selected']);
 	allTrials.push(currTrial);
-
+	console.log(currTrial)
+	console.log(allTrials)
 	// send stimuli here to trialInfo, set special keys inside trialInfo
 
 	for (var i in stimuli) {
-		allTrials[currTrialN]['stimulus' + i] = stimuli[i].id;
+		allTrials[currTrialN]['stimulus' + parseInt(i+1,10)] = stimuli[i].id;
 		if (stimuli[i].key != null) {
 			specialKeys.push(stimuli[i].key);
 
@@ -68,6 +84,7 @@ var push_trial_info = function push_trial_info() {
 */
 var draw_trial_display = function draw(trialVariables) {
 	// condition is a dictionary - each key can be used to set trial conditions
+
 	var imgFolder = '/static/stim/demo/';
 	var stimulus1 = trialVariables['stimulus1'];
 	var stim1Bid = trialVariables['stim1Bid'];
@@ -125,6 +142,7 @@ var checkKeyPress = function(e) {
 			allTrials[currTrialN].receivedResponse = true;
 			allTrials[currTrialN].results.rsp = e.key;
 			allTrials[currTrialN].trialEndTime = t2;
+			allTrials[currTrialN].trialDuration = t2 - t1;
 			end_trial();
 		}
 	}
@@ -168,7 +186,7 @@ var next_trial = function next_trial() {
 var end_trial = function end_trial() {
 	var i;
 	for (i=0;i<stimuli.length;i++) {
-		allTrials[currTrialN]['stimulus'+(i+1).toString()+'Loaded'] = stimuli[i].loaded;
+		allTrials[currTrialN]['stimulus' + parseInt(i+1,10) +'Loaded'] = stimuli[i].loaded;
 	}
 
 	var color;
@@ -180,6 +198,7 @@ var end_trial = function end_trial() {
 		allTrials[currTrialN].results.rsp = 'None';
 		allTrials[currTrialN].results.rt = t2 - t1;
 		allTrials[currTrialN].trialEndTime = t2;
+		allTrials[currTrialN].trialDuration = t2 - t1;
 	} else {
 		color = GREEN;
 	}

@@ -110,8 +110,23 @@ var imageStimulus = class imageStimulus {
 
 			// percent of window to be width of image
 			var scaledWidthPercent = 0.45;
-			var scaledWidth = window.innerWidth * scaledWidthPercent;
-			var scaledHeight = img.height/img.width * window.innerWidth * scaledWidthPercent;
+			var scaledWidth = canvas.width * scaledWidthPercent;
+			var scaledHeight = img.height/img.width * canvas.width * scaledWidthPercent;
+			console.log(scaledWidth/img.width)
+			console.log(scaledHeight/img.height)
+
+			while (scaledWidth/img.width <= .50) {
+				alert('Please make your browser window bigger, and then press "ok".')
+				var winWidth = window.innerWidth;
+				var winHeight = window.innerHeight;
+				canvas.width = winWidth;
+				canvas.height = winHeight;
+				ctx = document.getElementById('myCanvas').getContext('2d');
+				svg.setAttribute("width", (winWidth).toString());
+				svg.setAttribute("height", (winHeight).toString());
+				scaledWidth = canvas.width * scaledWidthPercent;
+				scaledHeight = img.height/img.width * canvas.width * scaledWidthPercent;
+			}
 
 			if (scaledWidth > img.width && scaledHeight > img.height) {
 				console.log("did not adjust image dimensions")
@@ -165,14 +180,14 @@ var imageStimulus = class imageStimulus {
   * 	returns null otherwise	
 */
 var get_img_position = function get_img_position(img, positionName) {
-	var padding = window.innerWidth * .02; // adjusts the amount of white space between two images
+	var padding = canvas.width * .02; // adjusts the amount of white space between two images
 	var positionCoords;
 	if (positionName == 'CENTER') {
-		positionCoords = [window.innerWidth / 2 - img.width / 2, canvas.height / 2 - img.height / 2]
+		positionCoords = [canvas.width / 2 - img.width / 2, canvas.height / 2 - img.height / 2]
 	} else if (positionName == 'LEFT') {
-		positionCoords = [window.innerWidth / 2 - img.width - padding, canvas.height / 2 - img.height / 2]
+		positionCoords = [canvas.width / 2 - img.width - padding, canvas.height / 2 - img.height / 2]
 	} else if (positionName == 'RIGHT') {
-		positionCoords = [window.innerWidth / 2 + padding, canvas.height / 2 - img.height / 2]
+		positionCoords = [canvas.width / 2 + padding, canvas.height / 2 - img.height / 2]
 	} else {
 		return null;
 	}
@@ -183,7 +198,7 @@ var get_img_position = function get_img_position(img, positionName) {
 		//alert('Image cut off on left edge')
 	}
 
-	if (positionCoords[1] > window.innerHeight) {
+	if (positionCoords[1] > canvas.height) {
 		// should not be alert b/c may show up on client screen
 		//alert('Image cut off on right edge')
 	}
@@ -222,12 +237,14 @@ var ratingScale = class ratingScale {
 	}
 
 	drawRatingBar() {
-		var width = window.innerWidth/2;
-		var height = window.innerHeight*0.04;
+		var width = canvas.width/2;
+		var height = canvas.height*0.04;
 		this.ratingBarWidth = width;
 		this.ratingBarHeight = height;
-		this.ratingBarX = window.innerWidth/2 - width/2;
-		this.ratingBarY = window.innerHeight/2 + (window.innerHeight*0.35);
+		this.ratingBarX = canvas.width/2 - width/2;
+		this.ratingBarY = canvas.height/2 + (canvas.height*0.35);
+		console.log(canvas.width)
+		console.log(canvas.height)
 
 		var r = document.createElementNS("http://www.w3.org/2000/svg", "rect");
 		r.setAttribute("onmousemove", "moveSelector(evt)")
@@ -242,7 +259,7 @@ var ratingScale = class ratingScale {
 
 	drawSelector(x, y, color) {
 		var width = this.ratingBarWidth*.03;
-		var height = window.innerHeight*0.04;
+		var height = canvas.height*0.04;
 		this.selectorWidth = width;
 		this.selectorHeight = height;
 		this.selectorX = x - this.selectorWidth/2;
@@ -323,6 +340,7 @@ var ratingScale = class ratingScale {
 		allTrials[currTrialN].receivedResponse = true;
 		allTrials[currTrialN].results.rsp = rating;
 		allTrials[currTrialN].trialEndTime = t2;
+		allTrials[currTrialN].trialDuration = t2 - t1;
 		end_trial();
 	}
 
@@ -364,10 +382,10 @@ var set_confirmation_color = function set_confirmation_color(color) {
 	if (box!=null) {
 		svg.removeChild(box);
 	}
-	var centerX = window.innerWidth / 2;
-	var centerY = window.innerHeight / 2;
+	var centerX = canvas.width / 2;
+	var centerY = canvas.height / 2;
 
-	var confirmBoxSide = window.innerWidth * 0.02;
+	var confirmBoxSide = canvas.width * 0.02;
 
 	box = document.createElementNS("http://www.w3.org/2000/svg", "rect");
 	box.setAttribute("x",(centerX - confirmBoxSide/2).toString());

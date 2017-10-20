@@ -1,10 +1,12 @@
 from flask import Flask,render_template,request,session
 from flask import redirect,url_for
+from flask import jsonify
 from psychopy import data
 import json
 import random
 import csv, os, sys
 import ast
+import socket
 from utils import * # importing * allows you to use methods from utils.py without calling utils.method_name
 import store_data
 
@@ -105,8 +107,24 @@ def choicetask():
 @app.route("/auction_instructions", methods = ["GET","POST"])
 def auction_instructions():
 	if request.method == "GET":
+		print "-----------------------------------------------------------"
+		print "-----------------------------------------------------------"
+		print socket.gethostbyname(socket.gethostname())
+		x = jsonify({'ip': request.remote_addr}) #, 200
+		print request.remote_addr
+		print request.environ['REMOTE_ADDR']
+		print request.access_route
+		print request.headers.getlist("X-Forwarded-For")#[0].rpartition(' ')#[-1]
+		print request.headers
+		print request.environ
+		print "-----------------------------------------------------------"
+		print "-----------------------------------------------------------"
 		return render_template('auction_instructions.html')
 	else:
+		x = jsonify({'ip': request.remote_addr}) #, 200
+		print request.environ['REMOTE_ADDR']
+		print request.headers
+		print request.environ
 		return redirect(url_for('auction'))
 
 @app.route("/choicetask_instructions", methods = ["GET","POST"])

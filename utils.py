@@ -29,7 +29,7 @@ def get_bid_responses(csv_name):
 			variables = row[0].split(',')
 			if rowN == 0:
 				varN = 0
-				stimIndex = variables.index('stimulus0')
+				stimIndex = variables.index('stimulus1')
 				bidIndex = variables.index('rsp')
 			else:
 				stimulus = variables[stimIndex]

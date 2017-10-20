@@ -1,4 +1,4 @@
-console.log("run_exp.js");
+console.log("loaded run_exp.js");
 var expVariables; 
 
 var recordAllKeyPresses = true;
@@ -33,6 +33,15 @@ var ctx = document.getElementById('myCanvas').getContext('2d');
 var svg = document.getElementById("mySVG");
 svg.setAttribute("width", (window.innerWidth).toString());
 svg.setAttribute("height", (window.innerHeight).toString());
+
+window.onresize = function() {
+	console.log("HELLO")
+	canvas.width = window.innerWidth;
+	canvas.height = window.innerHeight;
+	ctx = document.getElementById('myCanvas').getContext('2d');
+	svg.setAttribute("width", (window.innerWidth).toString());
+	svg.setAttribute("height", (window.innerHeight).toString());
+}
 
 var confirmationTime = 500; // in ms
 var confirmTimer;
