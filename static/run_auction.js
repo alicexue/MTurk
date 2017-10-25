@@ -110,36 +110,27 @@ var push_trial_info = function push_trial_info() {
 }
 
 /*
-  * Checks key presses and moves to next trial if key press is valid
-  * If recordAllKeyPresses is true, gets and stores key press information
-  * Checks array of special keys
-  * 	- if current key pressed is in specialKey, moves to next trial
+  * Does all clean up for trial
+  * Clear trialTimer
+  * Get trial duration / reaction time
+  * Sets timer for confirmation and iterates to next trial at the end of confirmation
 */
-var checkKeyPress = function(e) {
-	var timePressed = e.timeStamp;
-	t2 = timePressed;
-	if (specialKeys.indexOf(e.key) > -1 && currTrialN == allTrials.length - 1) { // key press is valid
-		clearTimeout(trialTimer);
-		clearTimeout(confirmTimer);
-		if (currTrialN < expVariables.length) {
-			var i;
-			for (i=0;i<stimuli.length;i++) {
-				if (e.key == stimuli[i].key) {
-					allTrials[currTrialN].results.selected = stimuli[i].id;
-				} 
-			}
-			allTrials[currTrialN].results.rt = t2 - t1;
-			allTrials[currTrialN].receivedResponse = true;
-			allTrials[currTrialN].results.rsp = e.key;
-			allTrials[currTrialN].trialEndTime = t2;
-			end_trial();
-		}
+var end_trial = function end_trial() {
+	var i;
+	for (i=0;i<stimuli.length;i++) {
+		allTrials[currTrialN]['stimulus' + parseInt(i+1,10) + 'Loaded'] = stimuli[i].loaded;
 	}
-	// record all key presses if true
-	if (recordAllKeyPresses) {
-		var keyPressData = new keyPressInfo(e.key, currTrialN, timePressed, timePressed-t1);
-		allKeyPresses.push(keyPressData);
+
+	clearTimeout(trialTimer);
+	if (allTrials[currTrialN].results == null) { // did not respond
+		t2 = performance.now();
+		drawNextTrial = true;
+		allTrials[currTrialN].results.rsp = 'None';
+		allTrials[currTrialN].results.rt = t2 - t1;
+		allTrials[currTrialN].trialEndTime = t2;
+		allTrials[currTrialN].trialDuration = t2 - t1;
 	}
+	confirmTimer = setTimeout(next_trial,confirmationTime); 
 }
 
 /*
@@ -165,29 +156,6 @@ var next_trial = function next_trial() {
 	}
 }
 
-/*
-  * Does all clean up for trial
-  * Clear trialTimer
-  * Get trial duration / reaction time
-  * Sets timer for confirmation and iterates to next trial at the end of confirmation
-*/
-var end_trial = function end_trial() {
-	var i;
-	for (i=0;i<stimuli.length;i++) {
-		allTrials[currTrialN]['stimulus' + parseInt(i+1,10) + 'Loaded'] = stimuli[i].loaded;
-	}
-
-	clearTimeout(trialTimer);
-	if (allTrials[currTrialN].results == null) { // did not respond
-		t2 = performance.now();
-		drawNextTrial = true;
-		allTrials[currTrialN].results.rsp = 'None';
-		allTrials[currTrialN].results.rt = t2 - t1;
-		allTrials[currTrialN].trialEndTime = t2;
-		allTrials[currTrialN].trialDuration = t2 - t1;
-	}
-	confirmTimer = setTimeout(next_trial,confirmationTime); 
-}
 
 /*
  * Called when change in window size is detected
@@ -207,5 +175,3 @@ var resizeWindow = function resizeWindow() {
 window.onresize = function() {
 	resizeWindow();
 }
-
-window.addEventListener("keydown", checkKeyPress);

@@ -42,6 +42,14 @@ def experiment():
 
 		return redirect(url_for('thankyou'))
 
+""" 
+Auction Task
+
+Description: 
+GET: Passes list of dictionaries with stimulus information to auction.html
+POST: Saves auction data and stimuli to csv files, redirects to choice task
+
+"""
 @app.route("/auction", methods = ["GET","POST"])
 def auction():
 	if request.method == "GET":
@@ -66,7 +74,14 @@ def auction():
 		
 		return redirect(url_for('choicetask_instructions'))
 
+""" 
+Choice Task
 
+Description: 
+GET: Retrieves stimulus ratings from auction data file, sets up stimuli for choice task
+POST: Saves choice task data and stimuli to csv files, redirects to thank you page
+
+"""
 @app.route("/choicetask", methods = ["GET","POST"])
 def choicetask():
 	if request.method == "GET":
@@ -106,6 +121,9 @@ def choicetask():
 		
 		return redirect(url_for('thankyou'))
 
+"""
+Auction Instructions
+"""
 @app.route("/auction_instructions", methods = ["GET","POST"])
 def auction_instructions():
 	if request.method == "GET":
@@ -129,6 +147,9 @@ def auction_instructions():
 		print request.environ
 		return redirect(url_for('auction'))
 
+"""
+Choice Task Instructions
+"""
 @app.route("/choicetask_instructions", methods = ["GET","POST"])
 def choicetask_instructions():
 	if request.method == "GET":
@@ -136,6 +157,9 @@ def choicetask_instructions():
 	else:
 		return redirect(url_for('choicetask'))
 
+"""
+Consent Form (home page)
+"""
 @app.route("/", methods = ["GET","POST"])
 def consent_form():
 	if request.method == "GET":

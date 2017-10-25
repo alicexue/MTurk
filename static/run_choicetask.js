@@ -1,7 +1,6 @@
 console.log("loaded run_choicetask.js");
 var expVariables; 
 
-var recordAllKeyPresses = true;
 var allKeyPresses = [];
 
 var currTrialN = 0;
@@ -36,6 +35,7 @@ svg.setAttribute("height", (window.innerHeight).toString());
 
 var confirmationTime = 500; // in ms
 var confirmTimer;
+var inConfirmation = false;
 
 var t1, t2;
 var trialTimer;
@@ -107,38 +107,40 @@ var push_trial_info = function push_trial_info() {
 
 /*
   * Checks key presses and moves to next trial
-  * If recordAllKeyPresses is true, gets and stores key press information
   * Checks array of special keys
   * 	- if current key pressed is in specialKey, moves to next trial
 */
+var keyIsDown = false; // keep track if key is still being held down - take one key press at a time
 var checkKeyPress = function(e) {
-	var timePressed = e.timeStamp;
-	t2 = timePressed;
-	// should check if timepressed is after trial starts
-	if (specialKeys.indexOf(e.key) > -1 && currTrialN == allTrials.length - 1) { 
-		clearTimeout(trialTimer);
-		clearTimeout(confirmTimer);
-		// see http://keycode.info/ for key codes
-		if (currTrialN < expVariables.length) {
-			var i;
-			for (i=0;i<stimuli.length;i++) {
-				if (e.key == stimuli[i].key) {
-					allTrials[currTrialN].results.selected = stimuli[i].id;
-				} 
+	if (inConfirmation == false && keyIsDown == false) { 
+		keyIsDown = true;
+		var timePressed = e.timeStamp;
+		t2 = timePressed;
+		// should check if timepressed is after trial starts
+		if (specialKeys.indexOf(e.key) > -1 && currTrialN == allTrials.length - 1) { 
+			clearTimeout(trialTimer);
+			clearTimeout(confirmTimer);
+			// see http://keycode.info/ for key codes
+			if (currTrialN < expVariables.length) {
+				var i;
+				for (i=0;i<stimuli.length;i++) {
+					if (e.key == stimuli[i].key) {
+						allTrials[currTrialN].results.selected = stimuli[i].id;
+					} 
+				}
+				allTrials[currTrialN].results.rt = t2 - t1;
+				allTrials[currTrialN].receivedResponse = true;
+				allTrials[currTrialN].results.rsp = e.key;
+				allTrials[currTrialN].trialEndTime = t2;
+				allTrials[currTrialN].trialDuration = t2 - t1;
+				end_trial();
 			}
-			allTrials[currTrialN].results.rt = t2 - t1;
-			allTrials[currTrialN].receivedResponse = true;
-			allTrials[currTrialN].results.rsp = e.key;
-			allTrials[currTrialN].trialEndTime = t2;
-			allTrials[currTrialN].trialDuration = t2 - t1;
-			end_trial();
 		}
 	}
-	// record all key presses if true
-	if (recordAllKeyPresses) {
-		var keyPressData = new keyPressInfo(e.key, currTrialN, timePressed, timePressed-t1);
-		allKeyPresses.push(keyPressData);
-	}
+}
+
+var setKeyUp = function(e) {
+	keyIsDown = false;
 }
 
 /*
@@ -148,6 +150,7 @@ var checkKeyPress = function(e) {
   * Checks if experiment has ended (there are no more trials), and ends the experiment
 */
 var next_trial = function next_trial() {
+	inConfirmation = false;
 	currTrialN+=1; // iterate to next trial
 	ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 	if (currTrialN < expVariables.length) { // experiment has not ended 
@@ -190,6 +193,7 @@ var end_trial = function end_trial() {
 		color = GREEN;
 	}
 	set_confirmation_color(color);
+	inConfirmation = true;
 	confirmTimer = setTimeout(next_trial,confirmationTime);
 }
 
@@ -211,4 +215,5 @@ var resizeWindow = function resizeWindow() {
 window.onresize = function() {
 	resizeWindow();
 }
-window.addEventListener("keydown", checkKeyPress);
+window.addEventListener("keypress", checkKeyPress);
+window.addEventListener("keyup", setKeyUp);
