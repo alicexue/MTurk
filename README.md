@@ -6,6 +6,7 @@ Frontend: HTML, Javascript, CSS
 
 
 Overview of folders (*) and files included:
+
 app.py
 utils.py
 store_data.py

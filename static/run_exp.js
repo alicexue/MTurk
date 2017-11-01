@@ -205,3 +205,7 @@ var end_trial = function end_trial() {
 
 
 window.addEventListener("keydown", checkKeyPress);
+
+window.onbeforeunload = function() {
+	return;
+}

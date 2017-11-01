@@ -175,3 +175,8 @@ var resizeWindow = function resizeWindow() {
 window.onresize = function() {
 	resizeWindow();
 }
+
+// ask to confirm exit of page 
+window.onbeforeunload = function() {
+	return;
+}

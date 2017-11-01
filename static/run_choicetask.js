@@ -217,3 +217,7 @@ window.onresize = function() {
 }
 window.addEventListener("keypress", checkKeyPress);
 window.addEventListener("keyup", setKeyUp);
+
+window.onbeforeunload = function() {
+	return;
+}
