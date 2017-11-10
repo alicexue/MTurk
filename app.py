@@ -93,23 +93,21 @@ def choicetask():
 		#stimuli2 = get_stimuli()
 		#random.shuffle(stimuli2)
 
-		stimuli1, stimuli2 = get_two_stimuli_lists()
+		stimuli = get_two_stimuli_lists()
 
 		stim1Bids = [];
 		stim2Bids = [];
 
 		stimBidDict = get_bid_responses(_thisDir + '/data/auction_data.csv')
 
-		for stim in stimuli1:
-			stim1Bids.append(stimBidDict[stim]);
-
-		for stim in stimuli2:
-			stim2Bids.append(stimBidDict[stim]);
+		for stimPair in stimuli:
+			stim1Bids.append(stimBidDict[stimPair[0]])
+			stim2Bids.append(stimBidDict[stimPair[1]])
 
 		expVariables = [] # array of dictionaries
 
-		for i in range(0,len(stimuli1)):
-			expVariables.append({"stimulus1":stimuli1[i],"stimulus2":stimuli2[i],"stim1Bid":stim1Bids[i],"stim2Bid":stim2Bids[i]})
+		for i in range(0,len(stimuli)):
+			expVariables.append({"stimulus1":stimuli[i][0],"stimulus2":stimuli[i][1],"stim1Bid":stim1Bids[i],"stim2Bid":stim2Bids[i]})
 
 		return render_template('choicetask.html',expVariables=expVariables)
 	else:

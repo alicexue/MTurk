@@ -16,6 +16,18 @@ def get_stimuli():
 	return stimuli
 
 def get_two_stimuli_lists():
+	stimuli = get_stimuli()
+	
+	two_stimuli = [];
+
+	for stimulus1 in stimuli:
+		for stimulus2 in stimuli:
+			if stimulus1 != stimulus2:
+				two_stimuli.append([stimulus1,stimulus2])
+	random.shuffle(two_stimuli)
+	return two_stimuli
+'''
+def get_two_stimuli_lists2():
 	stimuli1 = get_stimuli()
 	random.shuffle(stimuli1)
 	stimuli2 = get_stimuli()
@@ -29,8 +41,7 @@ def get_two_stimuli_lists():
 			stimuli2[i] = stimuli2[newIndex]
 			stimuli2[newIndex] = oldStimulus
 	return stimuli1, stimuli2
-
-get_two_stimuli_lists()
+'''
 
 def get_bid_responses(csv_name):
 	'''
