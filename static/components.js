@@ -164,7 +164,6 @@ var imageStimulus = class imageStimulus {
 				ctx.font = "20px Arial";
 				ctx.fillText("Please make the browser window bigger.",canvas.width/2,canvas.height/2);
 			} else {
-				ctx.clearRect(0,0,canvas.width,canvas.height);
 				ctx.drawImage(img, positionCoords[0], positionCoords[1], scaledWidth, scaledHeight);
 			}
 
