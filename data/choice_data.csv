@@ -1,9 +1,9 @@
 trialDuration,stimulus2Loaded,trialEndTime,maxTrialTime,stimulus1Bid,receivedResponse,rt,selected,rsp,trialStartTime,trialN,stimulus2Bid,stimulus1,stimulus1Loaded,stimulus2
-326.885,True,480.29,400000,1.5,True,326.885,Lindt_small,u,153.405,0,2.26,Lindt_small,True,PopTartsCinnamon
-205.33,True,1192.445,400000,2.26,True,205.33,Lindt_small,i,987.115,1,1.5,PopTartsCinnamon,True,Lindt_small
-161.765,True,1862.41,400000,1.48,True,161.765,ApplePie,u,1700.645,2,1.37,ApplePie,True,FrootLoops
-131.08,True,2500.41,400000,2.41,True,131.08,ApplePie,i,2369.33,3,1.48,wildberrynerds,True,ApplePie
-149.99,True,3157.33,400000,1.37,True,149.99,FrootLoops,u,3007.34,4,1.81,FrootLoops,True,Jollyrancherred
-127.605,True,3795.73,400000,1.72,True,127.605,CornPops,i,3668.125,5,2.19,Twinkie,True,CornPops
-144.145,True,4446.295,400000,2.19,True,144.145,CornPops,u,4302.15,6,2.41,CornPops,True,wildberrynerds
-66.62,True,5023.19,400000,1.81,True,66.62,Twinkie,i,4956.57,7,1.72,Jollyrancherred,True,Twinkie
+655.67,True,806,400000,2.58,True,655.67,CornPops,u,150.33,0,1.99,CornPops,True,wildberrynerds
+1856.345,True,3169.02,400000,1.36,True,1856.345,Twinkie,i,1312.675,1,2.35,Lindt_small,True,Twinkie
+2305.47,True,5983.895,400000,1.99,True,2305.47,ApplePie,i,3678.425,2,1.5,wildberrynerds,True,ApplePie
+38119.2,True,44612.755,400000,1.5,True,38119.2,ApplePie,u,6493.555,3,3,ApplePie,True,Jollyrancherred
+325.41,True,45448.7,400000,3,True,325.41,CornPops,i,45123.29,4,2.58,Jollyrancherred,True,CornPops
+225.25,True,46183.66,400000,0.29,True,225.25,FrootLoops,u,45958.41,5,0,FrootLoops,True,PopTartsCinnamon
+68.94,True,46761.6,400000,2.35,True,68.94,FrootLoops,i,46692.66,6,0.29,Twinkie,True,FrootLoops
+157.4,True,47428.68,400000,0,True,157.4,Lindt_small,i,47271.28,7,1.36,PopTartsCinnamon,True,Lindt_small
