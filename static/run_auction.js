@@ -33,8 +33,8 @@ canvas.height = winHeight;
 var ctx = document.getElementById('myCanvas').getContext('2d');
 
 var svg = document.getElementById("mySVG");
-svg.setAttribute("width", (winWidth).toString());
-svg.setAttribute("height", (winHeight).toString());
+svg.setAttribute("width", winWidth.toString());
+svg.setAttribute("height", winHeight.toString());
 
 var confirmationTime = 500; // in ms
 var confirmTimer;
@@ -44,6 +44,9 @@ var trialTimer;
 var maxTrialDuration = 400000; // in ms
 
 var scale;
+
+var origImgWidth = 576; // necessary for rescaling images and positioning scale
+var origImgHeight = 432; // necessary for rescaling images
 
 /*
  * Called in the HTML
@@ -59,7 +62,7 @@ var start_experiment = function start_experiment() {
 */
 var draw_trial_display = function draw_trial_display(trialVariables) {
 	// condition is a dictionary - each key can be used to set trial conditions
-
+	ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 	var imgFolder = '/static/stim/demo/';
 	var stimulus1 = trialVariables['stimulus1'];
 
@@ -74,13 +77,17 @@ var draw_trial_display = function draw_trial_display(trialVariables) {
 		push_trial_info();
 	}
 
+	var scaledImgDimensions = rescaleImgSize([origImgWidth,origImgHeight]);
+	var scaledHeight = scaledImgDimensions[1];
+
 	if (scale == null) { // set up scale for first trial
-		scale = new ratingScale(0,3,1,.01);
+		scale = new ratingScale(0,3,1,.01,canvas.width/2,canvas.height/2 + scaledHeight/2 + 10);
 	} else {
 		scale.resetScale(); // removes current scale
 	}
-	scale.drawRatingScale(); // draws/redraws scale
+	scale.drawRatingScale(canvas.width/2,canvas.height/2 + scaledHeight/2 + 10); // draws/redraws scale
 }
+
 
 /*
  * Initializes set of trial information and adds to allTrials
@@ -167,8 +174,8 @@ var resizeWindow = function resizeWindow() {
 	canvas.width = winWidth;
 	canvas.height = winHeight;
 	ctx = document.getElementById('myCanvas').getContext('2d');
-	svg.setAttribute("width", (winWidth).toString());
-	svg.setAttribute("height", (winHeight).toString());
+	svg.setAttribute("width", winWidth.toString());
+	svg.setAttribute("height", winHeight.toString());
 	draw_trial_display(expVariables[currTrialN]);
 }
 

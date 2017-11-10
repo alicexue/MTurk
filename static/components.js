@@ -77,6 +77,7 @@ var imageStimulus = class imageStimulus {
 		this.key = key; // keyboard key for selection
 		this.width = NaN;
 		this.height = NaN;
+		this.lastAlertTime = 0;
 	}
 
 	// position can be a string, like the ones in get_img_position
@@ -113,14 +114,18 @@ var imageStimulus = class imageStimulus {
 
 			imageStim.loaded = true;
 
-			// percent of window to be width of image
-			var scaledWidthPercent = 0.45;
-			var scaledWidth = canvas.width * scaledWidthPercent;
-			var scaledHeight = img.height/img.width * canvas.width * scaledWidthPercent;
+			imageStim.origWidth = img.width;
+			imageStim.origHeight = img.height;
+
+			var dimensions = rescaleImgSize([img.width,img.height]);
+			var scaledWidth = dimensions[0];
+			var scaledHeight = dimensions[1];
 
 			// if (scaledWidth/img.width <= .30 || scaledHeight + 50 >= canvas.height) {
+			
+			/*
 			while (scaledHeight + 50 >= canvas.height) {
-				alert('Please make your browser window bigger, and then press "OK".')
+				alert('Please make your browser window bigger, and then press "OK".');
 				console.log("opened alert")
 				var winWidth = window.innerWidth;
 				var winHeight = window.innerHeight;
@@ -132,12 +137,8 @@ var imageStimulus = class imageStimulus {
 				scaledWidth = canvas.width * scaledWidthPercent;
 				scaledHeight = img.height/img.width * canvas.width * scaledWidthPercent;
 			}
+			*/
 
-			if (scaledWidth > img.width && scaledHeight > img.height) {
-				console.log("did not adjust image dimensions")
-				scaledWidth = img.width;
-				scaledHeight = img.height;
-			}
 
 			img.setAttribute("width",scaledWidth);
 			img.setAttribute("height",scaledHeight);
@@ -157,12 +158,45 @@ var imageStimulus = class imageStimulus {
 				alert('Invalid image position')
 			}
 
-			ctx.drawImage(img, positionCoords[0], positionCoords[1], scaledWidth, scaledHeight);
+			if (scaledHeight < imageStim.origWidth * .40) {
+				console.log("alert")
+				ctx.clearRect(0,0,canvas.width,canvas.height);
+				ctx.font = "20px Arial";
+				ctx.fillText("Please make the browser window bigger.",canvas.width/2,canvas.height/2);
+			} else {
+				ctx.clearRect(0,0,canvas.width,canvas.height);
+				ctx.drawImage(img, positionCoords[0], positionCoords[1], scaledWidth, scaledHeight);
+			}
 
 		};
 		img.setAttribute("src", this.src);
 	}
+
 };
+
+// dimensions is [width, height]
+var rescaleImgSize = function rescaleImgSize(dimensions) {
+	// percent of window to be width of image
+	var width = dimensions[0];
+	var height = dimensions[1];
+	var scaledWidthPercent = 0.45;
+	var scaledWidth = canvas.width * scaledWidthPercent;
+	var scaledHeight = height/width * canvas.width * scaledWidthPercent;
+
+	if (scaledWidth > width && scaledHeight > height) {
+		console.log("did not adjust image dimensions")
+		scaledWidth = width;
+		scaledHeight = height;
+	}
+
+	if (scaledHeight >= canvas.height + 20) {
+		var newProportion = (canvas.height * .65) / scaledHeight;
+		scaledHeight = scaledHeight * newProportion;
+		scaledWidth = scaledWidth * newProportion;
+	}
+	return [scaledWidth, scaledHeight];
+}
+
 
 
 /*
@@ -207,7 +241,9 @@ var get_img_position = function get_img_position(img, positionName) {
  *** RATING SCALE ***
 */
 var ratingScale = class ratingScale {
-	constructor(min, max, tickIncrement, increment) {
+	// x is center of rating scale
+	// y is top of rating scale
+	constructor(min, max, tickIncrement, increment, x, y) {
 		if (min >= max) {
 			alert("Invalid parameters for ratingScale! min must be smaller than max");
 		}
@@ -224,13 +260,17 @@ var ratingScale = class ratingScale {
 		this.max = max;
 		this.tickIncrement = tickIncrement;
 		this.increment = increment;
+		this.x = x;
+		this.y = y;
 	}
 
 	/*
 	 * Draws rating bar and selector
 	*/
-	drawRatingScale() {
-		this.drawRatingBar();
+	drawRatingScale(x, y) {
+		this.x = x;
+		this.y = y;
+		this.drawRatingBar(this.x, this.y);
 		var right = this.ratingBarX + this.ratingBarWidth;
 		var left = this.ratingBarX;
 
@@ -245,15 +285,15 @@ var ratingScale = class ratingScale {
 	 * Draws rectangle svg as rating bar
 	 * Adds listener to rating bar (will call moveSelector when mouse is on top of rating bar)
 	*/
-	drawRatingBar() {
+	drawRatingBar(x, y) {
+		this.x = x;
+		this.y = y;
 		var width = canvas.width/2;
 		var height = canvas.height*0.04;
 		this.ratingBarWidth = width;
 		this.ratingBarHeight = height;
-		this.ratingBarX = canvas.width/2 - width/2;
-		this.ratingBarY = canvas.height/2 + (canvas.height*0.35);
-		console.log(canvas.width)
-		console.log(canvas.height)
+		this.ratingBarX = this.x - width/2;
+		this.ratingBarY = this.y;
 
 		var r = document.createElementNS("http://www.w3.org/2000/svg", "rect");
 		r.setAttribute("onmousemove", "moveSelector(evt)")
