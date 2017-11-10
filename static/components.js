@@ -56,6 +56,8 @@ function keyPressInfo(key,trialN,timePressedExp,timePressedTrial) {
   * Creates an image and assigns it an id, source, key value
   * Contains method to draw image stimulus at particular location
 */
+var blank;
+var alertText;
 var imageStimulus = class imageStimulus {
 	/*
 	  * Creates javascript image, sets id, src, key
@@ -121,25 +123,6 @@ var imageStimulus = class imageStimulus {
 			var scaledWidth = dimensions[0];
 			var scaledHeight = dimensions[1];
 
-			// if (scaledWidth/img.width <= .30 || scaledHeight + 50 >= canvas.height) {
-			
-			/*
-			while (scaledHeight + 50 >= canvas.height) {
-				alert('Please make your browser window bigger, and then press "OK".');
-				console.log("opened alert")
-				var winWidth = window.innerWidth;
-				var winHeight = window.innerHeight;
-				canvas.width = winWidth;
-				canvas.height = winHeight;
-				ctx = document.getElementById('myCanvas').getContext('2d');
-				svg.setAttribute("width", (winWidth).toString());
-				svg.setAttribute("height", (winHeight).toString());
-				scaledWidth = canvas.width * scaledWidthPercent;
-				scaledHeight = img.height/img.width * canvas.width * scaledWidthPercent;
-			}
-			*/
-
-
 			img.setAttribute("width",scaledWidth);
 			img.setAttribute("height",scaledHeight);
 
@@ -158,11 +141,9 @@ var imageStimulus = class imageStimulus {
 				alert('Invalid image position')
 			}
 
-			if (scaledHeight < imageStim.origWidth * .40) {
-				console.log("alert")
-				ctx.clearRect(0,0,canvas.width,canvas.height);
-				ctx.font = "20px Arial";
-				ctx.fillText("Please make the browser window bigger.",canvas.width/2,canvas.height/2);
+			if (scaledWidth < imageStim.origWidth * .40) { // if scaled image is too small
+				alertSmallWindow();
+
 			} else {
 				ctx.drawImage(img, positionCoords[0], positionCoords[1], scaledWidth, scaledHeight);
 			}
@@ -196,6 +177,38 @@ var rescaleImgSize = function rescaleImgSize(dimensions) {
 	return [scaledWidth, scaledHeight];
 }
 
+
+var alertSmallWindow = function alertSmallWindow() {
+	if (!svg.contains(blank)) {
+		blank = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+		blank.setAttribute("x","0");
+		blank.setAttribute("y","0");
+		blank.setAttribute("fill","white");
+		blank.setAttribute("width",(canvas.width).toString());
+		blank.setAttribute("height",(canvas.height).toString());
+		svg.appendChild(blank);
+	}
+
+	if (!svg.contains(alertText)) {		
+		alertText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+		alertText.setAttribute("x","0");
+		alertText.setAttribute("y",(canvas.height/2).toString());
+		alertText.setAttribute("font-family","Arial");
+		alertText.setAttribute("font-size","25");
+		alertText.setAttribute("fill","black");
+		alertText.textContent = "Please enlarge the window.";
+		svg.appendChild(alertText);
+
+		var textWidth = alertText.getComputedTextLength();
+
+		if (textWidth > canvas.width) {
+			svg.removeChild(alertText);
+			alertText.setAttribute("textLength",canvas.width);
+			alertText.setAttribute("lengthAdjust","spacingAndGlyphs");
+			svg.appendChild(alertText);
+		}
+	}
+}
 
 
 /*
@@ -337,13 +350,15 @@ var ratingScale = class ratingScale {
 		var nTicks = (this.max - this.min)*this.tickIncrement;
 		var i;
 		var tickLabels = [];
-		var fontsize = 25;
+		var fontSize = 25;
 		for (i = 0; i <= nTicks; i++) {
 			var label = document.createElementNS("http://www.w3.org/2000/svg", "text");
-			label.setAttribute("x",((i*nScaleValues/nRatingValues)+this.ratingBarX - fontsize + 5).toString());
-			label.setAttribute("y",(this.ratingBarY + this.ratingBarHeight + fontsize).toString());
+			var x = (i*nScaleValues/nRatingValues)+this.ratingBarX - fontSize + 5;
+			var y = this.ratingBarY + this.ratingBarHeight + fontSize
+			label.setAttribute("x",x.toString());
+			label.setAttribute("y",y.toString());
 			label.setAttribute("font-family","Arial");
-			label.setAttribute("font-size",fontsize.toString());
+			label.setAttribute("font-size",fontSize.toString() + "px");
 			label.setAttribute("fill","black");
 			label.textContent = "$" + i.toString();
 			tickLabels.push(label);
@@ -351,6 +366,11 @@ var ratingScale = class ratingScale {
 
 		}
 		this.tickLabels = tickLabels;
+
+		var bottom = y + fontSize;
+		if (bottom > canvas.height) {
+			alertSmallWindow();
+		}
 	}
 
 	/*
@@ -402,10 +422,10 @@ var ratingScale = class ratingScale {
 	 * Remove scale from 
 	*/
 	resetScale() {
-		if (this.bar != null) {
+		if (this.ratingScale.contains(this.bar)) {
 			this.ratingScale.removeChild(this.bar);
 		}
-		if (this.selector != null) {
+		if (this.ratingScale.contains(this.selector)) {
 			this.ratingScale.removeChild(this.selector);
 		}
 		var i;

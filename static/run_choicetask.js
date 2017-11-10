@@ -209,6 +209,12 @@ var resizeWindow = function resizeWindow() {
 	ctx = document.getElementById('myCanvas').getContext('2d');
 	svg.setAttribute("width", (winWidth).toString());
 	svg.setAttribute("height", (winHeight).toString());
+	if (svg.contains(blank)) {
+		svg.removeChild(blank);
+	}
+	if (svg.contains(alertText)) {
+		svg.removeChild(alertText);
+	}
 	draw_trial_display(expVariables[currTrialN]);
 }
 
