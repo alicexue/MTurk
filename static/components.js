@@ -199,12 +199,17 @@ var alertSmallWindow = function alertSmallWindow() {
 		alertText.textContent = "Please enlarge the window.";
 		svg.appendChild(alertText);
 
-		var textWidth = alertText.getComputedTextLength();
+		var textLength = alertText.getComputedTextLength();
 
-		if (textWidth > canvas.width) {
+		if (textLength > canvas.width) { // then have text be squished to fit canvas
 			svg.removeChild(alertText);
 			alertText.setAttribute("textLength",canvas.width);
 			alertText.setAttribute("lengthAdjust","spacingAndGlyphs");
+			svg.appendChild(alertText);
+		} else { // then center the text
+			var newX = canvas.width/2 - textLength/2;
+			svg.removeChild(alertText);
+			alertText.setAttribute("x",newX.toString());
 			svg.appendChild(alertText);
 		}
 	}
