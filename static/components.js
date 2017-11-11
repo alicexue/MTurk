@@ -18,7 +18,7 @@ var trialResults = class trialResults {
 	constructor(resultTypes) {
 		var i;
 		for (i=0;i<resultTypes.length;i++) {
-			this[resultTypes[i]] = 'None';
+			this[resultTypes[i]] = 'NaN';
 		}
 	}
 }
@@ -56,8 +56,6 @@ function keyPressInfo(key,trialN,timePressedExp,timePressedTrial) {
   * Creates an image and assigns it an id, source, key value
   * Contains method to draw image stimulus at particular location
 */
-var blank;
-var alertText;
 var imageStimulus = class imageStimulus {
 	/*
 	  * Creates javascript image, sets id, src, key
@@ -154,6 +152,13 @@ var imageStimulus = class imageStimulus {
 
 };
 
+/*
+  * Gets resized image dimensions
+  * If screen is not wide enough, scales width of image to 45% of window width
+  * If screen is not tall enough, scales height of image to 65% of window height
+  * @param dimensions: original dimensions of image
+  * @returns new array of scaled dimensions: [width, height]
+*/
 // dimensions is [width, height]
 var rescaleImgSize = function rescaleImgSize(dimensions) {
 	// percent of window to be width of image
@@ -177,7 +182,13 @@ var rescaleImgSize = function rescaleImgSize(dimensions) {
 	return [scaledWidth, scaledHeight];
 }
 
-
+/*
+  * Called when window is too small
+  * Draws white svg over entire screen + error message
+  * blank and alertText removed in resizeWindow
+*/
+var blank;
+var alertText;
 var alertSmallWindow = function alertSmallWindow() {
 	if (!svg.contains(blank)) {
 		blank = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -260,7 +271,7 @@ var get_img_position = function get_img_position(img, positionName) {
 var ratingScale = class ratingScale {
 	// x is center of rating scale
 	// y is top of rating scale
-	constructor(min, max, tickIncrement, increment, x, y) {
+	constructor(min, max, tickIncrement, increment, x, y, labelNames) {
 		if (min >= max) {
 			alert("Invalid parameters for ratingScale! min must be smaller than max");
 		}
@@ -279,6 +290,7 @@ var ratingScale = class ratingScale {
 		this.increment = increment;
 		this.x = x;
 		this.y = y;
+		this.labelNames = labelNames;
 	}
 
 	/*
@@ -295,7 +307,7 @@ var ratingScale = class ratingScale {
 		var randPos = Math.random() * (right - left) + left; 
 		this.drawSelector(randPos, 0, "blue");
 
-		this.drawTickLabels();
+		this.drawTickLabels(this.labelNames);
 	}
 
 	/*
@@ -348,25 +360,42 @@ var ratingScale = class ratingScale {
 	/*
 	 * Draws labels below the rating scale 
 	 * Position and number of labels determined by increment, max, and min set in constructor
+	 * If labelNames is null, just puts numbers
+	 * @param labelNames: array of labels for each tick
 	*/
-	drawTickLabels() {
+	drawTickLabels(labelNames) {
 		var nRatingValues = (this.max - this.min)/this.increment;
 		var nScaleValues = this.ratingBarWidth/this.increment;
-		var nTicks = (this.max - this.min)*this.tickIncrement;
+		var nTicks = (this.max - this.min)*this.tickIncrement + 1;
+
+		if (labelNames != null && labelNames.length != nTicks) {
+			alert("Number of label names given does not match number of ticks.");
+		}
+
 		var i;
 		var tickLabels = [];
 		var fontSize = 25;
-		for (i = 0; i <= nTicks; i++) {
+		for (i = 0; i <= nTicks - 1; i++) {
 			var label = document.createElementNS("http://www.w3.org/2000/svg", "text");
-			var x = (i*nScaleValues/nRatingValues)+this.ratingBarX - fontSize + 5;
+			var x = (i*nScaleValues/nRatingValues)+this.ratingBarX;
 			var y = this.ratingBarY + this.ratingBarHeight + fontSize
 			label.setAttribute("x",x.toString());
 			label.setAttribute("y",y.toString());
 			label.setAttribute("font-family","Arial");
 			label.setAttribute("font-size",fontSize.toString() + "px");
 			label.setAttribute("fill","black");
-			label.textContent = "$" + i.toString();
+
+			if (labelNames != null) {
+				label.textContent = labelNames[i].toString();
+			} else {
+				label.textContent = i.toString();
+			}
 			tickLabels.push(label);
+			this.ratingScale.appendChild(label);
+			var textLength = label.getComputedTextLength();
+			this.ratingScale.removeChild(label);
+			var centeredX = x - textLength/2;
+			label.setAttribute("x",centeredX.toString());
 			this.ratingScale.appendChild(label);
 
 		}
@@ -415,6 +444,9 @@ var ratingScale = class ratingScale {
 		console.log(rating);
 
 		t2 = evt.timeStamp;
+		console.log(allTrials)
+		console.log(currTrialN)
+		console.log(allTrials[currTrialN]);
 		allTrials[currTrialN].results.rt = t2 - t1;
 		allTrials[currTrialN].receivedResponse = true;
 		allTrials[currTrialN].results.rating = rating;

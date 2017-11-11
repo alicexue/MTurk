@@ -36,9 +36,6 @@ var svg = document.getElementById("mySVG");
 svg.setAttribute("width", winWidth.toString());
 svg.setAttribute("height", winHeight.toString());
 
-var confirmationTime = 500; // in ms
-var confirmTimer;
-
 var t1, t2;
 var trialTimer;
 var maxTrialDuration = 400000; // in ms
@@ -81,7 +78,7 @@ var draw_trial_display = function draw_trial_display(trialVariables) {
 	var scaledHeight = scaledImgDimensions[1];
 
 	if (scale == null) { // set up scale for first trial
-		scale = new ratingScale(0,3,1,.01,canvas.width/2,canvas.height/2 + scaledHeight/2 + 10);
+		scale = new ratingScale(0,3,1,.01,canvas.width/2,canvas.height/2 + scaledHeight/2 + 10, ["$0", "$1", "$2", "$3"]);
 	} else {
 		scale.resetScale(); // removes current scale
 	}
@@ -120,7 +117,6 @@ var push_trial_info = function push_trial_info() {
   * Does all clean up for trial
   * Clear trialTimer
   * Get trial duration / reaction time
-  * Sets timer for confirmation and iterates to next trial at the end of confirmation
 */
 var end_trial = function end_trial() {
 	var i;
@@ -137,7 +133,7 @@ var end_trial = function end_trial() {
 		allTrials[currTrialN].trialEndTime = t2;
 		allTrials[currTrialN].trialDuration = t2 - t1;
 	}
-	confirmTimer = setTimeout(next_trial,confirmationTime); 
+	next_trial();
 }
 
 /*
@@ -167,6 +163,9 @@ var next_trial = function next_trial() {
 /*
  * Called when change in window size is detected
  * Changes width and height of canvas and svg to that of window
+ * If window was previously too small (has blank and alertText)
+ * 	 then these are removed
+ * Calls on draw_trial_display to redraw display according to new window size
 */
 var resizeWindow = function resizeWindow() {
 	var winWidth = window.innerWidth;
@@ -176,12 +175,15 @@ var resizeWindow = function resizeWindow() {
 	ctx = document.getElementById('myCanvas').getContext('2d');
 	svg.setAttribute("width", winWidth.toString());
 	svg.setAttribute("height", winHeight.toString());
+
+	// remove blanks/alert text if exist
 	if (svg.contains(blank)) {
 		svg.removeChild(blank);
 	}
 	if (svg.contains(alertText)) {
 		svg.removeChild(alertText);
 	}
+
 	draw_trial_display(expVariables[currTrialN]);
 }
 

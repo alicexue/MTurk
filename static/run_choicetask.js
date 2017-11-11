@@ -200,6 +200,9 @@ var end_trial = function end_trial() {
 /*
  * Called when change in window size is detected
  * Changes width and height of canvas and svg to that of window
+ * If window was previously too small (has blank and alertText)
+ * 	 then these are removed
+ * Calls on draw_trial_display to redraw display according to new window size
 */
 var resizeWindow = function resizeWindow() {
 	var winWidth = window.innerWidth;
