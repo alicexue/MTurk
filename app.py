@@ -124,29 +124,8 @@ Auction Instructions
 @app.route("/auction_instructions", methods = ["GET","POST"])
 def auction_instructions():
 	if request.method == "GET":
-		print "-----------------------------------------------------------"
-		print "-----------------------------------------------------------"
-		print socket.gethostbyname(socket.gethostname())
-		x = jsonify({'ip': request.remote_addr}) #, 200
-		print request.remote_addr
-		print "HERE"
-		print request.environ['REMOTE_ADDR']
-		print "THERE"
-		print request.access_route
-		print request.headers.getlist("X-Forwarded-For")#[0].rpartition(' ')#[-1]
-		print request.headers
-		print request.environ
-		print type(request.environ)
-		request.environ["CONTENT_LENGTH"] = str(0)
-		print request.environ
-		print "-----------------------------------------------------------"
-		print "-----------------------------------------------------------"
 		return render_template('auction_instructions.html')
 	else:
-		x = jsonify({'ip': request.remote_addr}) #, 200
-		print request.environ['REMOTE_ADDR']
-		print request.headers
-		print request.environ
 		return redirect(url_for('auction'))
 
 """
@@ -155,8 +134,6 @@ Choice Task Instructions
 @app.route("/choicetask_instructions", methods = ["GET","POST"])
 def choicetask_instructions():
 	if request.method == "GET":
-		request.environ["CONTENT_LENGTH"] = str(0)
-		request.environ["CONTENT_TYPE"] = 'text/html';
 		return render_template('choicetask_instructions.html')
 	else:
 		return redirect(url_for('choicetask'))
@@ -166,24 +143,16 @@ Consent Form (home page)
 """
 @app.route("/", methods = ["GET","POST"])
 def consent_form():
-	print "HERE"
 	if request.method == "GET":
-		print "THERE"
-		request.environ["TRANSFER_ENCODING"] = 'identity'
-		#request.environ["CONTENT_LENGTH"] = str(0)
-		#request.environ["CONTENT_TYPE"] = 'text/html';
-		print request.environ
 		return render_template('consent_form.html')
 	else:
 		return redirect(url_for('auction_instructions'))
 
 @app.route("/thankyou", methods = ["GET"])
 def thankyou():
-	#request.environ["CONTENT_LENGTH"] = str(0)
-	#request.environ["CONTENT_TYPE"] = 'text/html';
 	return render_template('thankyou.html')
 
 if __name__ == "__main__":
 	app.debug = True
 	app.secret_key="Don't store this on github"
-	app.run(host = '0.0.0.0', port = 8000, threaded=True)
+	app.run(host = '0.0.0.0', port = 8000)
