@@ -18,7 +18,7 @@ var expErrors = [];
   * @param {array} inputExpVariables: each element is a dictionary containing trial information
   *		elements are in the order of trials
 */
-var set_trial_variables = function set(inputExpVariables) {
+var setTrialVariables = function setTrialVariables(inputExpVariables) {
 	expVariables = inputExpVariables
 }
 
@@ -42,8 +42,8 @@ var trialTimer;
 var maxTrialDuration = 400000; // in ms
 
 
-var start_experiment = function start_experiment() {
-	draw_trial_display(expVariables[currTrialN]); 
+var startExperiment = function startExperiment() {
+	drawTrialDisplay(expVariables[currTrialN]); 
 }
 
 /*
@@ -51,7 +51,7 @@ var start_experiment = function start_experiment() {
   * Updates trial information
   * @param {python dictionary/js object} trialVariables: has keys and values for trial parameters
 */
-var draw_trial_display = function draw(trialVariables) {
+var drawTrialDisplay = function draw(trialVariables) {
 	// condition is a dictionary - each key can be used to set trial conditions
 
 	var imgFolder = '/static/stim/demo/';
@@ -73,17 +73,17 @@ var draw_trial_display = function draw(trialVariables) {
 	stimuli = [img1, img2];
 
 	if (allTrials.length == currTrialN) {
-		push_trial_info();
+		pushTrialInfo();
 	}
 
 	allTrials[currTrialN]['stimulus1Bid'] = stim1Bid;
 	allTrials[currTrialN]['stimulus2Bid'] = stim2Bid;
 
-	set_confirmation_color(BLACK);
+	setConfirmationColor(BLACK);
 }
 
 
-var push_trial_info = function push_trial_info() {
+var pushTrialInfo = function pushTrialInfo() {
 	var currTrial = new trial(currTrialN, stimuli, maxTrialDuration, ['rt','rsp','selected']);
 	allTrials.push(currTrial);
 	console.log(currTrial)
@@ -100,7 +100,7 @@ var push_trial_info = function push_trial_info() {
 	}
 	
 	t1 = performance.now(); // start timer for this trial
-	trialTimer = setTimeout(end_trial,maxTrialDuration);
+	trialTimer = setTimeout(endTrial,maxTrialDuration);
 	allTrials[currTrialN].trialN = currTrialN;
 	allTrials[currTrialN].trialStartTime = t1;
 }
@@ -133,7 +133,7 @@ var checkKeyPress = function(e) {
 				allTrials[currTrialN].results.rsp = e.key;
 				allTrials[currTrialN].trialEndTime = t2;
 				allTrials[currTrialN].trialDuration = t2 - t1;
-				end_trial();
+				endTrial();
 			}
 		}
 	}
@@ -145,16 +145,16 @@ var setKeyUp = function(e) {
 
 /*
   * Draws next trial 
-  * Called by a timer in end_trial when maximum trial time is exceeded
+  * Called by a timer in endTrial when maximum trial time is exceeded
   * Iterates currTrialN, clears current screen and draws next trial
   * Checks if experiment has ended (there are no more trials), and ends the experiment
 */
-var next_trial = function next_trial() {
+var nextTrial = function nextTrial() {
 	inConfirmation = false;
 	currTrialN+=1; // iterate to next trial
 	ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 	if (currTrialN < expVariables.length) { // experiment has not ended 
-		draw_trial_display(expVariables[currTrialN]);
+		drawTrialDisplay(expVariables[currTrialN]);
 	} else { // experiment has ended
 		var strExpResults = JSON.stringify(allTrials);
 		document.getElementById('experimentResults').value = strExpResults;
@@ -173,7 +173,7 @@ var next_trial = function next_trial() {
   * Changes color of confirmation box
   * Sets timer for confirmation and iterates to next trial at the end of confirmation
 */
-var end_trial = function end_trial() {
+var endTrial = function endTrial() {
 	var i;
 	for (i=0;i<stimuli.length;i++) {
 		allTrials[currTrialN]['stimulus' + parseInt(i+1,10) +'Loaded'] = stimuli[i].loaded;
@@ -192,9 +192,9 @@ var end_trial = function end_trial() {
 	} else {
 		color = GREEN;
 	}
-	set_confirmation_color(color);
+	setConfirmationColor(color);
 	inConfirmation = true;
-	confirmTimer = setTimeout(next_trial,confirmationTime);
+	confirmTimer = setTimeout(nextTrial,confirmationTime);
 }
 
 /*
@@ -202,7 +202,7 @@ var end_trial = function end_trial() {
  * Changes width and height of canvas and svg to that of window
  * If window was previously too small (has blank and alertText)
  * 	 then these are removed
- * Calls on draw_trial_display to redraw display according to new window size
+ * Calls on drawTrialDisplay to redraw display according to new window size
 */
 var resizeWindow = function resizeWindow() {
 	var winWidth = window.innerWidth;
@@ -218,7 +218,7 @@ var resizeWindow = function resizeWindow() {
 	if (svg.contains(alertText)) {
 		svg.removeChild(alertText);
 	}
-	draw_trial_display(expVariables[currTrialN]);
+	drawTrialDisplay(expVariables[currTrialN]);
 }
 
 window.onresize = function() {

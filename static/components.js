@@ -80,7 +80,7 @@ var imageStimulus = class imageStimulus {
 		this.lastAlertTime = 0;
 	}
 
-	// position can be a string, like the ones in get_img_position
+	// position can be a string, like the ones in getImgPosition
 	// OR position can be an array of the coordinates [x, y]
 	// if position not a valid input, throws error
 
@@ -88,7 +88,7 @@ var imageStimulus = class imageStimulus {
 	  * Draw image on browser window
 	  * @param {string or array} position: location to draw the stimulus
 	  *		can be string or array of x, y coordinates
-	  * 	see @get_img_position for valid string inputs
+	  * 	see @getImgPosition for valid string inputs
 	  *		note: position of image is anchored at top left corner
 	  * 	alerts browser if param position is not valid
 	  *		also checks if image fails to load and records it
@@ -127,7 +127,7 @@ var imageStimulus = class imageStimulus {
 			imageStim.width = scaledWidth;
 			imageStim.height = scaledHeight;
 
-			var positionCoords = get_img_position(img, position);
+			var positionCoords = getImgPosition(img, position);
 			if (typeof position === 'string' && positionCoords != null) {
 				imageStim.positionName = position;
 				imageStim.positionCoords = positionCoords;
@@ -239,7 +239,7 @@ var alertSmallWindow = function alertSmallWindow() {
   *	@returns array of x, y coordinates if positionName is valid string,
   * 	returns null otherwise	
 */
-var get_img_position = function get_img_position(img, positionName) {
+var getImgPosition = function getImgPosition(img, positionName) {
 	var padding = canvas.width * .02; // adjusts the amount of white space between two images
 	var positionCoords;
 	if (positionName == 'CENTER') {
@@ -452,7 +452,7 @@ var ratingScale = class ratingScale {
 		allTrials[currTrialN].results.rating = rating;
 		allTrials[currTrialN].trialEndTime = t2;
 		allTrials[currTrialN].trialDuration = t2 - t1;
-		end_trial();
+		endTrial();
 	}
 
 	/*
@@ -502,7 +502,7 @@ var box;
   * Use case: Turns red when trial timed out and no response was received
   * @param {string} color: a hex value to set the box color 
 */
-var set_confirmation_color = function set_confirmation_color(color) {
+var setConfirmationColor = function setConfirmationColor(color) {
 	if (box!=null) {
 		svg.removeChild(box);
 	}
