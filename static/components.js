@@ -169,7 +169,7 @@ var rescaleImgSize = function rescaleImgSize(dimensions) {
 	var scaledHeight = height/width * canvas.width * scaledWidthPercent;
 
 	if (scaledWidth > width && scaledHeight > height) {
-		console.log("did not adjust image dimensions")
+		console.log("Did not adjust image dimensions.")
 		scaledWidth = width;
 		scaledHeight = height;
 	}
