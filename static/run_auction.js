@@ -65,7 +65,9 @@ var drawTrialDisplay = function drawTrialDisplay(trialVariables) {
 
 	console.log("Trial " + currTrialN + " " + stimulus1);
 
-	var img1 = new imageStimulus(stimulus1, imgFolder + stimulus1 + ".bmp", null);
+	var widthPercent = 0.80;
+
+	var img1 = new imageStimulus(stimulus1, imgFolder + stimulus1 + ".bmp", null, widthPercent, true);
 	img1.drawImage('CENTER');
 
 	stimuli = [img1];
@@ -74,7 +76,7 @@ var drawTrialDisplay = function drawTrialDisplay(trialVariables) {
 		pushTrialInfo();
 	}
 
-	var scaledImgDimensions = rescaleImgSize([origImgWidth,origImgHeight]);
+	var scaledImgDimensions = rescaleImgSize([origImgWidth,origImgHeight], widthPercent);
 	var scaledHeight = scaledImgDimensions[1];
 
 	if (scale == null) { // set up scale for first trial
@@ -123,12 +125,10 @@ var endTrial = function endTrial() {
 	for (i=0;i<stimuli.length;i++) {
 		allTrials[currTrialN]['stimulus' + parseInt(i+1,10) + 'Loaded'] = stimuli[i].loaded;
 	}
-
+	t2 = performance.now()
 	clearTimeout(trialTimer);
-	if (allTrials[currTrialN].results == null) { // did not respond
-		t2 = performance.now();
+	if (allTrials[currTrialN].results == null || t2 - t1 > maxTrialDuration) { // did not respond
 		drawNextTrial = true;
-		allTrials[currTrialN].results.rsp = 'None';
 		allTrials[currTrialN].results.rt = t2 - t1;
 		allTrials[currTrialN].trialEndTime = t2;
 		allTrials[currTrialN].trialDuration = t2 - t1;
@@ -148,7 +148,6 @@ var nextTrial = function nextTrial() {
 	if (currTrialN < expVariables.length) {
 		drawTrialDisplay(expVariables[currTrialN]);
 	} else {
-		
 		var strExpResults = JSON.stringify(allTrials);
 		document.getElementById('experimentResults').value = strExpResults;
 

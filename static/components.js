@@ -69,15 +69,18 @@ var imageStimulus = class imageStimulus {
 	  *		if you don't want a key associated with this stimulus, set key param to null
 	  *		these keys are automatically registered as events when user presses them
 	*/
-	constructor(id, src, key) {
+	constructor(id, src, key, widthPercent, rescaleHeight) {
 		this.imgObject = new Image();
 		this.id = id;
 		this.imgObject.setAttribute("id", id);
 		this.src = src;
 		this.key = key; // keyboard key for selection
+		this.origWidth = NaN;
+		this.origHeight = NaN;
 		this.width = NaN;
 		this.height = NaN;
-		this.lastAlertTime = 0;
+		this.widthPercent = widthPercent;
+		this.rescaleHeight = rescaleHeight;
 	}
 
 	// position can be a string, like the ones in getImgPosition
@@ -117,7 +120,7 @@ var imageStimulus = class imageStimulus {
 			imageStim.origWidth = img.width;
 			imageStim.origHeight = img.height;
 
-			var dimensions = rescaleImgSize([img.width,img.height]);
+			var dimensions = rescaleImgSize([img.width,img.height], imageStim.widthPercent, imageStim.rescaleHeight);
 			var scaledWidth = dimensions[0];
 			var scaledHeight = dimensions[1];
 
@@ -140,6 +143,7 @@ var imageStimulus = class imageStimulus {
 			}
 
 			if (scaledWidth < imageStim.origWidth * .40) { // if scaled image is too small
+				console.log("too small");
 				alertSmallWindow();
 
 			} else {
@@ -157,16 +161,31 @@ var imageStimulus = class imageStimulus {
   * If screen is not wide enough, scales width of image to 45% of window width
   * If screen is not tall enough, scales height of image to 65% of window height
   * @param dimensions: original dimensions of image
+  * @param widthPercent: percent of canvas width to set image width
+  * @param rescaleHeight: true if image height should be rescaled automatically when canvas height exceeds width
   * @returns new array of scaled dimensions: [width, height]
 */
 // dimensions is [width, height]
-var rescaleImgSize = function rescaleImgSize(dimensions) {
+var rescaleImgSize = function rescaleImgSize(dimensions, widthPercent, rescaleHeight) {
 	// percent of window to be width of image
 	var width = dimensions[0];
 	var height = dimensions[1];
-	var scaledWidthPercent = 0.45;
+	var scaledWidthPercent = widthPercent;
 	var scaledWidth = canvas.width * scaledWidthPercent;
 	var scaledHeight = height/width * canvas.width * scaledWidthPercent;
+
+	var readjust = false;
+	if (rescaleHeight) {
+		if (canvas.height < canvas.width) {
+			readjust = true;
+		}
+	}
+
+	if (scaledHeight >= canvas.height || readjust) {
+		var newProportion = (canvas.height * .65) / scaledHeight;
+		scaledHeight = scaledHeight * newProportion;
+		scaledWidth = scaledWidth * newProportion;
+	}
 
 	if (scaledWidth > width && scaledHeight > height) {
 		console.log("Did not adjust image dimensions.")
@@ -174,11 +193,6 @@ var rescaleImgSize = function rescaleImgSize(dimensions) {
 		scaledHeight = height;
 	}
 
-	if (scaledHeight >= canvas.height + 20) {
-		var newProportion = (canvas.height * .65) / scaledHeight;
-		scaledHeight = scaledHeight * newProportion;
-		scaledWidth = scaledWidth * newProportion;
-	}
 	return [scaledWidth, scaledHeight];
 }
 
@@ -403,6 +417,7 @@ var ratingScale = class ratingScale {
 
 		var bottom = y + fontSize;
 		if (bottom > canvas.height) {
+			console.log("rating bar cut off");
 			alertSmallWindow();
 		}
 	}

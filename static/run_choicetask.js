@@ -39,7 +39,7 @@ var inConfirmation = false;
 
 var t1, t2;
 var trialTimer;
-var maxTrialDuration = 400000; // in ms
+var maxTrialDuration = 4000; // in ms
 
 
 var startExperiment = function startExperiment() {
@@ -62,11 +62,13 @@ var drawTrialDisplay = function draw(trialVariables) {
 
 	console.log("Trial " + currTrialN + " " + stimulus1 + " " + stim1Bid.toString() + ", " + stimulus2 + " " + stim2Bid.toString());
 
-	var img1 = new imageStimulus(stimulus1, imgFolder + stimulus1 + ".bmp", 'u');
+	var widthPercent = 0.45;
+
+	var img1 = new imageStimulus(stimulus1, imgFolder + stimulus1 + ".bmp", 'u', widthPercent, false);
 	img1.drawImage('LEFT');
 	img1.bid = stim1Bid;
 
-	var img2 = new imageStimulus(stimulus2, imgFolder + stimulus2 + ".bmp", 'i');
+	var img2 = new imageStimulus(stimulus2, imgFolder + stimulus2 + ".bmp", 'i', widthPercent, false);
 	img2.drawImage('RIGHT');
 	img2.bid = stim2Bid;
 	
@@ -150,9 +152,9 @@ var setKeyUp = function(e) {
   * Checks if experiment has ended (there are no more trials), and ends the experiment
 */
 var nextTrial = function nextTrial() {
-	inConfirmation = false;
 	currTrialN+=1; // iterate to next trial
 	ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+	inConfirmation = false;
 	if (currTrialN < expVariables.length) { // experiment has not ended 
 		drawTrialDisplay(expVariables[currTrialN]);
 	} else { // experiment has ended
@@ -180,9 +182,9 @@ var endTrial = function endTrial() {
 	}
 
 	var color;
+	t2 = performance.now();
 	clearTimeout(trialTimer);
-	if (allTrials[currTrialN].results == null) { // did not respond
-		t2 = performance.now();
+	if (allTrials[currTrialN].results == null || t2 - t1 > maxTrialDuration) { // did not respond
 		color = RED;
 		drawNextTrial = true;
 		allTrials[currTrialN].results.rsp = 'None';
