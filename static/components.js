@@ -135,7 +135,7 @@ var imageStimulus = class imageStimulus {
 			}
 
 			if (scaledWidth < imageStim.origWidth * .40) { // if scaled image is too small
-				console.log("too small");
+				console.log("Image too small");
 				alertSmallWindow();
 
 			} else {

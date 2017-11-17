@@ -166,7 +166,6 @@ var nextTrial = function nextTrial() {
 	} else { // experiment has ended
 		var strExpResults = JSON.stringify(allTrials);
 		document.getElementById('experimentResults').value = strExpResults;
-
 		document.getElementById('exp').submit()
 	}
 }
@@ -191,7 +190,6 @@ var endTrial = function endTrial() {
 		drawNextTrial = true;
 		allTrials[currTrialN].results.rsp = 'None';
 		allTrials[currTrialN].results.rt = t2 - t1;
-		console.log(t2-t1)
 		allTrials[currTrialN].trialEndTime = t2;
 		allTrials[currTrialN].trialDuration = t2 - t1;
 	} else {

@@ -155,7 +155,6 @@ var nextTrial = function nextTrial() {
 	} else {
 		var strExpResults = JSON.stringify(allTrials);
 		document.getElementById('experimentResults').value = strExpResults;
-
 		document.getElementById('exp').submit()
 	}
 }

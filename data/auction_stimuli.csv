@@ -1,9 +1,9 @@
 stimulus1_origWidth,stimulus1_src,stimulus1_positionName,stimulus1_positionCoords,stimulus1_widthPercent,stimulus1_id,stimulus1_width,stimulus1_rescaleHeight,stimulus1_trialN,stimulus1_key,stimulus1_origHeight,stimulus1_loaded,stimulus1_height,stimulus1_imgObject,stimulus1_loadedTime
-576,/static/stim/demo/wildberrynerds.bmp,CENTER,"[64.5, 98.5]",0.8,wildberrynerds,486.2,True,0,None,432,True,364.65,{},197.11
-576,/static/stim/demo/Twinkie.bmp,CENTER,"[64.5, 98.5]",0.8,Twinkie,486.2,True,1,None,432,True,364.65,{},978.805
-576,/static/stim/demo/ApplePie.bmp,CENTER,"[64.5, 98.5]",0.8,ApplePie,486.2,True,2,None,432,True,364.65,{},1500.97
-576,/static/stim/demo/FrootLoops.bmp,CENTER,"[64.5, 98.5]",0.8,FrootLoops,486.2,True,3,None,432,True,364.65,{},2026.815
-576,/static/stim/demo/CornPops.bmp,CENTER,"[64.5, 98.5]",0.8,CornPops,486.2,True,4,None,432,True,364.65,{},2489.795
-576,/static/stim/demo/PopTartsCinnamon.bmp,CENTER,"[76.5, 104]",0.8,PopTartsCinnamon,513.933333333,True,5,None,432,True,385.45,{},14871.345
-576,/static/stim/demo/Lindt_small.bmp,CENTER,"[76.5, 104]",0.8,Lindt_small,513.933333333,True,6,None,432,True,385.45,{},15313.41
-576,/static/stim/demo/Jollyrancherred.bmp,CENTER,"[76.5, 104]",0.8,Jollyrancherred,513.933333333,True,7,None,432,True,385.45,{},15787.905
+576,/static/stim/demo/Jollyrancherred.bmp,CENTER,"[165, 109.5]",0.8,Jollyrancherred,539.933333333,True,0,None,432,True,404.95,{},600.935
+576,/static/stim/demo/ApplePie.bmp,CENTER,"[165, 109.5]",0.8,ApplePie,539.933333333,True,1,None,432,True,404.95,{},940.06
+576,/static/stim/demo/PopTartsCinnamon.bmp,CENTER,"[165, 109.5]",0.8,PopTartsCinnamon,539.933333333,True,2,None,432,True,404.95,{},1433.44
+576,/static/stim/demo/CornPops.bmp,CENTER,"[165, 109.5]",0.8,CornPops,539.933333333,True,3,None,432,True,404.95,{},1901.71
+576,/static/stim/demo/Twinkie.bmp,CENTER,"[165, 109.5]",0.8,Twinkie,539.933333333,True,4,None,432,True,404.95,{},2371.195
+576,/static/stim/demo/wildberrynerds.bmp,CENTER,"[165, 109.5]",0.8,wildberrynerds,539.933333333,True,5,None,432,True,404.95,{},2809.795
+576,/static/stim/demo/FrootLoops.bmp,CENTER,"[165, 109.5]",0.8,FrootLoops,539.933333333,True,6,None,432,True,404.95,{},3203.075
+576,/static/stim/demo/Lindt_small.bmp,CENTER,"[165, 109.5]",0.8,Lindt_small,539.933333333,True,7,None,432,True,404.95,{},3626.92

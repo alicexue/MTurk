@@ -1,9 +1,9 @@
 trialDuration,trialEndTime,maxTrialTime,receivedResponse,trialStartTime,rt,rating,trialN,stimulus1,stimulus1Loaded
-787.95,951.725,400000,True,163.775,787.95,1.87,0,wildberrynerds,True
-518.815,1476.735,400000,True,957.92,518.815,2.36,1,Twinkie,True
-520.565,2001.92,400000,True,1481.355,520.565,2.59,2,ApplePie,True
-456.06,2462.525,400000,True,2006.465,456.06,2.74,3,FrootLoops,True
-12377.5,14844.665,400000,True,2467.165,12377.5,2.05,4,CornPops,True
-439.48,15289.025,400000,True,14849.545,439.48,2.5,5,PopTartsCinnamon,True
-468.115,15761.775,400000,True,15293.66,468.115,1.59,6,Lindt_small,True
-447.77,16214.13,400000,True,15766.36,447.77,1.15,7,Jollyrancherred,True
+554.345,908.56,400000,True,354.215,554.345,2.06,0,Jollyrancherred,True
+492.93,1409.83,400000,True,916.9,492.93,1.6,1,ApplePie,True
+454.9,1869.835,400000,True,1414.935,454.9,2.07,2,PopTartsCinnamon,True
+471.585,2346.87,400000,True,1875.285,471.585,2.4,3,CornPops,True
+431.47,2782.95,400000,True,2351.48,431.47,2.11,4,Twinkie,True
+383.42,3170.8,400000,True,2787.38,383.42,1.97,5,wildberrynerds,True
+423.685,3598.945,400000,True,3175.26,423.685,1.81,6,FrootLoops,True
+399.365,4002.975,400000,True,3603.61,399.365,1.78,7,Lindt_small,True

@@ -24,7 +24,7 @@
 		<script src="{{ url_for('static', filename='run_choicetask.js') }}"></script>
 
 		<script>
-			setTrialVariables({{expVariables|tojson}}); 
+			setTrialVariables({{expVariables|tojson|safe}}); 
 			// curly brackets are for jinja2 templates, which returns expVariables from app.py
 			startExperiment();
 		</script>
