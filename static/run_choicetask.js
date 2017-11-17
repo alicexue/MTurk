@@ -152,8 +152,9 @@ var setKeyUp = function(e) {
   * Checks if experiment has ended (there are no more trials), and ends the experiment
 */
 var nextTrial = function nextTrial() {
-	currTrialN+=1; // iterate to next trial
 	ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+	svg.removeChild(box);
+	currTrialN+=1; // iterate to next trial
 	inConfirmation = false;
 	if (currTrialN < expVariables.length) { // experiment has not ended 
 		drawTrialDisplay(expVariables[currTrialN]);

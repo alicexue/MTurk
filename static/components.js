@@ -462,7 +462,7 @@ var ratingScale = class ratingScale {
 		console.log(allTrials)
 		console.log(currTrialN)
 		console.log(allTrials[currTrialN]);
-		allTrials[currTrialN].results.rt = t2 - t1;
+		allTrials[currTrialN].results.rt = t2 - t1; 
 		allTrials[currTrialN].receivedResponse = true;
 		allTrials[currTrialN].results.rating = rating;
 		allTrials[currTrialN].trialEndTime = t2;
@@ -471,7 +471,7 @@ var ratingScale = class ratingScale {
 	}
 
 	/*
-	 * Remove scale from 
+	 * Remove scale from svg
 	*/
 	resetScale() {
 		if (this.ratingScale.contains(this.bar)) {
@@ -482,7 +482,9 @@ var ratingScale = class ratingScale {
 		}
 		var i;
 		for (i=0;i<this.tickLabels.length;i++) {
-			this.ratingScale.removeChild(this.tickLabels[i]);
+			if (this.ratingScale.contains(this.tickLabels[i])) {
+				this.ratingScale.removeChild(this.tickLabels[i]);
+			}
 		}
 
 	}
@@ -518,7 +520,7 @@ var box;
   * @param {string} color: a hex value to set the box color 
 */
 var setConfirmationColor = function setConfirmationColor(color) {
-	if (box!=null) {
+	if (svg.contains(box)) {
 		svg.removeChild(box);
 	}
 	var centerX = canvas.width / 2;

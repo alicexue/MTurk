@@ -1,9 +1,9 @@
 stimulus1_origWidth,stimulus1_src,stimulus1_positionName,stimulus1_positionCoords,stimulus1_widthPercent,stimulus1_id,stimulus1_width,stimulus1_rescaleHeight,stimulus1_trialN,stimulus1_key,stimulus1_origHeight,stimulus1_loaded,stimulus1_height,stimulus1_imgObject
-576,/static/stim/demo/PopTartsCinnamon.bmp,CENTER,"[141.5, 109.5]",0.8,PopTartsCinnamon,539.933333333,True,0,None,432,True,404.95,{}
-576,/static/stim/demo/Jollyrancherred.bmp,CENTER,"[141.5, 109.5]",0.8,Jollyrancherred,539.933333333,True,1,None,432,True,404.95,{}
-576,/static/stim/demo/CornPops.bmp,CENTER,"[141.5, 109.5]",0.8,CornPops,539.933333333,True,2,None,432,True,404.95,{}
-576,/static/stim/demo/Lindt_small.bmp,CENTER,"[141.5, 109.5]",0.8,Lindt_small,539.933333333,True,3,None,432,True,404.95,{}
-576,/static/stim/demo/FrootLoops.bmp,CENTER,"[141.5, 109.5]",0.8,FrootLoops,539.933333333,True,4,None,432,True,404.95,{}
-576,/static/stim/demo/ApplePie.bmp,CENTER,"[141.5, 109.5]",0.8,ApplePie,539.933333333,True,5,None,432,True,404.95,{}
-576,/static/stim/demo/wildberrynerds.bmp,CENTER,"[141.5, 109.5]",0.8,wildberrynerds,539.933333333,True,6,None,432,True,404.95,{}
-576,/static/stim/demo/Twinkie.bmp,CENTER,"[141.5, 109.5]",0.8,Twinkie,539.933333333,True,7,None,432,True,404.95,{}
+576,/static/stim/demo/ApplePie.bmp,CENTER,"[85.5, 109.5]",0.8,ApplePie,539.933333333,True,0,None,432,True,404.95,{}
+576,/static/stim/demo/CornPops.bmp,CENTER,"[85.5, 109.5]",0.8,CornPops,539.933333333,True,1,None,432,True,404.95,{}
+576,/static/stim/demo/Twinkie.bmp,CENTER,"[85.5, 109.5]",0.8,Twinkie,539.933333333,True,2,None,432,True,404.95,{}
+576,/static/stim/demo/wildberrynerds.bmp,CENTER,"[85.5, 109.5]",0.8,wildberrynerds,539.933333333,True,3,None,432,True,404.95,{}
+576,/static/stim/demo/Lindt_small.bmp,CENTER,"[85.5, 109.5]",0.8,Lindt_small,539.933333333,True,4,None,432,True,404.95,{}
+576,/static/stim/demo/Jollyrancherred.bmp,CENTER,"[85.5, 109.5]",0.8,Jollyrancherred,539.933333333,True,5,None,432,True,404.95,{}
+576,/static/stim/demo/PopTartsCinnamon.bmp,CENTER,"[85.5, 109.5]",0.8,PopTartsCinnamon,539.933333333,True,6,None,432,True,404.95,{}
+576,/static/stim/demo/FrootLoops.bmp,CENTER,"[85.5, 109.5]",0.8,FrootLoops,539.933333333,True,7,None,432,True,404.95,{}

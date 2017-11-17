@@ -143,8 +143,9 @@ var endTrial = function endTrial() {
   * Checks if experiment has ended (there are no more trials), and ends the experiment
 */
 var nextTrial = function nextTrial() {
-	currTrialN+=1; // iterate to next trial
 	ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+	scale.resetScale();
+	currTrialN+=1; // iterate to next trial
 	if (currTrialN < expVariables.length) {
 		drawTrialDisplay(expVariables[currTrialN]);
 	} else {

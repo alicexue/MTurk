@@ -75,8 +75,11 @@ def auction():
 		with open(_thisDir + '/data/' + 'auction_data.txt', 'w') as jsonfile:
 			json.dump(request.form['experimentResults'], jsonfile)
 
-		store_data.organize_data(expResults, 'auction_data.csv', 'auction_stimuli.csv')
-		
+		try:
+			store_data.organize_data(expResults, 'auction_data.csv', 'auction_stimuli.csv')
+		except KeyError, e:
+			print "Missing dictionary key in auction results"
+
 		return redirect(url_for('choicetask_instructions'))
 
 """ 
@@ -122,8 +125,11 @@ def choicetask():
 		with open(_thisDir + '/data/' + 'choice_data.txt', 'w') as jsonfile:
 			json.dump(request.form['experimentResults'], jsonfile)
 
-		store_data.organize_data(expResults, 'choice_data.csv', 'choice_stimuli.csv');
-		
+		try:
+			store_data.organize_data(expResults, 'choice_data.csv', 'choice_stimuli.csv');
+		except KeyError, e:
+			print "Missing dictionary key in choice results"
+
 		return redirect(url_for('thankyou'))
 
 """
