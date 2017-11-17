@@ -12,7 +12,7 @@ var expResults = [];
 var allTrials = [];
 
 /*
-  * Called from script in experiment.html to initialize expVariables
+  * Called from script in choicetask.html to initialize expVariables
   * @param {array} inputExpVariables: each element is a dictionary containing trial information
   *		elements are in the order of trials
 */
@@ -39,7 +39,7 @@ var t1, t2;
 var trialTimer;
 var maxTrialDuration = 4000; // in ms
 
-
+// called from choicetask.html
 var startExperiment = function startExperiment() {
 	drawTrialDisplay(expVariables[currTrialN]); 
 }
@@ -47,6 +47,8 @@ var startExperiment = function startExperiment() {
 /*
   * Draws individual trial display
   * Updates trial information
+  * Draws images for trial
+  * Adds confirmation box to trial display
   * @param {python dictionary/js object} trialVariables: has keys and values for trial parameters
 */
 var drawTrialDisplay = function draw(trialVariables) {
@@ -82,7 +84,12 @@ var drawTrialDisplay = function draw(trialVariables) {
 	setConfirmationColor(BLACK);
 }
 
-
+/*
+ * Initializes set of trial information and adds to allTrials
+ * Checks for any special key presses (associated with stimuli) and adds to specialKeys
+ * Sets start time for trial
+ * Sets timer for trial
+*/
 var pushTrialInfo = function pushTrialInfo() {
 	var currTrial = new trial(currTrialN, stimuli, maxTrialDuration, ['rt','rsp','selected']);
 	allTrials.push(currTrial);
@@ -144,14 +151,14 @@ var setKeyUp = function(e) {
 }
 
 /*
-  * Draws next trial 
-  * Called by a timer in endTrial when maximum trial time is exceeded
-  * Iterates currTrialN, clears current screen and draws next trial
+  * Called by a timer in endTrial 
+  * Clears canvas, removes scale
+  * Iterates currTrialN by 1, clears current screen and calls drawTrialDisplay for next trial
   * Checks if experiment has ended (there are no more trials), and ends the experiment
 */
 var nextTrial = function nextTrial() {
 	ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-	svg.removeChild(box);
+	svg.removeChild(confirmationBox);
 	currTrialN+=1; // iterate to next trial
 	inConfirmation = false;
 	if (currTrialN < expVariables.length) { // experiment has not ended 
@@ -166,7 +173,7 @@ var nextTrial = function nextTrial() {
 
 /*
   * Does all clean up for trial
-  * Clear trialTimer
+  * Clears trialTimer
   * Get trial duration / reaction time
   * Changes color of confirmation box
   * Sets timer for confirmation and iterates to next trial at the end of confirmation
@@ -198,7 +205,7 @@ var endTrial = function endTrial() {
 /*
  * Called when change in window size is detected
  * Changes width and height of canvas and svg to that of window
- * If window was previously too small (has blank and alertText)
+ * If window was previously too small (has blankScreenCover and alertText)
  * 	 then these are removed
  * Calls on drawTrialDisplay to redraw display according to new window size
 */
@@ -210,8 +217,8 @@ var resizeWindow = function resizeWindow() {
 	ctx = document.getElementById('myCanvas').getContext('2d');
 	svg.setAttribute("width", (winWidth).toString());
 	svg.setAttribute("height", (winHeight).toString());
-	if (svg.contains(blank)) {
-		svg.removeChild(blank);
+	if (svg.contains(blankScreenCover)) {
+		svg.removeChild(blankScreenCover);
 	}
 	if (svg.contains(alertText)) {
 		svg.removeChild(alertText);

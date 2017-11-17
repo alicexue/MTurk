@@ -18,19 +18,8 @@ var trialResults = class trialResults {
 	constructor(resultTypes) {
 		var i;
 		for (i=0;i<resultTypes.length;i++) {
-			this[resultTypes[i]] = 'NaN';
+			this[resultTypes[i]] = NaN;
 		}
-	}
-}
-
-
-var windowResizeInfo = class windowResizeInfo {
-	constructor(time, initWidth, initHeight, finalWidth, finalHeight) {
-		this.time = time;
-		this.initWidth = initWidth;
-		this.initHeight = initHeight;
-		this.finalWidth = finalWidth;
-		this.finalHeight = finalHeight;
 	}
 }
 
@@ -65,9 +54,10 @@ var imageStimulus = class imageStimulus {
 	  * @param {string} src: location of image + image name
 	  *		could be in static folder or a website
 	  *		ex: '/static/stim/' + stimulusName + '.bmp'
-	  * @param {string} key: key to be associated with stimulus
+	  * @param {string} key: keyboard key to be associated with stimulus
 	  *		if you don't want a key associated with this stimulus, set key param to null
 	  *		these keys are automatically registered as events when user presses them
+	  * @param {boolean} rescaleHeight: if true, image height is automaticall rescaled when canvas height exceeds width
 	*/
 	constructor(id, src, key, widthPercent, rescaleHeight) {
 		this.imgObject = new Image();
@@ -162,9 +152,9 @@ var imageStimulus = class imageStimulus {
   * Gets resized image dimensions
   * If screen is not wide enough, scales width of image to 45% of window width
   * If screen is not tall enough, scales height of image to 65% of window height
-  * @param dimensions: original dimensions of image
-  * @param widthPercent: percent of canvas width to set image width
-  * @param rescaleHeight: true if image height should be rescaled automatically when canvas height exceeds width
+  * @param {array of integers} dimensions: original dimensions of image
+  * @param {double} widthPercent: percent of canvas width to set image width
+  * @param {boolean} rescaleHeight: if true, image height is automatically rescaled when canvas height exceeds width
   * @returns new array of scaled dimensions: [width, height]
 */
 // dimensions is [width, height]
@@ -189,8 +179,8 @@ var rescaleImgSize = function rescaleImgSize(dimensions, widthPercent, rescaleHe
 		scaledWidth = scaledWidth * newProportion;
 	}
 
-	if (scaledWidth > width && scaledHeight > height) {
-		console.log("Did not adjust image dimensions.")
+	if (scaledWidth > width && scaledHeight > height) { 
+		// never have image exceed original dimensions
 		scaledWidth = width;
 		scaledHeight = height;
 	}
@@ -201,19 +191,19 @@ var rescaleImgSize = function rescaleImgSize(dimensions, widthPercent, rescaleHe
 /*
   * Called when window is too small
   * Draws white svg over entire screen + error message
-  * blank and alertText removed in resizeWindow
+  * blankScreenCover and alertText removed in resizeWindow
 */
-var blank;
+var blankScreenCover;
 var alertText;
 var alertSmallWindow = function alertSmallWindow() {
-	if (!svg.contains(blank)) {
-		blank = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-		blank.setAttribute("x","0");
-		blank.setAttribute("y","0");
-		blank.setAttribute("fill","white");
-		blank.setAttribute("width",(canvas.width).toString());
-		blank.setAttribute("height",(canvas.height).toString());
-		svg.appendChild(blank);
+	if (!svg.contains(blankScreenCover)) {
+		blankScreenCover = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+		blankScreenCover.setAttribute("x","0");
+		blankScreenCover.setAttribute("y","0");
+		blankScreenCover.setAttribute("fill","white");
+		blankScreenCover.setAttribute("width",(canvas.width).toString());
+		blankScreenCover.setAttribute("height",(canvas.height).toString());
+		svg.appendChild(blankScreenCover);
 	}
 
 	if (!svg.contains(alertText)) {		
@@ -285,8 +275,17 @@ var getImgPosition = function getImgPosition(img, positionName) {
  *** RATING SCALE ***
 */
 var ratingScale = class ratingScale {
-	// x is center of rating scale
-	// y is top of rating scale
+	/*
+	  * @param {int} min: smallest numerical rating value
+	  * @param {int} max: largest numerical rating value
+	  * @param {double/int} tickIncrement: numerical difference between the ratings that are labeled
+	  * @param {int} increment: numerical difference between consecutive ratings
+	  *		e.g. 0.01 for dollar amounts
+	  * @param {double} x: coordinate of center of rating scale
+	  * @param {double} y: coordinate of top of rating scale
+	  * @param {array} labelNames: array of labels for each tick
+	  *		if null, numerical labels are added according to tickIncrement
+	 */
 	constructor(min, max, tickIncrement, increment, x, y, labelNames) {
 		if (min >= max) {
 			alert("Invalid parameters for ratingScale! min must be smaller than max");
@@ -299,7 +298,6 @@ var ratingScale = class ratingScale {
 		}
 		this.ratingScale = svg;
 
-		//this.ratingScale.setAttribute("height", (window.innerHeight/10).toString());
 		this.min = min;
 		this.max = max;
 		this.tickIncrement = tickIncrement;
@@ -311,6 +309,8 @@ var ratingScale = class ratingScale {
 
 	/*
 	 * Draws rating bar and selector
+	 * @param {double} x: coordinate of center of rating scale
+	 * @param {double} y: coordinate of top of rating scale
 	*/
 	drawRatingScale(x, y) {
 		this.x = x;
@@ -329,6 +329,8 @@ var ratingScale = class ratingScale {
 	/*
 	 * Draws rectangle svg as rating bar
 	 * Adds listener to rating bar (will call moveSelector when mouse is on top of rating bar)
+	 * @param {double} x: coordinate of center of rating scale
+	 * @param {double} y: coordinate of top of rating scale
 	*/
 	drawRatingBar(x, y) {
 		this.x = x;
@@ -353,6 +355,9 @@ var ratingScale = class ratingScale {
 
 	/*
 	 * Draws rectangle svg as rating bar
+	 * @param {double} x: coordinate of center of rating scale
+	 * @param {double} y: coordinate of top of rating scale
+	 * @param {string} color: svg color name or code
 	*/
 	drawSelector(x, y, color) {
 		var width = this.ratingBarWidth*.03;
@@ -376,8 +381,8 @@ var ratingScale = class ratingScale {
 	/*
 	 * Draws labels below the rating scale 
 	 * Position and number of labels determined by increment, max, and min set in constructor
-	 * If labelNames is null, just puts numbers
-	 * @param labelNames: array of labels for each tick
+	 * @param {array} labelNames: array of labels for each tick
+	  *		if null, numerical labels are added according to tickIncrement
 	*/
 	drawTickLabels(labelNames) {
 		var nRatingValues = (this.max - this.min)/this.increment;
@@ -418,14 +423,15 @@ var ratingScale = class ratingScale {
 		this.tickLabels = tickLabels;
 
 		var bottom = y + fontSize;
-		if (bottom > canvas.height) {
-			console.log("rating bar cut off");
+		if (bottom > canvas.height) { // rating bar cut off screen
 			alertSmallWindow();
 		}
 	}
 
 	/*
 	 * Reposition selector to mouse position over rating bar
+	 * Called by moveSelector
+	 * @param evt: event passed by moveSelector, which is called when mouse is over ratingBar
 	*/
 	updateSelector(evt) {
 		var originalX = parseInt(this.selector.getAttribute("x"));
@@ -436,6 +442,7 @@ var ratingScale = class ratingScale {
 
 	/*
 	 * Determine rating, set trial results, and end the trial
+	 * @param evt: event passed by getRating, which is called when selector is clicked
 	*/
 	recordRating(evt) {
 		// (max-min) / increment => number of possible values
@@ -514,27 +521,27 @@ const GREEN = "#00cc00";
 /*
  *** CONFIRMATION BOX ***
 */
-var box;
+var confirmationBox;
 /*
   * Creates an svg box at the center of the screen
   * Use case: Turns green when user responds
   * Use case: Turns red when trial timed out and no response was received
-  * @param {string} color: a hex value to set the box color 
+  * @param {string} color: svg color name or code to set the box color 
 */
 var setConfirmationColor = function setConfirmationColor(color) {
-	if (svg.contains(box)) {
-		svg.removeChild(box);
+	if (svg.contains(confirmationBox)) {
+		svg.removeChild(confirmationBox);
 	}
 	var centerX = canvas.width / 2;
 	var centerY = canvas.height / 2;
 
 	var confirmBoxSide = canvas.width * 0.02;
 
-	box = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-	box.setAttribute("x",(centerX - confirmBoxSide/2).toString());
-	box.setAttribute("y",(centerY).toString());
-	box.setAttribute("width",confirmBoxSide.toString());
-	box.setAttribute("height",confirmBoxSide.toString());
-	box.setAttribute("fill",color);
-	svg.appendChild(box);
+	confirmationBox = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+	confirmationBox.setAttribute("x",(centerX - confirmBoxSide/2).toString());
+	confirmationBox.setAttribute("y",(centerY).toString());
+	confirmationBox.setAttribute("width",confirmBoxSide.toString());
+	confirmationBox.setAttribute("height",confirmBoxSide.toString());
+	confirmationBox.setAttribute("fill",color);
+	svg.appendChild(confirmationBox);
 }
