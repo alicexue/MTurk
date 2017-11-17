@@ -103,6 +103,7 @@ var imageStimulus = class imageStimulus {
 		var img = this.imgObject;
 
 		this.loaded = false;
+		this.loadedTime = NaN;
 
 		if (typeof position === 'string') {
 			this.positionName = position;
@@ -115,6 +116,7 @@ var imageStimulus = class imageStimulus {
 		img.onload = function() {
 			// "this" becomes img, not the object imageStimulus
 
+			imageStim.loadedTime = performance.now();
 			imageStim.loaded = true;
 
 			imageStim.origWidth = img.width;
@@ -473,7 +475,7 @@ var ratingScale = class ratingScale {
 	/*
 	 * Remove scale from svg
 	*/
-	resetScale() {
+	removeScale() {
 		if (this.ratingScale.contains(this.bar)) {
 			this.ratingScale.removeChild(this.bar);
 		}

@@ -12,8 +12,6 @@ var specialKeys = [];
 var expResults = [];
 var allTrials = [];
 
-var expErrors = [];
-
 /*
   * Called from script in experiment.html to initialize expVariables
   * @param {array} inputExpVariables: each element is a dictionary containing trial information
@@ -76,13 +74,13 @@ var drawTrialDisplay = function drawTrialDisplay(trialVariables) {
 		pushTrialInfo();
 	}
 
-	var scaledImgDimensions = rescaleImgSize([origImgWidth,origImgHeight], widthPercent);
+	var scaledImgDimensions = rescaleImgSize([origImgWidth,origImgHeight], widthPercent, true);
 	var scaledHeight = scaledImgDimensions[1];
 
 	if (scale == null) { // set up scale for first trial
 		scale = new ratingScale(0,3,1,.01,canvas.width/2,canvas.height/2 + scaledHeight/2 + 10, ["$0", "$1", "$2", "$3"]);
 	} else {
-		scale.resetScale(); // removes current scale
+		scale.removeScale(); // removes current scale
 	}
 	scale.drawRatingScale(canvas.width/2,canvas.height/2 + scaledHeight/2 + 10); // draws/redraws scale
 }
@@ -121,12 +119,12 @@ var pushTrialInfo = function pushTrialInfo() {
   * Get trial duration / reaction time
 */
 var endTrial = function endTrial() {
+	t2 = performance.now();
+	clearTimeout(trialTimer);
 	var i;
 	for (i=0;i<stimuli.length;i++) {
 		allTrials[currTrialN]['stimulus' + parseInt(i+1,10) + 'Loaded'] = stimuli[i].loaded;
 	}
-	t2 = performance.now()
-	clearTimeout(trialTimer);
 	if (allTrials[currTrialN].results == null || t2 - t1 > maxTrialDuration) { // did not respond
 		drawNextTrial = true;
 		allTrials[currTrialN].results.rt = t2 - t1;
@@ -144,16 +142,13 @@ var endTrial = function endTrial() {
 */
 var nextTrial = function nextTrial() {
 	ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-	scale.resetScale();
+	scale.removeScale();
 	currTrialN+=1; // iterate to next trial
 	if (currTrialN < expVariables.length) {
 		drawTrialDisplay(expVariables[currTrialN]);
 	} else {
 		var strExpResults = JSON.stringify(allTrials);
 		document.getElementById('experimentResults').value = strExpResults;
-
-		var strExpErrors = JSON.stringify(expErrors);
-		document.getElementById('experimentErrors').value = strExpErrors;
 
 		document.getElementById('exp').submit()
 	}

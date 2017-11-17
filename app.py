@@ -14,33 +14,6 @@ os.chdir(_thisDir)
 
 app = Flask(__name__)
 
-@app.route("/experiment", methods = ["GET","POST"])
-def experiment():
-	if request.method == "GET":
-		### set experiment conditions here and pass to experiment.html 
-		# trialVariables should be an array of dictionaries 
-		# each element of the array represents the condition for one trial
-		# set the variable conditions to the array of conditions
-		stimuli1 = get_stimuli()
-		stimuli2 = get_stimuli()
-		random.shuffle(stimuli1)
-		random.shuffle(stimuli2)
-
-		expVariables = [] # array of dictionaries
-
-		for i in range(0,len(stimuli1)):
-			expVariables.append({"stimulus1":stimuli1[i]})
-			#expVariables.append({"stimulus1":stimuli1[i],'stimulus2':stimuli2[i]})
-
-		return render_template('experiment.html',expVariables=expVariables)
-	else:
-		expResults = json.loads(request.form['experimentResults'])
-		expErrors = json.loads(request.form['experimentErrors'])
-
-		store_data.organize_data(expResults, 'exp_data.csv', 'exp_stimuli.csv');
-
-		return redirect(url_for('thankyou'))
-
 """ 
 Auction Task
 
@@ -67,7 +40,6 @@ def auction():
 		return render_template('auction.html',expVariables=expVariables)
 	else:
 		expResults = json.loads(request.form['experimentResults'])
-		expErrors = json.loads(request.form['experimentErrors'])
 		
 		if not os.path.exists('data'):
 			os.makedirs('data')
@@ -117,7 +89,6 @@ def choicetask():
 		return render_template('choicetask.html',expVariables=expVariables)
 	else:
 		expResults = json.loads(request.form['experimentResults'])
-		expErrors = json.loads(request.form['experimentErrors'])
 		
 		if not os.path.exists('data'):
 			os.makedirs('data')

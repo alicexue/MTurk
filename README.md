@@ -95,3 +95,5 @@ Notes:
  	- Mac: Cmd + Shift + R
  	- Windows: Control + Shift + R
  - Everything in the frontend is accessible to the user, so it is possible for a user to change the information stored in your Javascript files. 
+ - Timers: Calls to the timer (to check if max time has been exceeded) are delayed when the window is inactive
+ 	-- see: https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setTimeout#Reasons_for_delays_longer_than_specified

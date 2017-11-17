@@ -11,8 +11,6 @@ var specialKeys = [];
 var expResults = [];
 var allTrials = [];
 
-var expErrors = [];
-
 /*
   * Called from script in experiment.html to initialize expVariables
   * @param {array} inputExpVariables: each element is a dictionary containing trial information
@@ -162,9 +160,6 @@ var nextTrial = function nextTrial() {
 		var strExpResults = JSON.stringify(allTrials);
 		document.getElementById('experimentResults').value = strExpResults;
 
-		var strExpErrors = JSON.stringify(expErrors);
-		document.getElementById('experimentErrors').value = strExpErrors;
-
 		document.getElementById('exp').submit()
 	}
 }
@@ -177,19 +172,19 @@ var nextTrial = function nextTrial() {
   * Sets timer for confirmation and iterates to next trial at the end of confirmation
 */
 var endTrial = function endTrial() {
+	t2 = performance.now();
+	clearTimeout(trialTimer);
 	var i;
 	for (i=0;i<stimuli.length;i++) {
 		allTrials[currTrialN]['stimulus' + parseInt(i+1,10) +'Loaded'] = stimuli[i].loaded;
 	}
-
 	var color;
-	t2 = performance.now();
-	clearTimeout(trialTimer);
 	if (allTrials[currTrialN].results == null || t2 - t1 > maxTrialDuration) { // did not respond
 		color = RED;
 		drawNextTrial = true;
 		allTrials[currTrialN].results.rsp = 'None';
 		allTrials[currTrialN].results.rt = t2 - t1;
+		console.log(t2-t1)
 		allTrials[currTrialN].trialEndTime = t2;
 		allTrials[currTrialN].trialDuration = t2 - t1;
 	} else {
