@@ -114,15 +114,15 @@ var pushTrialInfo = function pushTrialInfo() {
 */
 var keyIsDown = false; // keep track if key is still being held down - take one key press at a time
 var checkKeyPress = function(e) {
-	if (inConfirmation == false && keyIsDown == false) { 
+	var timePressed = e.timeStamp;
+	if (inConfirmation == false && keyIsDown == false && timePressed > t1) { 
 		keyIsDown = true;
-		var timePressed = e.timeStamp;
 		t2 = timePressed;
 		// should check if timepressed is after trial starts
 		if (specialKeys.indexOf(e.key) > -1 && currTrialN == allTrials.length - 1) { 
 			clearTimeout(trialTimer);
 			clearTimeout(confirmTimer);
-			// see http://keycode.info/ for key codes
+			
 			if (currTrialN < expVariables.length) {
 				var i;
 				for (i=0;i<stimuli.length;i++) {

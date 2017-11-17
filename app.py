@@ -69,7 +69,13 @@ def auction():
 		expResults = json.loads(request.form['experimentResults'])
 		expErrors = json.loads(request.form['experimentErrors'])
 		
-		store_data.organize_data(expResults, 'auction_data.csv', 'auction_stimuli.csv');
+		if not os.path.exists('data'):
+			os.makedirs('data')
+
+		with open(_thisDir + '/data/' + 'auction_data.txt', 'w') as jsonfile:
+			json.dump(request.form['experimentResults'], jsonfile)
+
+		store_data.organize_data(expResults, 'auction_data.csv', 'auction_stimuli.csv')
 		
 		return redirect(url_for('choicetask_instructions'))
 
@@ -110,6 +116,12 @@ def choicetask():
 		expResults = json.loads(request.form['experimentResults'])
 		expErrors = json.loads(request.form['experimentErrors'])
 		
+		if not os.path.exists('data'):
+			os.makedirs('data')
+
+		with open(_thisDir + '/data/' + 'choice_data.txt', 'w') as jsonfile:
+			json.dump(request.form['experimentResults'], jsonfile)
+
 		store_data.organize_data(expResults, 'choice_data.csv', 'choice_stimuli.csv');
 		
 		return redirect(url_for('thankyou'))
