@@ -59,6 +59,7 @@ var drawTrialDisplay = function draw(trialVariables) {
 	var stim1Bid = trialVariables['stim1Bid'];
 	var stimulus2 = trialVariables['stimulus2'];
 	var stim2Bid = trialVariables['stim2Bid'];
+	var delta = trialVariables['delta']; // right bid - left bid
 
 	//console.log("Trial " + currTrialN + " " + stimulus1 + " " + stim1Bid.toString() + ", " + stimulus2 + " " + stim2Bid.toString());
 
@@ -80,6 +81,8 @@ var drawTrialDisplay = function draw(trialVariables) {
 
 	allTrials[currTrialN]['stimulus1Bid'] = stim1Bid;
 	allTrials[currTrialN]['stimulus2Bid'] = stim2Bid;
+
+	allTrials[currTrialN]['delta'] = delta;
 
 	setConfirmationColor(BLACK);
 }

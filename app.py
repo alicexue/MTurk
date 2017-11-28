@@ -78,9 +78,12 @@ def choicetask():
 
 		expVariables = [] # array of dictionaries
 
+		deltas = []
 		for i in range(0,len(stim1Bids)):
-			print stim2Bids[i] - stim1Bids[i]
-			expVariables.append({"stimulus1":stim1Names[i],"stimulus2":stim2Names[i],"stim1Bid":stim1Bids[i],"stim2Bid":stim2Bids[i]})
+			deltas.append(stim2Bids[i] - stim1Bids[i])
+
+		for i in range(0,len(stim1Bids)):
+			expVariables.append({"stimulus1":stim1Names[i],"stimulus2":stim2Names[i],"stim1Bid":stim1Bids[i],"stim2Bid":stim2Bids[i], "delta":deltas[i]})
 
 		return render_template('choicetask.html',expVariables=expVariables)
 	else:
