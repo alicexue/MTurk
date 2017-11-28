@@ -465,12 +465,12 @@ var ratingScale = class ratingScale {
 		rating = Math.floor(rating);
 		rating = rating*this.increment;
 
-		console.log(rating);
+		//console.log(rating);
 
 		t2 = evt.timeStamp;
-		console.log(allTrials)
-		console.log(currTrialN)
-		console.log(allTrials[currTrialN]);
+		//console.log(allTrials)
+		//console.log(currTrialN)
+		//console.log(allTrials[currTrialN]);
 		allTrials[currTrialN].results.rt = t2 - t1; 
 		allTrials[currTrialN].receivedResponse = true;
 		allTrials[currTrialN].results.rating = rating;

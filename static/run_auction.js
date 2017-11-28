@@ -38,9 +38,6 @@ var t1, t2;
 // t1: start time of trial
 // t2: end time of trial
 
-var trialTimer;
-var maxTrialDuration = 400000; // in ms
-
 var scale;
 
 var origImgWidth = 576; // necessary for rescaling images and positioning scale
@@ -63,10 +60,10 @@ var startExperiment = function startExperiment() {
 var drawTrialDisplay = function drawTrialDisplay(trialVariables) {
 	// condition is a dictionary - each key can be used to set trial conditions
 	ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-	var imgFolder = '/static/stim/demo/';
+	var imgFolder = '/static/stim/';
 	var stimulus1 = trialVariables['stimulus1'];
 
-	console.log("Trial " + currTrialN + " " + stimulus1);
+	//console.log("Trial " + currTrialN + " " + stimulus1);
 
 	var widthPercent = 0.80;
 
@@ -95,10 +92,9 @@ var drawTrialDisplay = function drawTrialDisplay(trialVariables) {
  * Initializes set of trial information and adds to allTrials
  * Checks for any special key presses (associated with stimuli) and adds to specialKeys
  * Sets start time for trial
- * Sets timer for trial
 */
 var pushTrialInfo = function pushTrialInfo() {
-	var currTrial = new trial(currTrialN, stimuli, maxTrialDuration, ['rt','rating']);
+	var currTrial = new trial(currTrialN, stimuli, null, ['rt','rating']);
 	allTrials.push(currTrial);
 
 	// send stimuli here to trialInfo, set special keys inside trialInfo
@@ -110,7 +106,6 @@ var pushTrialInfo = function pushTrialInfo() {
 	}
 
 	t1 = performance.now(); // start timer for this trial
-	trialTimer = setTimeout(endTrial,maxTrialDuration);
 
 	allTrials[currTrialN].trialStartTime = t1;
 
@@ -121,17 +116,15 @@ var pushTrialInfo = function pushTrialInfo() {
 
 /*
   * Does all clean up for trial
-  * Clear trialTimer
   * Get trial duration / reaction time
 */
 var endTrial = function endTrial() {
 	t2 = performance.now();
-	clearTimeout(trialTimer);
 	var i;
 	for (i=0;i<stimuli.length;i++) {
 		allTrials[currTrialN]['stimulus' + parseInt(i+1,10) + 'Loaded'] = stimuli[i].loaded;
 	}
-	if (allTrials[currTrialN].results == null || t2 - t1 > maxTrialDuration) { // did not respond
+	if (allTrials[currTrialN].results == null) { // did not respond
 		drawNextTrial = true;
 		allTrials[currTrialN].results.rt = t2 - t1;
 		allTrials[currTrialN].trialEndTime = t2;
@@ -141,7 +134,6 @@ var endTrial = function endTrial() {
 }
 
 /*
-  * Called by a timer in endTrial 
   * Clears canvas, removes scale
   * Iterates currTrialN by 1, clears current screen and calls drawTrialDisplay for next trial
   * Checks if experiment has ended (there are no more trials), and ends the experiment

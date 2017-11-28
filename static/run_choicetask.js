@@ -54,13 +54,13 @@ var startExperiment = function startExperiment() {
 var drawTrialDisplay = function draw(trialVariables) {
 	// condition is a dictionary - each key can be used to set trial conditions
 
-	var imgFolder = '/static/stim/demo/';
+	var imgFolder = '/static/stim/';
 	var stimulus1 = trialVariables['stimulus1'];
 	var stim1Bid = trialVariables['stim1Bid'];
 	var stimulus2 = trialVariables['stimulus2'];
 	var stim2Bid = trialVariables['stim2Bid'];
 
-	console.log("Trial " + currTrialN + " " + stimulus1 + " " + stim1Bid.toString() + ", " + stimulus2 + " " + stim2Bid.toString());
+	//console.log("Trial " + currTrialN + " " + stimulus1 + " " + stim1Bid.toString() + ", " + stimulus2 + " " + stim2Bid.toString());
 
 	var widthPercent = 0.45;
 
@@ -93,8 +93,8 @@ var drawTrialDisplay = function draw(trialVariables) {
 var pushTrialInfo = function pushTrialInfo() {
 	var currTrial = new trial(currTrialN, stimuli, maxTrialDuration, ['rt','rsp','selected']);
 	allTrials.push(currTrial);
-	console.log(currTrial)
-	console.log(allTrials)
+	//console.log(currTrial)
+	//console.log(allTrials)
 	// send stimuli here to trialInfo, set special keys inside trialInfo
 
 	var i;
@@ -188,7 +188,7 @@ var endTrial = function endTrial() {
 	if (allTrials[currTrialN].results == null || t2 - t1 > maxTrialDuration) { // did not respond
 		color = RED;
 		drawNextTrial = true;
-		allTrials[currTrialN].results.rsp = 'None';
+		allTrials[currTrialN].results.rsp = 'NaN';
 		allTrials[currTrialN].results.rt = t2 - t1;
 		allTrials[currTrialN].trialEndTime = t2;
 		allTrials[currTrialN].trialDuration = t2 - t1;

@@ -70,21 +70,17 @@ def choicetask():
 		# each element of the array represents the condition for one trial
 		# set the variable conditions to the array of conditions
 
-		stimuli = get_two_stimuli_lists()
-
 		stim1Bids = [];
 		stim2Bids = [];
 
 		stimBidDict = get_bid_responses(_thisDir + '/data/auction_data.csv')
-
-		for stimPair in stimuli:
-			stim1Bids.append(stimBidDict[stimPair[0]])
-			stim2Bids.append(stimBidDict[stimPair[1]])
+		[stim1Names, stim1Bids, stim2Names, stim2Bids] = get_two_stimuli_lists(stimBidDict)
 
 		expVariables = [] # array of dictionaries
 
-		for i in range(0,len(stimuli)):
-			expVariables.append({"stimulus1":stimuli[i][0],"stimulus2":stimuli[i][1],"stim1Bid":stim1Bids[i],"stim2Bid":stim2Bids[i]})
+		for i in range(0,len(stim1Bids)):
+			print stim2Bids[i] - stim1Bids[i]
+			expVariables.append({"stimulus1":stim1Names[i],"stimulus2":stim2Names[i],"stim1Bid":stim1Bids[i],"stim2Bid":stim2Bids[i]})
 
 		return render_template('choicetask.html',expVariables=expVariables)
 	else:
@@ -138,6 +134,6 @@ def thankyou():
 	return render_template('thankyou.html')
 
 if __name__ == "__main__":
-	app.debug = True
+	app.debug = False
 	app.secret_key="Don't store this on github"
 	app.run(host = '0.0.0.0', port = 8000)
