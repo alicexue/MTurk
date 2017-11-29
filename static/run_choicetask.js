@@ -136,7 +136,8 @@ var checkKeyPress = function(e) {
 				for (i=0;i<stimuli.length;i++) {
 					if (e.key == stimuli[i].key) {
 						allTrials[currTrialN].results.selected = stimuli[i].id;
-					} 
+					} else {
+					}
 				}
 				allTrials[currTrialN].results.rt = t2 - t1;
 				allTrials[currTrialN].receivedResponse = true;
@@ -191,6 +192,7 @@ var endTrial = function endTrial() {
 	if (allTrials[currTrialN].results == null || t2 - t1 > maxTrialDuration) { // did not respond
 		color = RED;
 		drawNextTrial = true;
+		allTrials[currTrialN].results.selected = 'NaN';
 		allTrials[currTrialN].results.rsp = 'NaN';
 		allTrials[currTrialN].results.rt = t2 - t1;
 		allTrials[currTrialN].trialEndTime = t2;

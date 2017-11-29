@@ -7,12 +7,17 @@ import csv, os, sys
 import ast
 import socket
 from utils import * # importing * allows you to use methods from utils.py without calling utils.method_name
-import store_data
+from store_data import *
+from store_subject_info import *
+import pandas as pd
 
 _thisDir = os.path.dirname(os.path.abspath(__file__)).decode(sys.getfilesystemencoding())
 os.chdir(_thisDir)
 
 app = Flask(__name__)
+
+expName = 'TEST'
+workerID = 'abc123' 
 
 """ 
 Auction Task
@@ -24,6 +29,7 @@ POST: Saves auction data and stimuli to csv files, redirects to choice task
 """
 @app.route("/auction", methods = ["GET","POST"])
 def auction():
+
 	if request.method == "GET":
 		### set experiment conditions here and pass to experiment.html 
 		# trialVariables should be an array of dictionaries 
@@ -39,18 +45,16 @@ def auction():
 
 		return render_template('auction.html',expVariables=expVariables)
 	else:
+		subjectID = get_subjectID(expName, workerID)
 		expResults = json.loads(request.form['experimentResults'])
-		
-		if not os.path.exists('data'):
-			os.makedirs('data')
 
-		with open(_thisDir + '/data/' + 'auction_data.txt', 'w') as jsonfile:
-			json.dump(request.form['experimentResults'], jsonfile)
+		if not os.path.exists(expName):
+			os.makedirs(expName)
 
-		try:
-			store_data.organize_data(expResults, 'auction_data.csv', 'auction_stimuli.csv')
-		except KeyError, e:
-			print "Missing dictionary key in auction results"
+		if not os.path.exists(expName + '/' + subjectID):
+			os.makedirs(expName + '/' + subjectID)
+
+		store_data(expName, expResults,'Auction',subjectID)
 
 		return redirect(url_for('choicetask_instructions'))
 
@@ -64,6 +68,7 @@ POST: Saves choice task data and stimuli to csv files, redirects to thank you pa
 """
 @app.route("/choicetask", methods = ["GET","POST"])
 def choicetask():
+	subjectID = get_subjectID(expName, workerID)
 	if request.method == "GET":
 		### set experiment conditions here and pass to experiment.html 
 		# trialVariables should be an array of dictionaries 
@@ -73,7 +78,7 @@ def choicetask():
 		stim1Bids = [];
 		stim2Bids = [];
 
-		stimBidDict = get_bid_responses(_thisDir + '/data/auction_data.csv')
+		stimBidDict = get_bid_responses(_thisDir + '/' + expName + '/' + subjectID + '/' + subjectID + '_AuctionData.csv')
 		[stim1Names, stim1Bids, stim2Names, stim2Bids] = get_two_stimuli_lists(stimBidDict)
 
 		expVariables = [] # array of dictionaries
@@ -88,17 +93,13 @@ def choicetask():
 		return render_template('choicetask.html',expVariables=expVariables)
 	else:
 		expResults = json.loads(request.form['experimentResults'])
-		
-		if not os.path.exists('data'):
-			os.makedirs('data')
 
-		with open(_thisDir + '/data/' + 'choice_data.txt', 'w') as jsonfile:
-			json.dump(request.form['experimentResults'], jsonfile)
+		if not os.path.exists(expName):
+			os.makedirs(expName)
 
-		try:
-			store_data.organize_data(expResults, 'choice_data.csv', 'choice_stimuli.csv');
-		except KeyError, e:
-			print "Missing dictionary key in choice results"
+		if not os.path.exists(expName + '/' + subjectID):
+			os.makedirs(expName + '/' + subjectID)
+		store_data(expName, expResults,'ChoiceTask', subjectID)
 
 		return redirect(url_for('thankyou'))
 
@@ -130,6 +131,10 @@ def consent_form():
 	if request.method == "GET":
 		return render_template('consent_form.html')
 	else:
+		### need to change code here after testing is finished
+		global workerID 
+		workerID = 'abc' + str(random.randint(1000, 10000))
+		store_subject_info(expName, workerID)
 		return redirect(url_for('auction_instructions'))
 
 @app.route("/thankyou", methods = ["GET"])

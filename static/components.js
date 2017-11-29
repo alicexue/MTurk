@@ -18,7 +18,7 @@ var trialResults = class trialResults {
 	constructor(resultTypes) {
 		var i;
 		for (i=0;i<resultTypes.length;i++) {
-			this[resultTypes[i]] = NaN;
+			this[resultTypes[i]] = 'NaN';
 		}
 	}
 }

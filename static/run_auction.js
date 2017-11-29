@@ -67,7 +67,7 @@ var drawTrialDisplay = function drawTrialDisplay(trialVariables) {
 
 	var widthPercent = 0.80;
 
-	var img1 = new imageStimulus(stimulus1, imgFolder + stimulus1 + ".bmp", null, widthPercent, true);
+	var img1 = new imageStimulus(stimulus1, imgFolder + stimulus1 + ".bmp", 'NaN', widthPercent, true);
 	img1.drawImage('CENTER');
 
 	stimuli = [img1];
@@ -94,13 +94,13 @@ var drawTrialDisplay = function drawTrialDisplay(trialVariables) {
  * Sets start time for trial
 */
 var pushTrialInfo = function pushTrialInfo() {
-	var currTrial = new trial(currTrialN, stimuli, null, ['rt','rating']);
+	var currTrial = new trial(currTrialN, stimuli, 'NaN', ['rt','rating']);
 	allTrials.push(currTrial);
 
 	// send stimuli here to trialInfo, set special keys inside trialInfo
 	var i;
 	for (i=0;i<stimuli.length;i++) {
-		if (stimuli[i].key != null) {
+		if (stimuli[i].key != 'NaN') {
 			specialKeys.push(stimuli[i].key);
 		}
 	}

@@ -1,67 +1,51 @@
 import os, sys
 import csv
+import pandas as pd
 
 _thisDir = os.path.dirname(os.path.abspath(__file__)).decode(sys.getfilesystemencoding())
 os.chdir(_thisDir)
 
-def organize_data(expResults, data_csv_name, stimuli_csv_name):
-	if not os.path.exists('data'):
-		os.makedirs('data')
+def store_data(expName, expResults, taskName, subjectID):
+	dataDF = None
+	stimDF = None
+	for i in range(0,len(expResults)):
+		trial = expResults[i]
+		stimuli = trial.pop('stimuli', None)
 
-	keys = expResults[0].keys()
-	#keys = list(reversed(keys))
+		if len(stimuli) > 1:
+			tmpStimuli = {}
+			for i in range(0, len(stimuli)):
+				stimulusInfo = stimuli[i]
+				keys = stimulusInfo.keys()
+				for key in keys:
+					value = stimulusInfo[key]
+					if type(value) is list:
+						value = str(value)
+					tmpStimuli.update({'stimulus' + str(i+1) + '_' + key:value})
+			stimuli = tmpStimuli
 
-	header = []
-	stimuliHeader = []
-	for key in keys:
-		if key == 'results':
-			resultKeys = expResults[0]['results'].keys()
-			#resultKeys = list(reversed(resultKeys))
-			for resultKey in resultKeys:
-				header.append(resultKey)
+		results = trial.pop('results', None)
 
-		elif key != 'stimuli':
-			header.append(key)
+		trial.update(results)
+		trial.update({'subjectID':subjectID})
+
+		stimuli.update({'subjectID':subjectID})
+
+		if i == 0:
+			trialDataDF = pd.DataFrame(data=trial, index=[0])
+			dataDF = trialDataDF
+
+			trialStimDF = pd.DataFrame(data=stimuli, index=[0])
+			stimDF = trialStimDF
 		else:
-			stimuli = expResults[0]['stimuli']
-			stimulusKeys = expResults[0]['stimuli'][0].keys()
-			#stimulusKeys = list(reversed(stimulusKeys))
-			for i in range(0,len(stimuli)):
-				for stimulusKey in stimulusKeys:
-					stimuliHeader.append('stimulus'+str(i+1)+'_'+stimulusKey)
+			trialDataDF = pd.DataFrame(data=trial, index=[i+1])
+			dataDF = pd.concat([dataDF,trialDataDF], axis=0)
 
-	allTrialOutput = []
-	allStimuliInfo = []
-	for trial in expResults:
-		trialOutput = []
-		stimuliInfo = []
-		for key in keys:
-			if key == 'results':
-				results = trial['results']
-				for resultKey in results:
-					trialOutput.append(str(results[resultKey]))
+			trialStimDF = pd.DataFrame(data=stimuli, index=[i+1])
+			stimDF = pd.concat([stimDF,trialStimDF], axis=0)
 
-			elif key != 'stimuli':
-				trialOutput.append(str(trial[key]))
-			else:
-				stimuli = trial['stimuli']
-				for i in range(0,len(stimuli)):
-					stimulus = stimuli[i]
-					for stimulusKey in stimulusKeys:
-						stimuliInfo.append(str(stimulus[stimulusKey]))
-		allTrialOutput.append(trialOutput)
-		allStimuliInfo.append(stimuliInfo)
+	csvLocation = _thisDir + '/' + expName + '/' + subjectID + '/' + subjectID + '_'+ taskName +'Data.csv'
+	dataDF.to_csv(csvLocation,index=False)
 
-	with open(_thisDir + '/data/' + data_csv_name, 'wb') as csvfile:
-		writer = csv.writer(csvfile)
-		writer.writerow(header)
-
-		for trial in allTrialOutput:
-			writer.writerow(trial)
-
-	with open(_thisDir + '/data/' + stimuli_csv_name, 'wb') as csvfile:
-		writer = csv.writer(csvfile)
-		writer.writerow(stimuliHeader)
-
-		for trialStimuli in allStimuliInfo:
-			writer.writerow(trialStimuli)
+	csvLocation = _thisDir + '/' + expName + '/' + subjectID + '/' + subjectID + '_'+ taskName +'Stimuli.csv'
+	stimDF.to_csv(csvLocation,index=False)
