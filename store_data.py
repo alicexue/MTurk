@@ -10,25 +10,24 @@ def store_data(expName, expResults, taskName, subjectID):
 	stimDF = None
 	for i in range(0,len(expResults)):
 		trial = expResults[i]
-		stimuli = trial.pop('stimuli', None)
+		stimuli = trial.pop('stimuli', None) # stimuli is array
 
-		if len(stimuli) > 1:
-			tmpStimuli = {}
-			for i in range(0, len(stimuli)):
-				stimulusInfo = stimuli[i]
-				keys = stimulusInfo.keys()
-				for key in keys:
-					value = stimulusInfo[key]
-					if type(value) is list:
-						value = str(value)
-					tmpStimuli.update({'stimulus' + str(i+1) + '_' + key:value})
-			stimuli = tmpStimuli
+		tmpStimuli = {}
+		for j in range(0, len(stimuli)):
+			stimulusInfo = stimuli[j]
+			keys = stimulusInfo.keys()
+			for key in keys:
+				value = stimulusInfo[key]
+				if type(value) is list: # cannot add array to dataframe - convert to str instead
+					value = str(value)
+				tmpStimuli.update({'stimulus' + str(j+1) + '_' + key:value})
+		stimuli = tmpStimuli
 
 		results = trial.pop('results', None)
 
 		trial.update(results)
 		trial.update({'subjectID':subjectID})
-
+		
 		stimuli.update({'subjectID':subjectID})
 
 		if i == 0:
