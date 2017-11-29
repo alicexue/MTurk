@@ -16,9 +16,6 @@ os.chdir(_thisDir)
 
 app = Flask(__name__)
 
-expName = 'TEST'
-workerID = 'abc123' 
-
 """ 
 Auction Task
 
@@ -29,7 +26,8 @@ POST: Saves auction data and stimuli to csv files, redirects to choice task
 """
 @app.route("/auction", methods = ["GET","POST"])
 def auction():
-
+	workerID = request.args.get('workerID')
+	expName = request.args.get('expName')
 	if request.method == "GET":
 		### set experiment conditions here and pass to experiment.html 
 		# trialVariables should be an array of dictionaries 
@@ -43,7 +41,7 @@ def auction():
 		for i in range(0,len(stimuli1)):
 			expVariables.append({"stimulus1":stimuli1[i]})
 
-		return render_template('auction.html',expVariables=expVariables)
+		return render_template('auction.html', expVariables=expVariables)
 	else:
 		subjectID = get_subjectID(expName, workerID)
 		expResults = json.loads(request.form['experimentResults'])
@@ -56,7 +54,7 @@ def auction():
 
 		store_data(expName, expResults,'Auction',subjectID)
 
-		return redirect(url_for('choicetask_instructions'))
+		return redirect(url_for('choicetask_instructions', workerID = workerID, expName = expName))
 
 """ 
 Choice Task
@@ -68,6 +66,8 @@ POST: Saves choice task data and stimuli to csv files, redirects to thank you pa
 """
 @app.route("/choicetask", methods = ["GET","POST"])
 def choicetask():
+	workerID = request.args.get('workerID')
+	expName = request.args.get('expName')
 	subjectID = get_subjectID(expName, workerID)
 	if request.method == "GET":
 		### set experiment conditions here and pass to experiment.html 
@@ -108,20 +108,24 @@ Auction Instructions
 """
 @app.route("/auction_instructions", methods = ["GET","POST"])
 def auction_instructions():
+	workerID = request.args.get('workerID')
+	expName = request.args.get('expName')
 	if request.method == "GET":
-		return render_template('auction_instructions.html')
+		return render_template('auction_instructions.html', workerID = workerID, expName = expName)
 	else:
-		return redirect(url_for('auction'))
+		return redirect(url_for('auction', workerID = workerID, expName = expName))
 
 """
 Choice Task Instructions
 """
 @app.route("/choicetask_instructions", methods = ["GET","POST"])
 def choicetask_instructions():
+	workerID = request.args.get('workerID')
+	expName = request.args.get('expName')
 	if request.method == "GET":
-		return render_template('choicetask_instructions.html')
+		return render_template('choicetask_instructions.html', workerID = workerID, expName = expName)
 	else:
-		return redirect(url_for('choicetask'))
+		return redirect(url_for('choicetask', workerID = workerID, expName = expName))
 
 """
 Consent Form (home page)
@@ -132,10 +136,10 @@ def consent_form():
 		return render_template('consent_form.html')
 	else:
 		### need to change code here after testing is finished
-		global workerID 
 		workerID = 'abc' + str(random.randint(1000, 10000))
+		expName = 'TEST'
 		store_subject_info(expName, workerID)
-		return redirect(url_for('auction_instructions'))
+		return redirect(url_for('auction_instructions', workerID = workerID, expName = expName))
 
 @app.route("/thankyou", methods = ["GET"])
 def thankyou():
@@ -144,4 +148,4 @@ def thankyou():
 if __name__ == "__main__":
 	app.debug = False
 	app.secret_key="Don't store this on github"
-	app.run(host = '0.0.0.0', port = 8000)
+	app.run(host = '0.0.0.0', port = 8000, debug = True)
