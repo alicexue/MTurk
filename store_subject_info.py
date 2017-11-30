@@ -30,5 +30,16 @@ def store_subject_info(expName, workerID):
 def get_subjectID(expName, workerID):
 	csvLocation = _thisDir + '/' + expName +'/subject_worker_ids.csv'
 	df = pd.read_csv(csvLocation)
-	subjectID = df.loc[df['workerID'] == workerID]['subjectID'].values[0]
-	return subjectID
+	subjectIDs = df.loc[df['workerID'] == workerID]['subjectID'].values
+	if len(subjectIDs) > 0:
+		subjectID = df.loc[df['workerID'] == workerID]['subjectID'].values[0]
+		return subjectID
+	else: 
+		return False # workerID doesn't exist 
+
+def workerID_exists(expName, workerID):
+	subjectID = get_subjectID(expName, workerID)
+	if subjectID == False:
+		return False
+	else:
+		return True

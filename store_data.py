@@ -17,9 +17,7 @@ def store_data(expName, expResults, taskName, subjectID):
 			stimulusInfo = stimuli[j]
 			keys = stimulusInfo.keys()
 			for key in keys:
-				value = stimulusInfo[key]
-				if type(value) is list: # cannot add array to dataframe - convert to str instead
-					value = str(value)
+				value = str(stimulusInfo[key]) # lists will be separated into multiple rows in df
 				tmpStimuli.update({'stimulus' + str(j+1) + '_' + key:value})
 		stimuli = tmpStimuli
 
