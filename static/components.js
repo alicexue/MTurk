@@ -512,7 +512,9 @@ var moveSelector = function moveSelector(evt) {
  * Calls recordRating for the scale
 */
 var getRating = function(evt) {
-	scale.recordRating(evt);
+	if (!svg.contains(blankScreenCover)) { 
+		scale.recordRating(evt);
+	}
 }
 
 const BLACK = "#000000";
@@ -529,19 +531,21 @@ var confirmationBox;
   * @param {string} color: svg color name or code to set the box color 
 */
 var setConfirmationColor = function setConfirmationColor(color) {
-	if (svg.contains(confirmationBox)) {
-		svg.removeChild(confirmationBox);
+	if (!svg.contains(blankScreenCover)) {
+		if (svg.contains(confirmationBox)) {
+			svg.removeChild(confirmationBox);
+		}
+		var centerX = canvas.width / 2;
+		var centerY = canvas.height / 2;
+
+		var confirmBoxSide = canvas.width * 0.02;
+
+		confirmationBox = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+		confirmationBox.setAttribute("x",(centerX - confirmBoxSide/2).toString());
+		confirmationBox.setAttribute("y",(centerY).toString());
+		confirmationBox.setAttribute("width",confirmBoxSide.toString());
+		confirmationBox.setAttribute("height",confirmBoxSide.toString());
+		confirmationBox.setAttribute("fill",color);
+		svg.appendChild(confirmationBox);
 	}
-	var centerX = canvas.width / 2;
-	var centerY = canvas.height / 2;
-
-	var confirmBoxSide = canvas.width * 0.02;
-
-	confirmationBox = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-	confirmationBox.setAttribute("x",(centerX - confirmBoxSide/2).toString());
-	confirmationBox.setAttribute("y",(centerY).toString());
-	confirmationBox.setAttribute("width",confirmBoxSide.toString());
-	confirmationBox.setAttribute("height",confirmBoxSide.toString());
-	confirmationBox.setAttribute("fill",color);
-	svg.appendChild(confirmationBox);
 }

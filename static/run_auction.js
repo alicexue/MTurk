@@ -147,6 +147,29 @@ var nextTrial = function nextTrial() {
 	} else {
 		var strExpResults = JSON.stringify(allTrials);
 		document.getElementById('experimentResults').value = strExpResults;
+
+		var loadingText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+		loadingText.setAttribute("x","0");
+		loadingText.setAttribute("y",(canvas.height/2).toString());
+		loadingText.setAttribute("font-family","Arial");
+		loadingText.setAttribute("font-size","25");
+		loadingText.setAttribute("fill","black");
+		loadingText.textContent = "Loading... Please wait.";
+		svg.appendChild(loadingText);
+		var textLength = loadingText.getComputedTextLength();
+
+		if (textLength > canvas.width) { // then have text be squished to fit canvas
+			svg.removeChild(loadingText);
+			loadingText.setAttribute("textLength",canvas.width);
+			loadingText.setAttribute("lengthAdjust","spacingAndGlyphs");
+			svg.appendChild(loadingText);
+		} else { // then center the text
+			var newX = canvas.width/2 - textLength/2;
+			svg.removeChild(loadingText);
+			loadingText.setAttribute("x",newX.toString());
+			svg.appendChild(loadingText);
+		}
+
 		document.getElementById('exp').submit()
 	}
 }

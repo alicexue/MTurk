@@ -123,7 +123,7 @@ var pushTrialInfo = function pushTrialInfo() {
 var keyIsDown = false; // keep track if key is still being held down - take one key press at a time
 var checkKeyPress = function(e) {
 	var timePressed = e.timeStamp;
-	if (inConfirmation == false && keyIsDown == false && timePressed > t1) { 
+	if (inConfirmation == false && keyIsDown == false && timePressed > t1 && !svg.contains(blankScreenCover)) { 
 		keyIsDown = true;
 		t2 = timePressed;
 		// should check if timepressed is after trial starts
@@ -162,7 +162,9 @@ var setKeyUp = function(e) {
 */
 var nextTrial = function nextTrial() {
 	ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-	svg.removeChild(confirmationBox);
+	if (svg.contains(confirmationBox)) {
+		svg.removeChild(confirmationBox);
+	}
 	currTrialN+=1; // iterate to next trial
 	inConfirmation = false;
 	if (currTrialN < expVariables.length) { // experiment has not ended 
@@ -170,6 +172,29 @@ var nextTrial = function nextTrial() {
 	} else { // experiment has ended
 		var strExpResults = JSON.stringify(allTrials);
 		document.getElementById('experimentResults').value = strExpResults;
+
+		var loadingText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+		loadingText.setAttribute("x","0");
+		loadingText.setAttribute("y",(canvas.height/2).toString());
+		loadingText.setAttribute("font-family","Arial");
+		loadingText.setAttribute("font-size","25");
+		loadingText.setAttribute("fill","black");
+		loadingText.textContent = "Loading... Please wait.";
+		svg.appendChild(loadingText);
+		var textLength = loadingText.getComputedTextLength();
+
+		if (textLength > canvas.width) { // then have text be squished to fit canvas
+			svg.removeChild(loadingText);
+			loadingText.setAttribute("textLength",canvas.width);
+			loadingText.setAttribute("lengthAdjust","spacingAndGlyphs");
+			svg.appendChild(loadingText);
+		} else { // then center the text
+			var newX = canvas.width/2 - textLength/2;
+			svg.removeChild(loadingText);
+			loadingText.setAttribute("x",newX.toString());
+			svg.appendChild(loadingText);
+		}
+
 		document.getElementById('exp').submit()
 	}
 }
