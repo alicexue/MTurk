@@ -1,4 +1,4 @@
-console.log("loaded run_auction.js");
+console.log("loaded run_auction.js ");
 var expVariables; 
 
 var recordAllKeyPresses = true;

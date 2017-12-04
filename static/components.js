@@ -1,4 +1,4 @@
-console.log("loaded components.js");
+console.log("loaded components.js ");
 
 // trial class should store the stimuli array, ['trialN', 'trialStartTime', 'trialEndTime', 'stimulus', 'rsp', 'rt']
 var trial = class trial {

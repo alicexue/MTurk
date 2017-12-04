@@ -1,4 +1,4 @@
-console.log("loaded run_choicetask.js");
+console.log("loaded run_choicetask.js ");
 var expVariables; 
 
 var allKeyPresses = [];
