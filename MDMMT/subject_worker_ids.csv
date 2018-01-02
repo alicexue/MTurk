@@ -1,0 +1,4 @@
+completedAuction,completedChoiceTask,subjectID,timeCreated,workerID
+False,False,MDMMT00001,2018-01-02 15:41:37,abc4049
+True,True,MDMMT00002,2018-01-02 15:44:59,abc5962
+True,True,MDMMT0003,2018-01-02 15:58:07,abc5079

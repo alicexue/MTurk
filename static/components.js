@@ -517,6 +517,51 @@ var getRating = function(evt) {
 	}
 }
 
+var instructionsObj;
+var instructionsText = class instructionsText {
+
+	constructor(text) {
+		this.text = text;
+	}
+
+	showText(y) {
+		if (!svg.contains(instructionsObj)) {		
+			instructionsObj = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+			instructionsObj.setAttribute("x","0");
+			instructionsObj.setAttribute("y",y.toString());
+			instructionsObj.setAttribute("font-family","Arial");
+			instructionsObj.setAttribute("font-size","20");
+			instructionsObj.setAttribute("fill","black");
+			instructionsObj.textContent = this.text;
+			svg.appendChild(instructionsObj);
+
+			var textLength = instructionsObj.getComputedTextLength();
+
+			if (textLength > canvas.width) { // then have text be squished to fit canvas
+				svg.removeChild(instructionsObj);
+				instructionsObj.setAttribute("textLength",canvas.width);
+				instructionsObj.setAttribute("lengthAdjust","spacingAndGlyphs");
+				svg.appendChild(instructionsObj);
+			} else { // then center the text
+				var newX = canvas.width/2 - textLength/2;
+				svg.removeChild(instructionsObj);
+				instructionsObj.setAttribute("x",newX.toString());
+				svg.appendChild(instructionsObj);
+			}
+
+			if (y - 20 < 0) {
+				alertSmallWindow();
+			}
+		}
+	}
+
+	removeText() {
+		if (svg.contains(instructionsObj)) {
+			svg.removeChild(instructionsObj);
+		}
+	}
+}
+
 const BLACK = "#000000";
 const RED = "#ff0000";
 const GREEN = "#00cc00";

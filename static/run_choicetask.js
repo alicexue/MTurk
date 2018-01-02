@@ -5,6 +5,9 @@ var allKeyPresses = [];
 
 var currTrialN = 0;
 
+var origImgWidth = 576; // necessary for rescaling images
+var origImgHeight = 432; // necessary for rescaling images
+
 var stimuli = []; // keep track of stimuli to be display on one trial
 var specialKeys = [];
 
@@ -51,10 +54,11 @@ var startExperiment = function startExperiment() {
   * Adds confirmation box to trial display
   * @param {python dictionary/js object} trialVariables: has keys and values for trial parameters
 */
+var instructions;
 var drawTrialDisplay = function draw(trialVariables) {
 	// condition is a dictionary - each key can be used to set trial conditions
 
-	var imgFolder = '/static/stim/';
+	var imgFolder = stimFolder;
 	var stimulus1 = trialVariables['stimulus1'];
 	var stim1Bid = trialVariables['stim1Bid'];
 	var stimulus2 = trialVariables['stimulus2'];
@@ -85,6 +89,16 @@ var drawTrialDisplay = function draw(trialVariables) {
 	allTrials[currTrialN]['delta'] = delta;
 
 	setConfirmationColor(BLACK);
+
+	var scaledImgDimensions = rescaleImgSize([origImgWidth,origImgHeight], widthPercent, false);
+	var scaledHeight = scaledImgDimensions[1];
+
+	if (instructions == null) {
+		instructions = new instructionsText("Which food do you like more? Press 'u' for the one on the left or 'i' for the one on the right.");
+	} else {
+		instructions.removeText();
+	}
+	instructions.showText(canvas.height/2 - scaledHeight/2 - 10);
 }
 
 /*
@@ -170,6 +184,8 @@ var nextTrial = function nextTrial() {
 	if (currTrialN < expVariables.length) { // experiment has not ended 
 		drawTrialDisplay(expVariables[currTrialN]);
 	} else { // experiment has ended
+		instructions.removeText();
+
 		var strExpResults = JSON.stringify(allTrials);
 		document.getElementById('experimentResults').value = strExpResults;
 

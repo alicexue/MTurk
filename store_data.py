@@ -6,7 +6,7 @@ import datetime
 _thisDir = os.path.dirname(os.path.abspath(__file__)).decode(sys.getfilesystemencoding())
 os.chdir(_thisDir)
 
-def store_data(expName, expResults, taskName, subjectID):
+def store_data(expID, expResults, taskName, subjectID):
 	dataDF = None
 	stimDF = None
 	for i in range(0,len(expResults)):
@@ -45,9 +45,9 @@ def store_data(expName, expResults, taskName, subjectID):
 			trialStimDF = pd.DataFrame(data=stimuli, index=[i+1])
 			stimDF = pd.concat([stimDF,trialStimDF], axis=0)
 
-	dataFileLocation = _thisDir + '/' + expName + '/' + subjectID + '/' + subjectID + '_'+ taskName +'Data'
+	dataFileLocation = _thisDir + '/' + expID + '/' + subjectID + '/' + subjectID + '_'+ taskName +'Data'
 
-	stimFileLocation = _thisDir + '/' + expName + '/' + subjectID + '/' + subjectID + '_'+ taskName +'Stimuli'
+	stimFileLocation = _thisDir + '/' + expID + '/' + subjectID + '/' + subjectID + '_'+ taskName +'Stimuli'
 
 	newDataFileName = dataFileLocation
 	newStimFileName = stimFileLocation

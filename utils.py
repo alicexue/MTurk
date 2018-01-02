@@ -9,15 +9,32 @@ os.chdir(_thisDir)
 '''
 Returns a list of all stimuli in the stim folder (assuming all the .bmp files are stimulus images)
 '''
-def get_stimuli():
+def get_stimuli(folder):
 	'''
 	get array of stimuli from the directory name stim
 	'''
 	stimuli = []
-	for stimulusFile in os.listdir(_thisDir + '/static/stim/'):
+	for stimulusFile in os.listdir(_thisDir + folder):
 		if stimulusFile.endswith(".bmp"): 
 			stimuli.append(stimulusFile[:-4])
 	return stimuli
+
+def get_two_stimuli_lists_without_bids(folder):
+	stimuli1 = get_stimuli(folder)
+	random.shuffle(stimuli1)
+	stimuli2 = get_stimuli(folder)
+	random.shuffle(stimuli2)
+	shamBids = []
+	for i in range(0,len(stimuli1)):
+		shamBids.append(-1)
+		if stimuli1[i] == stimuli2[i]:
+			newIndex = random.randint(0,len(stimuli1)-1)
+			while newIndex == i or stimuli1[newIndex] == stimuli2[newIndex]:
+				newIndex = random.randint(0,len(stimuli1)-1)
+			oldStimulus = stimuli2[i]
+			stimuli2[i] = stimuli2[newIndex]
+			stimuli2[newIndex] = oldStimulus
+	return [stimuli1, shamBids, stimuli2, shamBids]
 
 '''
 Get lists of two stimuli for choice task
@@ -31,12 +48,12 @@ The order of the stimuli within pairings is also randomized so that the stimulus
 	is randomly put on the left or the right
 The array returned contains lists of the stimuli names and their respective bids
 '''
-def get_two_stimuli_lists(stimBidDF):
+def get_two_stimuli_lists(stimBidDF, folder):
 	result = stimBidDF.sort_values("bid")
 	result = result.reset_index(drop=True)
 
 	pairDiff = [1, 2, 3, 6, 10, 15, 30]
-	stimuli = get_stimuli()
+	stimuli = get_stimuli(folder)
 	nStim = len(stimuli)
 	pairingIndices = []
 	for x in pairDiff:

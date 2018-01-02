@@ -57,10 +57,11 @@ var startExperiment = function startExperiment() {
   * Adds rating scale to display
   * @param {python dictionary/js object} trialVariables: has keys and values for trial parameters
 */
+var instructions;
 var drawTrialDisplay = function drawTrialDisplay(trialVariables) {
 	// condition is a dictionary - each key can be used to set trial conditions
 	ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-	var imgFolder = '/static/stim/';
+	var imgFolder = stimFolder;
 	var stimulus1 = trialVariables['stimulus1'];
 
 	//console.log("Trial " + currTrialN + " " + stimulus1);
@@ -79,8 +80,15 @@ var drawTrialDisplay = function drawTrialDisplay(trialVariables) {
 	var scaledImgDimensions = rescaleImgSize([origImgWidth,origImgHeight], widthPercent, true);
 	var scaledHeight = scaledImgDimensions[1];
 
+	if (instructions == null) {
+		instructions = new instructionsText("Rate how much you want to eat this food from 0 (least) to 10 (most).");
+	} else {
+		instructions.removeText();
+	}
+	instructions.showText(canvas.height/2 - scaledHeight/2 - 30);
+
 	if (scale == null) { // set up scale for first trial
-		scale = new ratingScale(0,3,1,.01,canvas.width/2,canvas.height/2 + scaledHeight/2 + 10, ["$0", "$1", "$2", "$3"]);
+		scale = new ratingScale(0,10,1,.01,canvas.width/2,canvas.height/2 + scaledHeight/2 + 10, ["0", "", "", "", "", "5", "", "", "", "", "10"]);
 	} else {
 		scale.removeScale(); // removes current scale
 	}
@@ -141,6 +149,7 @@ var endTrial = function endTrial() {
 var nextTrial = function nextTrial() {
 	ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 	scale.removeScale();
+	instructions.removeText();
 	currTrialN+=1; // iterate to next trial
 	if (currTrialN < expVariables.length) {
 		drawTrialDisplay(expVariables[currTrialN]);
