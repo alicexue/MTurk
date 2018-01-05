@@ -1,10 +1,12 @@
-from flask import Flask,render_template,request,session
-from flask import redirect,url_for
+from flask import Flask, render_template, request, session
+from flask import redirect, url_for
 from flask import jsonify
 import json
 import random
-import csv, os, sys
-from utils import * # importing * allows you to use methods from utils.py without calling utils.method_name
+import csv
+import os
+import sys
+from utils import * 
 from store_data import *
 from store_subject_info import *
 import pandas as pd
@@ -125,7 +127,7 @@ def choicetask(expId):
 
 			return redirect(url_for('choicetask_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo))
 	elif containsAllMTurkArgs:
-
+		# not demo - record responses now
 		workerId = request.args.get('workerId')
 		subjectId = get_subjectId(expId, workerId)
 		assignmentId = request.args.get('assignmentId')
@@ -199,7 +201,7 @@ def auction_instructions(expId):
 				if request.form['submit'] == 'Continue':
 					return redirect(url_for('auction', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo))
 				else:
-					return redirect(url_for('auction_demo_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo))
+					return redirect(url_for('auction', demo='TRUE', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo))
 		else:
 			return redirect(url_for('unauthorized_error'))
 	else:
@@ -248,7 +250,7 @@ def choicetask_instructions(expId):
 				if request.form['submit'] == 'Continue':
 					return redirect(url_for('choicetask', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo))
 				else:
-					return redirect(url_for('choicetask_demo_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo))
+					return redirect(url_for('choicetask', demo='TRUE', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo))
 		else:
 			return redirect(url_for('unauthorized_error'))
 	else:
@@ -291,7 +293,7 @@ def MDMMT():
 		assignmentId = 'xxxxx' + str(random.randint(10000, 100000))
 		hitId = 'hhhhh' + str(random.randint(10000, 100000))
 		turkSubmitTo = 'www.mturk.com'
-		store_subject_info(expId, workerId)
+		store_subject_info(expId, workerId, assignmentId, hitId, turkSubmitTo)
 		return redirect(url_for('auction_demo_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, demo='TRUE'))
 
 @app.route("/thankyou", methods = ["GET"])
@@ -345,5 +347,4 @@ def page_not_found(e):
 if __name__ == "__main__":
 	app.debug = False
 	app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
-	app.debug = True
 	app.run(host = '0.0.0.0', port = 8000)

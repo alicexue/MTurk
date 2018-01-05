@@ -27,10 +27,15 @@ p {
 	font-family: "Arial";
 	padding-left: 30px;
 	padding-right: 30px;
-	line-height: 20px;
+	line-height: 22px;
 }
 
 body {
 	background-color: #ffffff;
-    /*background-color: #999999;*/
+}
+
+img {
+    max-width: 1200px;
+    height: auto;
+    width: 100%; 
 }

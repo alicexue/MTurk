@@ -1,4 +1,5 @@
-import os, sys
+import os
+import sys
 import csv
 import random
 import pandas as pd

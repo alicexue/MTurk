@@ -1,27 +1,29 @@
 import pandas as pd
-import csv, os, sys
+import csv
+import os
+import sys
 import datetime
 
 _thisDir = os.path.dirname(os.path.abspath(__file__)).decode(sys.getfilesystemencoding())
 os.chdir(_thisDir)
 
-def store_subject_info(expId, workerId):
+def store_subject_info(expId, workerId, assignmentId, hitId, turkSubmitTo):
 	if not os.path.exists(expId):
 		os.makedirs(expId)
 	csvLocation = _thisDir + '/' + expId +'/subject_worker_ids.csv'
 	if not os.path.exists(csvLocation):
-		newSubjectId = expId + "%04d" % (1,)
+		newSubjectId = expId + "_%04d" % (1,)
 		currentTime = datetime.datetime.now()
 		currentTime = currentTime.strftime("%Y-%m-%d %H:%M:%S")
-		newSubject = {'subjectId':newSubjectId, 'workerId':workerId, 'timeCreated':currentTime, 'completedAuction':False, 'completedChoiceTask':False}
+		newSubject = {'subjectId':newSubjectId, 'workerId':workerId, 'assignmentId':assignmentId, 'hitId':hitId, 'turkSubmitTo':turkSubmitTo, 'timeCreated':currentTime, 'completedAuction':False, 'completedChoiceTask':False}
 		new_df = pd.DataFrame(data=newSubject, index=[0])
 	else:
 		df = pd.read_csv(csvLocation)
 		nSubjects = len(df.index)
-		newSubjectId = expId + "%04d" % (nSubjects+1,)
+		newSubjectId = expId + "_%04d" % (nSubjects+1,)
 		currentTime = datetime.datetime.now()
 		currentTime = currentTime.strftime("%Y-%m-%d %H:%M:%S")
-		newSubject = {'subjectId':newSubjectId, 'workerId':workerId, 'timeCreated':currentTime, 'completedAuction':False, 'completedChoiceTask':False}
+		newSubject = {'subjectId':newSubjectId, 'workerId':workerId, 'assignmentId':assignmentId, 'hitId':hitId, 'turkSubmitTo':turkSubmitTo, 'timeCreated':currentTime, 'completedAuction':False, 'completedChoiceTask':False}
 		df2 = pd.DataFrame(data=newSubject, index=[0])
 		new_df = pd.concat([df,df2], axis=0)
 	new_df.to_csv(csvLocation,index=False)
@@ -73,9 +75,7 @@ def set_completed_auction(expId, workerId, boole):
 	df = pd.read_csv(csvLocation)
 	if workerId_exists(expId, workerId):
 		idx = df[df['workerId'] == workerId].index[0]
-		print df.loc[idx, 'completedAuction']
 		df.loc[idx, 'completedAuction'] = boole
-		print df.loc[idx, 'completedAuction']
 		df.to_csv(csvLocation,index=False)
 
 def set_completed_choice_task(expId, workerId, boole):
@@ -83,7 +83,5 @@ def set_completed_choice_task(expId, workerId, boole):
 	df = pd.read_csv(csvLocation)
 	if workerId_exists(expId, workerId):
 		idx = df[df['workerId'] == workerId].index[0]
-		print df.loc[idx, 'completedChoiceTask']
 		df.loc[idx, 'completedChoiceTask'] = boole
-		print df.loc[idx, 'completedChoiceTask']
 		df.to_csv(csvLocation,index=False)
