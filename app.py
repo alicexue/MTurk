@@ -199,7 +199,10 @@ def auction_instructions(expId):
 				return render_template('auction_instructions.html')
 			else:
 				if request.form['submit'] == 'Continue':
-					return redirect(url_for('auction', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo))
+					if request.args.get('assignmentId') == 'ASSIGNMENT_ID_NOT_AVAILABLE':
+						return redirect(url_for('choicetask_demo_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, demo='TRUE'))
+					else:
+						return redirect(url_for('auction', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo))
 				else:
 					return redirect(url_for('auction', demo='TRUE', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo))
 		else:
@@ -212,9 +215,7 @@ Auction Demo Instructions
 """
 @app.route("/auction_demo_instructions/<expId>", methods = ["GET","POST"])
 def auction_demo_instructions(expId):
-	if 'assignmentId' in request.args and request.args.get('assignmentId') == 'ASSIGNMENT_ID_NOT_AVAILABLE':
-		redirect(url_for('accept_hit'))
-	elif contains_all_args(request.args) and request.args.get('assignmentId') != 'ASSIGNMENT_ID_NOT_AVAILABLE':
+	if contains_all_args(request.args):
 
 		workerId = request.args.get('workerId')
 		assignmentId = request.args.get('assignmentId')
@@ -248,7 +249,10 @@ def choicetask_instructions(expId):
 				return render_template('choicetask_instructions.html', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo)
 			else:
 				if request.form['submit'] == 'Continue':
-					return redirect(url_for('choicetask', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo))
+					if request.args.get('assignmentId') == 'ASSIGNMENT_ID_NOT_AVAILABLE':
+						return redirect(url_for('accept_hit'))
+					else:
+						return redirect(url_for('choicetask', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo))
 				else:
 					return redirect(url_for('choicetask', demo='TRUE', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo))
 		else:
@@ -287,13 +291,27 @@ def MDMMT():
 	if request.method == "GET":
 		return render_template('consent_form.html')
 	else:
-		### need to change code here after testing is finished
 		expId = 'MDMMT'
-		workerId = 'abc' + str(random.randint(1000, 10000))
-		assignmentId = 'xxxxx' + str(random.randint(10000, 100000))
-		hitId = 'hhhhh' + str(random.randint(10000, 100000))
-		turkSubmitTo = 'www.mturk.com'
-		store_subject_info(expId, workerId, assignmentId, hitId, turkSubmitTo)
+		if contains_all_args(request.args):
+			workerId = request.args.get('workerId')
+			assignmentId = request.args.get('assignmentId')
+			hitId = request.args.get('hitId')
+			turkSubmitTo = request.args.get('turkSubmitTo')
+		elif 'assignmentId' in request.args and request.args.get('assignmentId') == 'ASSIGNMENT_ID_NOT_AVAILABLE':
+			expId = 'MDMMT_PREVIEW'
+			workerId = 'abc' + str(random.randint(1000, 10000))
+			assignmentId = request.args.get('assignmentId')
+			hitId = 'hhhhh' + str(random.randint(10000, 100000))
+			turkSubmitTo = 'www.calkins.psych.columbia.edu'
+		else:
+			### need to change code here after testing is finished
+			expId = 'MDMMT_PREVIEW'
+			workerId = 'abc' + str(random.randint(1000, 10000))
+			assignmentId = 'xxxxx' + str(random.randint(10000, 100000))
+			hitId = 'hhhhh' + str(random.randint(10000, 100000))
+			turkSubmitTo = 'www.calkins.psych.columbia.edu'
+
+		store_subject_info(expId, workerId, assignmentId, hitId, turkSubmitTo) 
 		return redirect(url_for('auction_demo_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, demo='TRUE'))
 
 @app.route("/thankyou", methods = ["GET"])
