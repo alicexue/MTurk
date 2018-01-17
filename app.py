@@ -316,7 +316,11 @@ def MDMMT():
 
 @app.route("/thankyou", methods = ["GET"])
 def thankyou():
-	return render_template('thankyou.html')
+	if 'assignmentId' in request.args:
+		assignmentId = request.args.get('assignmentId')
+		return render_template('thankyou.html', assignmentId=assignmentId)
+	else:
+		return redirect(url_for('unauthorized_error'))
 
 @app.route("/auction_error/<expId>", methods = ["GET", "POST"])
 def auction_error(expId):
