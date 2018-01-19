@@ -30,6 +30,10 @@ p {
 	line-height: 22px;
 }
 
+form{
+	font-family: "Arial";
+}
+
 body {
 	background-color: #ffffff;
 }

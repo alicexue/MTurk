@@ -6,14 +6,17 @@
 	</head>
 
 	<h2 style="text-align: center">Thank you for participating in this study!</h2>
-	<h3 style="text-align: center"> Please make sure to click the button below to ensure your results are accepted. </h3>
+	<h3 style="text-align: center"> Please make sure to click the button below to submit the HIT. </h3>
 
 	<center>
-	<form method="POST" action="https://workersandbox.mturk.com/mturk/externalSubmit">
-	<!form method="POST" action="https://www.mturk.com/mturk/externalSubmit">
+	{% if live %}
+		<form method="POST" action="https://www.mturk.com/mturk/externalSubmit">
+	{% else %}
+		<form method="POST" action="https://workersandbox.mturk.com/mturk/externalSubmit">
+	{% endif %}
 		<input type="hidden" name="assignmentId" value="{{ assignmentId }}">
 		<input type="hidden" name="exp" value="food"> 
-		<input type="submit" value="Submit results" style="font-size: 30px;">
+		<input type="submit" value="Submit HIT" style="font-size: 30px;">
 	</form>
 </center>
 </html>

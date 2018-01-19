@@ -16,6 +16,28 @@ os.chdir(_thisDir)
 
 app = Flask(__name__)
 
+"""
+It is assumed that all tasks are preceded by a demo (when moving onto the next task, always reroute to a demo instructions page
+- see code for clarification)
+
+1. Define the order in which tasks are to be completed in your experiment (see MDMMT_taskOrder)
+2. Add variable from step 1 to the dictionary expTaskOrders. In the key-value pair, the variable from step 1
+should be the value and the experiment abbreviation/name should be the key.
+
+Each task has 3 associated functions - suppose our task is called "auction"
+	1) function that runs the task (also runs demo) (auction(expId))
+	2) function for task instructions
+	3) function for instructions of task's demo
+	Notes:
+		Each function must take expId as a parameter and each function must contain a variable that defines the name of the task
+
+"""
+
+
+
+MDMMT_taskOrder = ['auction', 'choicetask'] # order of tasks in experiment
+expTaskOrders = {'MDMMT':MDMMT_taskOrder} # dictionary of experiments - key is exp name, value is order of tasks
+
 """ 
 Auction Task
 
@@ -26,7 +48,8 @@ POST: Saves auction data and stimuli to csv files, redirects to choice task
 """
 @app.route("/auction/<expId>", methods = ["GET","POST"])
 def auction(expId):
-	containsAllMTurkArgs = contains_all_args(request.args)
+	name = 'auction'
+	containsAllMTurkArgs = contains_necessary_args(request.args)
 
 	if 'demo' in request.args and containsAllMTurkArgs:
 		if request.method == "GET" and request.args.get('demo') == 'TRUE':
@@ -45,14 +68,11 @@ def auction(expId):
 			assignmentId = request.args.get('assignmentId')
 			hitId = request.args.get('hitId')
 			turkSubmitTo = request.args.get('turkSubmitTo')
+			live = request.args.get('live') == "True"
 
-			return redirect(url_for('auction_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo))
+			return redirect(url_for('auction_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 	elif containsAllMTurkArgs:
-
-		workerId = request.args.get('workerId')
-		assignmentId = request.args.get('assignmentId')
-		hitId = request.args.get('hitId')
-		turkSubmitTo = request.args.get('turkSubmitTo')
+		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
 
 		completedAuction = completed_auction(expId, workerId)
 
@@ -75,19 +95,18 @@ def auction(expId):
 				subjectId = get_subjectId(expId, workerId)
 				expResults = json.loads(request.form['experimentResults'])
 
-				if not os.path.exists(expId):
-					os.makedirs(expId)
-
-				if not os.path.exists(expId + '/' + subjectId):
-					os.makedirs(expId + '/' + subjectId)
-
+				add_new_subject(expId, subjectId)
 				store_data(expId, expResults,'Auction',subjectId)
 
 				set_completed_auction(expId, workerId, True)
 
-				return redirect(url_for('choicetask_demo_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo))
+				nextTask = get_next_task(name, expTaskOrders[expId])
+				if nextTask == 'thankyou':
+					return redirect(url_for('thankyou', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+				else:
+					return redirect(url_for(nextTask + '_demo_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 		elif workerId_exists(expId, workerId) and completedAuction == True:
-			return redirect(url_for('auction_error', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo))
+			return redirect(url_for('auction_error', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 		else:
 			return redirect(url_for('unauthorized_error'))
 	else:
@@ -103,7 +122,8 @@ POST: Saves choice task data and stimuli to csv files, redirects to thank you pa
 """
 @app.route("/choicetask/<expId>", methods = ["GET","POST"])
 def choicetask(expId):
-	containsAllMTurkArgs = contains_all_args(request.args)
+	name = 'choicetask'
+	containsAllMTurkArgs = contains_necessary_args(request.args)
 
 	if 'demo' in request.args and containsAllMTurkArgs:
 		if request.method == "GET" and request.args.get('demo') == 'TRUE':
@@ -119,20 +139,13 @@ def choicetask(expId):
 				expVariables.append({"stimulus1":stim1Names[i],"stimulus2":stim2Names[i],"stim1Bid":stim1Bids[i],"stim2Bid":stim2Bids[i], "delta":deltas[i]})
 			return render_template('choicetask.html', expId=expId, expVariables=expVariables, stimFolder='/static/stim/demo/')
 		else:
+			[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
 
-			workerId = request.args.get('workerId')
-			assignmentId = request.args.get('assignmentId')
-			hitId = request.args.get('hitId')
-			turkSubmitTo = request.args.get('turkSubmitTo')
-
-			return redirect(url_for('choicetask_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo))
+			return redirect(url_for('choicetask_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 	elif containsAllMTurkArgs:
 		# not demo - record responses now
-		workerId = request.args.get('workerId')
+		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
 		subjectId = get_subjectId(expId, workerId)
-		assignmentId = request.args.get('assignmentId')
-		hitId = request.args.get('hitId')
-		turkSubmitTo = request.args.get('turkSubmitTo')
 
 		completedChoiceTask = completed_choice_task(expId, workerId)
 
@@ -165,18 +178,19 @@ def choicetask(expId):
 			else:
 				expResults = json.loads(request.form['experimentResults'])
 
-				if not os.path.exists(expId):
-					os.makedirs(expId)
-
-				if not os.path.exists(expId + '/' + subjectId):
-					os.makedirs(expId + '/' + subjectId)
+				add_new_subject(expId, subjectId)
 				store_data(expId, expResults,'ChoiceTask', subjectId)
 
 				set_completed_choice_task(expId, workerId, True)
 
-				return redirect(url_for('thankyou', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo))
+				nextTask = get_next_task(name, expTaskOrders[expId])
+				if nextTask == 'thankyou':
+					return redirect(url_for('thankyou', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+				else:
+					return redirect(url_for(nextTask + '_demo_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+
 		elif workerId_exists(expId, workerId) and completedChoiceTask == True:
-			return redirect(url_for('choicetask_error', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo))
+			return redirect(url_for('choicetask_error', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 		else:
 			return redirect(url_for('unauthorized_error'))
 	else:
@@ -187,24 +201,25 @@ Auction Instructions
 """
 @app.route("/auction_instructions/<expId>", methods = ["GET","POST"])
 def auction_instructions(expId):
-	if contains_all_args(request.args):
-
-		workerId = request.args.get('workerId')
-		assignmentId = request.args.get('assignmentId')
-		hitId = request.args.get('hitId')
-		turkSubmitTo = request.args.get('turkSubmitTo')
+	name = 'auction'
+	if contains_necessary_args(request.args):
+		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
 
 		if workerId_exists(expId, workerId):
 			if request.method == "GET":
 				return render_template('auction_instructions.html')
 			else:
 				if request.form['submit'] == 'Continue':
-					if request.args.get('assignmentId') == 'ASSIGNMENT_ID_NOT_AVAILABLE':
-						return redirect(url_for('choicetask_demo_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, demo='TRUE'))
+					if request.args.get('assignmentId') == 'ASSIGNMENT_ID_NOT_AVAILABLE': # if in preview
+						nextTask = get_next_task(name, expTaskOrders[expId])
+						if nextTask == 'thankyou':
+							return redirect(url_for('thankyou', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+						else:
+							return redirect(url_for(nextTask + '_demo_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 					else:
-						return redirect(url_for('auction', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo))
+						return redirect(url_for('auction', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 				else:
-					return redirect(url_for('auction', demo='TRUE', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo))
+					return redirect(url_for('auction', demo='TRUE', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 		else:
 			return redirect(url_for('unauthorized_error'))
 	else:
@@ -215,18 +230,20 @@ Auction Demo Instructions
 """
 @app.route("/auction_demo_instructions/<expId>", methods = ["GET","POST"])
 def auction_demo_instructions(expId):
-	if contains_all_args(request.args):
+	name = 'auction'
 
-		workerId = request.args.get('workerId')
+	assignmentId = None
+	if 'assignmentId' in request.args:
 		assignmentId = request.args.get('assignmentId')
-		hitId = request.args.get('hitId')
-		turkSubmitTo = request.args.get('turkSubmitTo')
 
-		if workerId_exists(expId, workerId):
+	if contains_necessary_args(request.args) or assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE':
+		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
+
+		if workerId_exists(expId, workerId) or assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE':
 			if request.method == "GET":
 				return render_template('auction_demo_instructions.html')
 			else:
-				return redirect(url_for('auction', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, demo='TRUE'))
+				return redirect(url_for('auction', demo='TRUE', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 		else:
 			return redirect(url_for('unauthorized_error'))
 	else:
@@ -237,24 +254,21 @@ Choice Task Instructions
 """
 @app.route("/choicetask_instructions/<expId>", methods = ["GET","POST"])
 def choicetask_instructions(expId):
-	if contains_all_args(request.args):
-
-		workerId = request.args.get('workerId')
-		assignmentId = request.args.get('assignmentId')
-		hitId = request.args.get('hitId')
-		turkSubmitTo = request.args.get('turkSubmitTo')
+	name = 'choicetask'
+	if contains_necessary_args(request.args):
+		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
 
 		if workerId_exists(expId, workerId):
 			if request.method == "GET":
-				return render_template('choicetask_instructions.html', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo)
+				return render_template('choicetask_instructions.html', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live)
 			else:
 				if request.form['submit'] == 'Continue':
 					if request.args.get('assignmentId') == 'ASSIGNMENT_ID_NOT_AVAILABLE':
 						return redirect(url_for('accept_hit'))
 					else:
-						return redirect(url_for('choicetask', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo))
+						return redirect(url_for('choicetask', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 				else:
-					return redirect(url_for('choicetask', demo='TRUE', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo))
+					return redirect(url_for('choicetask', demo='TRUE', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 		else:
 			return redirect(url_for('unauthorized_error'))
 	else:
@@ -265,18 +279,21 @@ Choice Task Demo Instructions
 """
 @app.route("/choicetask_demo_instructions/<expId>", methods = ["GET","POST"])
 def choicetask_demo_instructions(expId):
-	if contains_all_args(request.args):
+	name = 'choicetask'
 
-		workerId = request.args.get('workerId')
+	assignmentId = None
+	if 'assignmentId' in request.args:
 		assignmentId = request.args.get('assignmentId')
-		hitId = request.args.get('hitId')
-		turkSubmitTo = request.args.get('turkSubmitTo')
 
-		if workerId_exists(expId, workerId):
+	if contains_necessary_args(request.args) or assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE':
+
+		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
+
+		if workerId_exists(expId, workerId) or assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE':
 			if request.method == "GET":
-				return render_template('choicetask_demo_instructions.html', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo)
+				return render_template('choicetask_demo_instructions.html', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live)
 			else:
-				return redirect(url_for('choicetask', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, demo='TRUE'))
+				return redirect(url_for('choicetask', demo='TRUE', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 		else:
 			return redirect(url_for('unauthorized_error'))
 	else:
@@ -288,34 +305,55 @@ Consent Form (home page)
 """
 @app.route("/MDMMT", methods = ["GET","POST"])
 def MDMMT():
+	expId = 'MDMMT'
 	if request.method == "GET":
-		return render_template('consent_form.html')
+		if 'assignmentId' in request.args and request.args.get('assignmentId') == 'ASSIGNMENT_ID_NOT_AVAILABLE':
+			return redirect(url_for('check_eligibility', expId=expId))
+		else:
+			return render_template('consent_form.html')
 	else:
-		expId = 'MDMMT'
-		if contains_all_args(request.args):
-			workerId = request.args.get('workerId')
-			assignmentId = request.args.get('assignmentId')
-			hitId = request.args.get('hitId')
-			turkSubmitTo = request.args.get('turkSubmitTo')
+		if contains_necessary_args(request.args): 
+			# worker accepted HIT 
+			[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
+
+			store_subject_info(expId, workerId, assignmentId, hitId, turkSubmitTo) 
+
 		elif 'assignmentId' in request.args and request.args.get('assignmentId') == 'ASSIGNMENT_ID_NOT_AVAILABLE':
-			expId = 'MDMMT_PREVIEW'
+			# worker previewing HIT
 			workerId = 'abc' + str(random.randint(1000, 10000))
 			assignmentId = request.args.get('assignmentId')
 			hitId = 'hhhhh' + str(random.randint(10000, 100000))
 			turkSubmitTo = 'www.calkins.psych.columbia.edu'
+			live = request.args.get('live') == "True"
+
 		else:
-			### need to change code here after testing is finished
-			expId = 'MDMMT_PREVIEW'
+			# in testing - accessed site through www.calkins.psych.columbia.edu
 			workerId = 'abc' + str(random.randint(1000, 10000))
 			assignmentId = 'xxxxx' + str(random.randint(10000, 100000))
 			hitId = 'hhhhh' + str(random.randint(10000, 100000))
 			turkSubmitTo = 'www.calkins.psych.columbia.edu'
+			live = False
 
-		store_subject_info(expId, workerId, assignmentId, hitId, turkSubmitTo) 
-		return redirect(url_for('auction_demo_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, demo='TRUE'))
+			store_subject_info(expId, workerId, assignmentId, hitId, turkSubmitTo) 
+
+		firstTask = expTaskOrders[expId][0]
+		return redirect(url_for(firstTask + '_demo_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+
+@app.route("/check_eligibility/<expId>", methods = ["GET", "POST"])
+def check_eligibility(expId):
+	if request.method == "GET":
+		return render_template('check_eligibility.html')
+	else:
+		workerId = request.form['workerId']
+		if workerId_exists(expId, workerId) and completed_auction(expId, workerId) and completed_choice_task(expId, workerId):
+			return render_template('return_hit.html')
+		else:
+			return redirect(url_for(expId))
+
 
 @app.route("/thankyou", methods = ["GET"])
 def thankyou():
+	name = 'thankyou'
 	if 'assignmentId' in request.args:
 		assignmentId = request.args.get('assignmentId')
 		return render_template('thankyou.html', assignmentId=assignmentId)
@@ -324,29 +362,37 @@ def thankyou():
 
 @app.route("/auction_error/<expId>", methods = ["GET", "POST"])
 def auction_error(expId):
-	if contains_all_args(request.args):
-		workerId = request.args.get('workerId')
-		assignmentId = request.args.get('assignmentId')
-		hitId = request.args.get('hitId')
-		turkSubmitTo = request.args.get('turkSubmitTo')
+	name = 'auction'
+	if contains_necessary_args(request.args):
+		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
 
 		if request.method == "GET":
 			return render_template('auction_error.html')
 		else:
-			return redirect(url_for('choicetask_demo_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, demo='TRUE'))
+			nextTask = get_next_task(name, expTaskOrders[expId])
+			if nextTask == 'thankyou':
+				return redirect(url_for('thankyou', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+			else:
+				return redirect(url_for(nextTask + '_demo_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 	else:
 		return redirect(url_for('unauthorized_error'))
 
 @app.route("/choicetask_error/<expId>", methods = ["GET"])
 def choicetask_error(expId):
-	if contains_all_args(request.args):
+	name = 'choicetask'
+	if contains_necessary_args(request.args):
 		workerId = request.args.get('workerId')
 		assignmentId = request.args.get('assignmentId')
 		hitId = request.args.get('hitId')
 		turkSubmitTo = request.args.get('turkSubmitTo')
+		live = request.args.get('live') == "True"
 
 		if request.method == "GET":
-			return redirect(url_for('thankyou', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, demo='TRUE'))
+			nextTask = get_next_task(name, expTaskOrders[expId])
+			if nextTask == 'thankyou':
+				return redirect(url_for('thankyou', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+			else:
+				return redirect(url_for(nextTask + '_demo_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 	else:
 		return redirect(url_for('unauthorized_error'))
 
