@@ -137,13 +137,13 @@ worker_requirements = [
 
 # Create the HIT
 response = client.create_hit(
-    MaxAssignments=3,
-    LifetimeInSeconds=331200,
+    MaxAssignments=9,
+    LifetimeInSeconds=432000,
     AssignmentDurationInSeconds=3600,
     Reward=mturk_environment['reward'],
     Title='What snack do you prefer?',
     Keywords='research,psych,psychology,food,preferences',
-    Description='You will rate how much you like snack foods and which one you prefer. Although we have allocated an hour for you to complete this study, it should only take you about 30 minutes. This HIT cannot be completed on a mobile device. You need a mouse and a keyboard.',
+    Description='You will rate how much you like snack foods and which one you prefer. We have allocated an hour for you to complete this study, but it should take you about 30 minutes. This HIT cannot be completed on a mobile device. You need a mouse and a keyboard.',
     Question=question_sample,
     QualificationRequirements=worker_requirements,
 )
@@ -164,6 +164,7 @@ info.update(response['ResponseMetadata'])
 df = pd.DataFrame(data=info, index=[0])
 _thisDir = os.path.dirname(os.path.abspath(__file__)).decode(sys.getfilesystemencoding())
 os.chdir(_thisDir)
+if not os.path.exists(expId):
+    os.makedirs(expId)
 csvLocation = _thisDir + '/' + expId +'/HIT_' + str(hit_id) + '.csv'
 df.to_csv(csvLocation,index=False)
-

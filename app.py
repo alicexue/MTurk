@@ -8,7 +8,7 @@ import os
 import sys
 from utils import * 
 from store_data import *
-from store_subject_info import *
+from manage_subject_info import *
 import pandas as pd
 
 _thisDir = os.path.dirname(os.path.abspath(__file__)).decode(sys.getfilesystemencoding())
@@ -202,15 +202,20 @@ Auction Instructions
 @app.route("/auction_instructions/<expId>", methods = ["GET","POST"])
 def auction_instructions(expId):
 	name = 'auction'
-	if contains_necessary_args(request.args):
+
+	assignmentId = None
+	if 'assignmentId' in request.args:
+		assignmentId = request.args.get('assignmentId')
+
+	if contains_necessary_args(request.args) or assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE':
 		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
 
-		if workerId_exists(expId, workerId):
+		if workerId_exists(expId, workerId) or assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE':
 			if request.method == "GET":
 				return render_template('auction_instructions.html')
 			else:
 				if request.form['submit'] == 'Continue':
-					if request.args.get('assignmentId') == 'ASSIGNMENT_ID_NOT_AVAILABLE': # if in preview
+					if assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE': # if in preview
 						nextTask = get_next_task(name, expTaskOrders[expId])
 						if nextTask == 'thankyou':
 							return redirect(url_for('thankyou', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
@@ -255,15 +260,20 @@ Choice Task Instructions
 @app.route("/choicetask_instructions/<expId>", methods = ["GET","POST"])
 def choicetask_instructions(expId):
 	name = 'choicetask'
-	if contains_necessary_args(request.args):
+
+	assignmentId = None
+	if 'assignmentId' in request.args:
+		assignmentId = request.args.get('assignmentId')
+
+	if contains_necessary_args(request.args) or assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE':
 		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
 
-		if workerId_exists(expId, workerId):
+		if workerId_exists(expId, workerId) or assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE':
 			if request.method == "GET":
 				return render_template('choicetask_instructions.html', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live)
 			else:
 				if request.form['submit'] == 'Continue':
-					if request.args.get('assignmentId') == 'ASSIGNMENT_ID_NOT_AVAILABLE':
+					if assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE':
 						return redirect(url_for('accept_hit'))
 					else:
 						return redirect(url_for('choicetask', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
@@ -307,16 +317,23 @@ Consent Form (home page)
 def MDMMT():
 	expId = 'MDMMT'
 	if request.method == "GET":
-		if 'assignmentId' in request.args and request.args.get('assignmentId') == 'ASSIGNMENT_ID_NOT_AVAILABLE':
-			return redirect(url_for('check_eligibility', expId=expId))
+		if 'preview' in request.args and request.args.get('preview') == 'True':
+			return render_template('consent_form.html')
+		elif 'assignmentId' in request.args and 'hitId' in request.args and request.args.get('assignmentId') == 'ASSIGNMENT_ID_NOT_AVAILABLE':
+			assignmentId = request.args.get('assignmentId')
+			hitId = request.args.get('hitId')
+			return redirect(url_for('check_eligibility', expId=expId, assignmentId=assignmentId, hitId=hitId))
 		else:
 			return render_template('consent_form.html')
 	else:
+
 		if contains_necessary_args(request.args): 
 			# worker accepted HIT 
 			[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
-
-			store_subject_info(expId, workerId, assignmentId, hitId, turkSubmitTo) 
+			if workerId_exists(expId, workerId) and completed_auction(expId, workerId) and completed_choice_task(expId, workerId):
+				return render_template('return_hit.html')
+			elif not workerId_exists(expId, workerId):
+				store_subject_info(expId, workerId, assignmentId, hitId, turkSubmitTo) 
 
 		elif 'assignmentId' in request.args and request.args.get('assignmentId') == 'ASSIGNMENT_ID_NOT_AVAILABLE':
 			# worker previewing HIT
@@ -341,14 +358,20 @@ def MDMMT():
 
 @app.route("/check_eligibility/<expId>", methods = ["GET", "POST"])
 def check_eligibility(expId):
-	if request.method == "GET":
-		return render_template('check_eligibility.html')
-	else:
+	if request.method == "GET" and 'assignmentId' in request.args and 'hitId' in request.args:
+		assignmentId = request.args.get('assignmentId')
+		hitId = request.args.get('hitId')
+		return render_template('check_eligibility.html', assignmentId=assignmentId, hitId=hitId)
+	elif request.method == "POST" and 'assignmentId' in request.args and 'hitId' in request.args:
 		workerId = request.form['workerId']
+		assignmentId = request.args.get('assignmentId')
+		hitId = request.args.get('hitId')
 		if workerId_exists(expId, workerId) and completed_auction(expId, workerId) and completed_choice_task(expId, workerId):
 			return render_template('return_hit.html')
 		else:
-			return redirect(url_for(expId))
+			return redirect(url_for(expId, preview='True', assignmentId=assignmentId, hitId=hitId))
+	else:
+		return redirect(url_for('unauthorized_error'))
 
 
 @app.route("/thankyou", methods = ["GET"])

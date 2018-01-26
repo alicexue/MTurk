@@ -76,12 +76,13 @@ for assignment in assignments:
     assignment_id = assignment['AssignmentId']
 
     print 'The Worker with ID {} submitted assignment {}'.format(worker_id, assignment_id)
-
+    
     # Approve the Assignment (if it hasn't already been approved)
     if assignment['AssignmentStatus'] == 'Submitted':
         print 'Approving Assignment {}'.format(assignment_id)
         client.approve_assignment(
             AssignmentId=assignment_id,
-            RequesterFeedback='good',
+            RequesterFeedback='Thanks for completing this HIT!',
             OverrideRejection=False,
         )
+
