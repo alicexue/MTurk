@@ -15,12 +15,6 @@ def check_subject_data(expId, subjectId):
 	auctionFile = subjectFolder + subjectId + '_AuctionData.csv'
 	choiceFile = subjectFolder + subjectId + '_ChoiceTaskData.csv'
 
-	"""
-	if os.path.exists(auctionFile):
-		auctionData = pd.read_csv(auctionFile)
-		print auctionData
-	"""
-
 	if os.path.exists(choiceFile):
 		choiceData = pd.read_csv(choiceFile)
 
