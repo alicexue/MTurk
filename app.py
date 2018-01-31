@@ -35,7 +35,7 @@ Each task has 3 associated functions - suppose our task is called "auction"
 
 
 
-MDMMT_taskOrder = ['auction', 'choicetask'] # order of tasks in experiment
+MDMMT_taskOrder = ['auction_demo_instructions', 'auction', 'choicetask_demo_instructions', 'choicetask', 'feedback'] # order of tasks in experiment
 expTaskOrders = {'MDMMT':MDMMT_taskOrder} # dictionary of experiments - key is exp name, value is order of tasks
 
 """ 
@@ -101,10 +101,7 @@ def auction(expId):
 				set_completed_auction(expId, workerId, True)
 
 				nextTask = get_next_task(name, expTaskOrders[expId])
-				if nextTask == 'thankyou':
-					return redirect(url_for('thankyou', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
-				else:
-					return redirect(url_for(nextTask + '_demo_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+				return redirect(url_for(nextTask, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 		elif workerId_exists(expId, workerId) and completedAuction == True:
 			return redirect(url_for('auction_error', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 		else:
@@ -184,10 +181,7 @@ def choicetask(expId):
 				set_completed_choice_task(expId, workerId, True)
 
 				nextTask = get_next_task(name, expTaskOrders[expId])
-				if nextTask == 'thankyou':
-					return redirect(url_for('thankyou', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
-				else:
-					return redirect(url_for(nextTask + '_demo_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+				return redirect(url_for(nextTask, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 
 		elif workerId_exists(expId, workerId) and completedChoiceTask == True:
 			return redirect(url_for('choicetask_error', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
@@ -393,10 +387,7 @@ def auction_error(expId):
 			return render_template('auction_error.html')
 		else:
 			nextTask = get_next_task(name, expTaskOrders[expId])
-			if nextTask == 'thankyou':
-				return redirect(url_for('thankyou', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
-			else:
-				return redirect(url_for(nextTask + '_demo_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+			return redirect(url_for(nextTask, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 	else:
 		return redirect(url_for('unauthorized_error'))
 
@@ -412,10 +403,25 @@ def choicetask_error(expId):
 
 		if request.method == "GET":
 			nextTask = get_next_task(name, expTaskOrders[expId])
-			if nextTask == 'thankyou':
-				return redirect(url_for('thankyou', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
-			else:
-				return redirect(url_for(nextTask + '_demo_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+			return redirect(url_for(nextTask, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+	else:
+		return redirect(url_for('unauthorized_error'))
+
+@app.route("/feedback/<expId>", methods=["GET","POST"])
+def feedback(expId):
+	name = 'feedback'
+	if contains_necessary_args(request.args):
+		workerId = request.args.get('workerId')
+		assignmentId = request.args.get('assignmentId')
+		hitId = request.args.get('hitId')
+		turkSubmitTo = request.args.get('turkSubmitTo')
+		live = request.args.get('live') == "True"
+		if request.method == "GET":
+			return render_template('feedback.html')
+		else:
+			feedback = request.form["feedback"]
+			store_feedback(expId, workerId, feedback)
+			return redirect(url_for('thankyou', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 	else:
 		return redirect(url_for('unauthorized_error'))
 
