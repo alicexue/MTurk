@@ -24,13 +24,9 @@ def check_subject_data(expId, subjectId):
 		stim1CorrectRsp = choiceData['stimulus1Bid'] > choiceData['stimulus2Bid']
 
 		choices = choiceData['selected'] == choiceData['stimulus1']
-		print choices
-		print stim1CorrectRsp
 		consistentRsps = stim1CorrectRsp == choices
 		consistentRsps = consistentRsps[receivedResponseClmn == True]
-		print consistentRsps
 		consistency = round(consistentRsps.mean(), 2)
-		print consistency
 		nResponses = receivedResponseClmn.sum()
 
 		return [consistency, nResponses]
