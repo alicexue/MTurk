@@ -34,7 +34,6 @@ Each task has 3 associated functions - suppose our task is called "auction"
 """
 
 
-
 MDMMT_taskOrder = ['auction_demo_instructions', 'auction', 'choicetask_demo_instructions', 'choicetask', 'feedback'] # order of tasks in experiment
 expTaskOrders = {'MDMMT':MDMMT_taskOrder} # dictionary of experiments - key is exp name, value is order of tasks
 
@@ -211,10 +210,7 @@ def auction_instructions(expId):
 				if request.form['submit'] == 'Continue':
 					if assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE': # if in preview
 						nextTask = get_next_task(name, expTaskOrders[expId])
-						if nextTask == 'thankyou':
-							return redirect(url_for('thankyou', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
-						else:
-							return redirect(url_for(nextTask + '_demo_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+						return redirect(url_for(nextTask, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 					else:
 						return redirect(url_for('auction', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 				else:
@@ -348,7 +344,7 @@ def MDMMT():
 			store_subject_info(expId, workerId, assignmentId, hitId, turkSubmitTo) 
 
 		firstTask = expTaskOrders[expId][0]
-		return redirect(url_for(firstTask + '_demo_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+		return redirect(url_for(firstTask, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 
 @app.route("/check_eligibility/<expId>", methods = ["GET", "POST"])
 def check_eligibility(expId):
