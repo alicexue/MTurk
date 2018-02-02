@@ -18,7 +18,7 @@ def store_subject_info(expId, workerId, assignmentId, hitId, turkSubmitTo):
 		newSubjectId = expId + "_%04d" % (1,)
 		currentTime = datetime.datetime.now()
 		currentTime = currentTime.strftime("%Y-%m-%d %H:%M:%S")
-		newSubject = {'subjectId':newSubjectId, 'assignmentId':assignmentId, 'hitId':hitId, 'turkSubmitTo':turkSubmitTo, 'timeCreated':currentTime, 'completedAuction':False, 'completedChoiceTask':False}
+		newSubject = {'subjectId':newSubjectId, 'assignmentId':assignmentId, 'hitId':hitId, 'turkSubmitTo':turkSubmitTo, 'timestamp':currentTime, 'completedAuction':False, 'completedChoiceTask':False}
 		new_df = pd.DataFrame(data=newSubject, index=[0])
 	else:
 		df = pd.read_csv(csvLocation)
@@ -26,14 +26,14 @@ def store_subject_info(expId, workerId, assignmentId, hitId, turkSubmitTo):
 		newSubjectId = expId + "_%04d" % (nSubjects+1,)
 		currentTime = datetime.datetime.now()
 		currentTime = currentTime.strftime("%Y-%m-%d %H:%M:%S")
-		newSubject = {'subjectId':newSubjectId, 'assignmentId':assignmentId, 'hitId':hitId, 'turkSubmitTo':turkSubmitTo, 'timeCreated':currentTime, 'completedAuction':False, 'completedChoiceTask':False}
+		newSubject = {'subjectId':newSubjectId, 'assignmentId':assignmentId, 'hitId':hitId, 'turkSubmitTo':turkSubmitTo, 'timestamp':currentTime, 'completedAuction':False, 'completedChoiceTask':False}
 		df2 = pd.DataFrame(data=newSubject, index=[0])
 		new_df = pd.concat([df,df2], axis=0)
 	new_df.to_csv(csvLocation,index=False)
 
 	# store subjectId and workerId
 	csvLocation = _thisDir + '/' + expId +'/' + expId + '_subject_worker_ids.csv'
-	newSubject = {'expId':expId, 'subjectId':newSubjectId, 'workerId':workerId}
+	newSubject = {'expId':expId, 'workerId':workerId, 'timestamp':currentTime}
 	if not os.path.exists(csvLocation):
 		new_df = pd.DataFrame(data=newSubject, index=[0])
 	else:
@@ -43,17 +43,30 @@ def store_subject_info(expId, workerId, assignmentId, hitId, turkSubmitTo):
 	new_df.to_csv(csvLocation,index=False)
 
 
-# should assume subject did not participate before
-def get_subjectId(expId, workerId):
+def get_timestamp(expId, workerId):
 	csvLocation = _thisDir + '/' + expId +'/' + expId + '_subject_worker_ids.csv'
 	if os.path.exists(csvLocation):
 		df = pd.read_csv(csvLocation)
-		subjectIds = df.loc[df['workerId'] == workerId]['subjectId'].values
-		if len(subjectIds) > 0:
-			subjectId = subjectIds[0]
-			return subjectId
+		timestamps = df.loc[df['workerId'] == workerId]['timestamp'].values
+		if len(timestamps) > 0:
+			return timestamps[0]
 		else: 
-			return False # workerId doesn't exist 
+			return False 
+
+# should assume subject did not participate before
+def get_subjectId(expId, workerId):
+	csvLocation = _thisDir + '/' + expId +'/' + expId + '_subject_assignment_info.csv'
+	if os.path.exists(csvLocation):
+		df = pd.read_csv(csvLocation)
+		timestamp = get_timestamp(expId, workerId)
+		if timestamp != False:
+			subjectIds = df.loc[df['timestamp'] == timestamp]['subjectId'].values
+			if len(subjectIds) > 0:
+				return subjectIds[0]
+			else: 
+				return False 
+		else:
+			return False
 	else:
 		return False
 
