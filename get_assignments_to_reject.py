@@ -19,7 +19,7 @@ if len(sys.argv) < 2:
 expId = sys.argv[1]
 
 if not os.path.exists(expId):
-	print "No data has been collected for ", expId, " yet."
+	print "No data has been collected for", expId, "yet."
 	sys.exit()
 
 dataDir = _thisDir + '/' + expId + '/'
@@ -67,14 +67,14 @@ while (response != "y" and response != "n"):
 			assignmentId = assignmentIdsToReject[i]
 			subjectId = subjectIdsToReject[i]
 			submitLink = turkSubmitLinks[i]
-
-			if submitLink == "https://www.mturk.com/mturk" or submitLink == "https://workersandbox.mturk.com/mturk":
-				if submitLink == "https://www.mturk.com/mturk":
-					liveArg = "live"
-				else:
-					liveArg = "sandbox"
-				args = ["python", "reject_assignment.py", liveArg, assignmentId]
-				subprocess.call(args)
-				update_assignment_status(expId, subjectId, "Rejected")	
-				counter+=1
+			if (get_assignment_status(expId, subjectId) != "Rejected"):
+				if submitLink == "https://www.mturk.com" or submitLink == "https://workersandbox.mturk.com":
+					if submitLink == "https://www.mturk.com":
+						liveArg = "live"
+					else:
+						liveArg = "sandbox"
+					args = ["python", "reject_assignment.py", liveArg, assignmentId]
+					subprocess.call(args)
+					update_assignment_status(expId, subjectId, "Rejected")	
+					counter+=1
 		print "Number of assignments rejected:", counter

@@ -55,7 +55,7 @@ else:
 	df = pd.read_csv(summaryFile)
 	subjectsWStats = df['subjectId'].values
 	for subject in subjects:
-		if subject not in subjectsWStats:
+		if subject not in subjectsWStats and completed_auction_subject(expId, subject):
 			[percentAccuracy, nResponses] = check_subject_data(expId, subject)
 			newSubjects.append(subject)
 			accuracyStats.append(percentAccuracy)

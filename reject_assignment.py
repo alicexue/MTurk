@@ -22,5 +22,4 @@ if not live:
 	args.append("--endpoint-url")
 	args.append("https://mturk-requester-sandbox.us-east-1.amazonaws.com")
 
-print args
 subprocess.call(args)

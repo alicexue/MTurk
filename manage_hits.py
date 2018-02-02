@@ -52,8 +52,8 @@ if sys.argv[1] != "live" and sys.argv[1] != "sandbox":
 	sys.exit()
 
 live = sys.argv[1] == "live"
-op_request = sys.argv[2]
-hit_id = sys.argv[3] 
+hit_id = sys.argv[2] 
+op_request = sys.argv[3]
 
 if op_request == "expire":
 	operation = "update-expiration-for-hit"
@@ -71,10 +71,11 @@ args.append("--hit-id")
 args.append(hit_id)
 
 if op_request == "expire":
-	args.append("expire-at 0")
-elif op_request == "list":
+	args.append("--expire-at")
+	args.append("0")
+elif op_request == "list_asgmts":
 	args.append("--query")
-	args.append('"Assignments[].{AssignmentId: AssignmentId, Status: AssignmentStatus, WorkerId: WorkerId}"')
+	args.append("Assignments[].{AssignmentId: AssignmentId, Status: AssignmentStatus, WorkerId: WorkerId}")
 	args.append("--output")
 	args.append("table")
 

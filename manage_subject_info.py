@@ -134,6 +134,30 @@ def completed_choice_task(expId, workerId):
 	else:
 		return False
 
+def completed_auction_subject(expId, subjectId):
+	csvLocation = _thisDir + '/' + expId +'/' + expId + '_subject_assignment_info.csv'
+	if os.path.exists(csvLocation):
+		df = pd.read_csv(csvLocation)
+		completed = df.loc[df['subjectId'] == subjectId]['completedAuction'].values[0]
+		if completed == True:
+			return True
+		else:
+			return False
+	else:
+		return False
+
+def completed_choice_task_subject(expId, subjectId):
+	csvLocation = _thisDir + '/' + expId +'/' + expId + '_subject_assignment_info.csv'
+	if os.path.exists(csvLocation):
+		df = pd.read_csv(csvLocation)
+		completed = df.loc[df['subjectId'] == subjectId]['completedChoiceTask'].values[0]
+		if completed == True:
+			return True
+		else:
+			return False
+	else:
+		return False
+
 def set_completed_auction(expId, workerId, boole):
 	csvLocation = _thisDir + '/' + expId +'/' + expId + '_subject_assignment_info.csv'
 	if os.path.exists(csvLocation):
