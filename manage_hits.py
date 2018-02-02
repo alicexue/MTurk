@@ -8,7 +8,7 @@ instructions = """
 OPTIONS:
 (1) list all HITs:\n
 \t 2nd arg: live or sandbox\n
-\t 3rd arg: list_hits (note underscore not hyphen)\n
+\t 3rd arg: list_hits (Note underscore not hyphen)\n
 (2) perform operation on HIT:\n 
 \t2nd arg: live or sandbox\n
 \t3rd arg: HIT id\n
@@ -36,6 +36,10 @@ if len(sys.argv) == 3:
 		print "\nCurrent UNIX time: ", time.time()
 		print "Note: By default the table only prints the 10 most recent HITs"
 		subprocess.call(args)
+		sys.exit()
+	else:
+		print "Invalid arguments"
+		print instructions
 		sys.exit()
 	
 if len(sys.argv) < 4:
