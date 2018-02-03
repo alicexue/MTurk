@@ -6,7 +6,7 @@ var allKeyPresses = [];
 
 var currTrialN = 0;
 
-var stimuli = []; // keep track of stimuli to be display on one trial
+var stimuli = []; 
 var specialKeys = [];
 
 var expResults = [];
@@ -28,7 +28,7 @@ var winWidth = window.innerWidth;
 var winHeight = window.innerHeight;
 canvas.width = winWidth;
 canvas.height = winHeight;
-var ctx = document.getElementById('myCanvas').getContext('2d');
+var ctx = canvas.getContext('2d');
 
 var svg = document.getElementById("mySVG");
 svg.setAttribute("width", winWidth.toString());
@@ -43,10 +43,33 @@ var scale;
 var origImgWidth = 576; // necessary for rescaling images and positioning scale
 var origImgHeight = 432; // necessary for rescaling images
 
+var widthPercent = .80;
+var rescaleHeight = true;
+var stimNames = ["stimulus1"];
+
 /*
  * Called in the HTML
 */
+var nStimuli;
+var nImagesLoaded = 0;
 var startExperiment = function startExperiment() {
+	nStimuli = expVariables.length;
+	drawLoadingText();
+	generateOffScreenCanvases();
+}
+
+var drawStimuliToCanvas = function drawStimuliToCanvas(trialVariables, trialN, canvasCtx) {
+	var position = "CENTER";
+	var stimulus1 = trialVariables['stimulus1'];
+	var img1 = new imageStimulus(stimulus1, stimFolder + stimulus1 + ".bmp", 'NaN', widthPercent, rescaleHeight);
+	img1.drawImage(position, trialN, canvasCtx);
+	trialStimuli = [img1];
+	stimuli[trialN] = trialStimuli;
+}
+
+
+var startFirstTrial = function startFirstTrial() {
+	removeLoadingText();
 	drawTrialDisplay(expVariables[currTrialN]); 
 }
 
@@ -61,23 +84,21 @@ var instructions;
 var drawTrialDisplay = function drawTrialDisplay(trialVariables) {
 	// condition is a dictionary - each key can be used to set trial conditions
 	ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-	var imgFolder = stimFolder;
 	var stimulus1 = trialVariables['stimulus1'];
 
-	//console.log("Trial " + currTrialN + " " + stimulus1);
-
-	var widthPercent = 0.80;
-
-	var img1 = new imageStimulus(stimulus1, imgFolder + stimulus1 + ".bmp", 'NaN', widthPercent, true);
-	img1.drawImage('CENTER');
-
-	stimuli = [img1];
+	var trialCanvas = document.getElementById("trial"+currTrialN);
+	var trialCtx = trialCanvas.getContext('2d');
+	if (trialCanvas.width == canvas.width && trialCanvas.height == canvas.height) {
+		ctx.drawImage(trialCanvas, 0, 0, canvas.width, canvas.height);
+	} else {
+		drawStimuliToCanvas(trialVariables, currTrialN, ctx)
+	}
 
 	if (allTrials.length == currTrialN) {
 		pushTrialInfo();
 	}
 
-	var scaledImgDimensions = rescaleImgSize([origImgWidth,origImgHeight], widthPercent, true);
+	var scaledImgDimensions = rescaleImgSize([origImgWidth,origImgHeight], widthPercent, rescaleHeight);
 	var scaledHeight = scaledImgDimensions[1];
 
 	if (instructions == null) {
@@ -102,14 +123,14 @@ var drawTrialDisplay = function drawTrialDisplay(trialVariables) {
  * Sets start time for trial
 */
 var pushTrialInfo = function pushTrialInfo() {
-	var currTrial = new trial(currTrialN, stimuli, 'NaN', ['rt','rating']);
+	var currTrial = new trial(currTrialN, stimuli[currTrialN], 'NaN', ['rt','rating']);
 	allTrials.push(currTrial);
 
 	// send stimuli here to trialInfo, set special keys inside trialInfo
 	var i;
-	for (i=0;i<stimuli.length;i++) {
-		if (stimuli[i].key != 'NaN') {
-			specialKeys.push(stimuli[i].key);
+	for (i=0;i<stimuli[currTrialN].length;i++) {
+		if (stimuli[currTrialN][i].key != 'NaN') {
+			specialKeys.push(stimuli[currTrialN][i].key);
 		}
 	}
 
@@ -117,8 +138,8 @@ var pushTrialInfo = function pushTrialInfo() {
 
 	allTrials[currTrialN].trialStartTime = t1;
 
-	for (var i in stimuli) {
-		allTrials[currTrialN]['stimulus' + parseInt(i+1,10)] = stimuli[i].id;
+	for (i=0;i<stimuli[currTrialN].length;i++) {
+		allTrials[currTrialN]['stimulus' + parseInt(i+1,10)] = stimuli[currTrialN][i].id;
 	}
 }
 
@@ -129,8 +150,8 @@ var pushTrialInfo = function pushTrialInfo() {
 var endTrial = function endTrial() {
 	t2 = performance.now();
 	var i;
-	for (i=0;i<stimuli.length;i++) {
-		allTrials[currTrialN]['stimulus' + parseInt(i+1,10) + 'Loaded'] = stimuli[i].loaded;
+	for (i=0;i<stimuli[currTrialN].length;i++) {
+		allTrials[currTrialN]['stimulus' + parseInt(i+1,10) + 'Loaded'] = stimuli[currTrialN][i].loaded;
 	}
 	if (allTrials[currTrialN].results == null) { // did not respond
 		drawNextTrial = true;
@@ -157,27 +178,7 @@ var nextTrial = function nextTrial() {
 		var strExpResults = JSON.stringify(allTrials);
 		document.getElementById('experimentResults').value = strExpResults;
 
-		var loadingText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-		loadingText.setAttribute("x","0");
-		loadingText.setAttribute("y",(canvas.height/2).toString());
-		loadingText.setAttribute("font-family","Arial");
-		loadingText.setAttribute("font-size","25");
-		loadingText.setAttribute("fill","black");
-		loadingText.textContent = "Loading... Please wait.";
-		svg.appendChild(loadingText);
-		var textLength = loadingText.getComputedTextLength();
-
-		if (textLength > canvas.width) { // then have text be squished to fit canvas
-			svg.removeChild(loadingText);
-			loadingText.setAttribute("textLength",canvas.width);
-			loadingText.setAttribute("lengthAdjust","spacingAndGlyphs");
-			svg.appendChild(loadingText);
-		} else { // then center the text
-			var newX = canvas.width/2 - textLength/2;
-			svg.removeChild(loadingText);
-			loadingText.setAttribute("x",newX.toString());
-			svg.appendChild(loadingText);
-		}
+		drawLoadingText();
 
 		document.getElementById('exp').submit()
 	}

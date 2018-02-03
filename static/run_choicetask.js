@@ -8,7 +8,7 @@ var currTrialN = 0;
 var origImgWidth = 576; // necessary for rescaling images
 var origImgHeight = 432; // necessary for rescaling images
 
-var stimuli = []; // keep track of stimuli to be display on one trial
+var stimuli = []; 
 var specialKeys = [];
 
 var expResults = [];
@@ -42,8 +42,40 @@ var t1, t2;
 var trialTimer;
 var maxTrialDuration = 4000; // in ms
 
-// called from choicetask.html
+
+var widthPercent = .45;
+var rescaleHeight = false;
+
+/*
+ * Called in the HTML
+*/
+var nStimuli;
+var nImagesLoaded = 0;
 var startExperiment = function startExperiment() {
+	nStimuli = expVariables.length * 2;
+	drawLoadingText();
+	generateOffScreenCanvases();
+}
+
+var drawStimuliToCanvas = function drawStimuliToCanvas(trialVariables, trialN, canvasCtx) {
+	var stimulus1 = trialVariables['stimulus1'];
+	var stimulus2 = trialVariables['stimulus2'];
+	var stim1Bid = trialVariables['stim1Bid'];
+	var stim2Bid = trialVariables['stim2Bid'];
+	
+	var img1 = new imageStimulus(stimulus1, stimFolder + stimulus1 + ".bmp", 'u', widthPercent, false);
+	img1.drawImage('LEFT', trialN, canvasCtx);
+	img1.bid = stim1Bid;
+
+	var img2 = new imageStimulus(stimulus2, stimFolder + stimulus2 + ".bmp", 'i', widthPercent, false);
+	img2.drawImage('RIGHT', trialN, canvasCtx);
+	img2.bid = stim2Bid;
+	
+	stimuli[trialN] = [img1, img2];
+}
+
+var startFirstTrial = function startFirstTrial() {
+	removeLoadingText();
 	drawTrialDisplay(expVariables[currTrialN]); 
 }
 
@@ -58,26 +90,19 @@ var instructions;
 var drawTrialDisplay = function draw(trialVariables) {
 	// condition is a dictionary - each key can be used to set trial conditions
 
-	var imgFolder = stimFolder;
-	var stimulus1 = trialVariables['stimulus1'];
 	var stim1Bid = trialVariables['stim1Bid'];
-	var stimulus2 = trialVariables['stimulus2'];
 	var stim2Bid = trialVariables['stim2Bid'];
 	var delta = trialVariables['delta']; // right bid - left bid
 
 	//console.log("Trial " + currTrialN + " " + stimulus1 + " " + stim1Bid.toString() + ", " + stimulus2 + " " + stim2Bid.toString());
 
-	var widthPercent = 0.45;
-
-	var img1 = new imageStimulus(stimulus1, imgFolder + stimulus1 + ".bmp", 'u', widthPercent, false);
-	img1.drawImage('LEFT');
-	img1.bid = stim1Bid;
-
-	var img2 = new imageStimulus(stimulus2, imgFolder + stimulus2 + ".bmp", 'i', widthPercent, false);
-	img2.drawImage('RIGHT');
-	img2.bid = stim2Bid;
-	
-	stimuli = [img1, img2];
+	var trialCanvas = document.getElementById("trial"+currTrialN);
+	var trialCtx = trialCanvas.getContext('2d');
+	if (trialCanvas.width == canvas.width && trialCanvas.height == canvas.height) {
+		ctx.drawImage(trialCanvas, 0, 0, canvas.width, canvas.height);
+	} else {
+		drawStimuliToCanvas(trialVariables, currTrialN, ctx)
+	}
 
 	if (allTrials.length == currTrialN) {
 		pushTrialInfo();
@@ -108,17 +133,18 @@ var drawTrialDisplay = function draw(trialVariables) {
  * Sets timer for trial
 */
 var pushTrialInfo = function pushTrialInfo() {
-	var currTrial = new trial(currTrialN, stimuli, maxTrialDuration, ['rt','rsp','selected']);
+	var currTrial = new trial(currTrialN, stimuli[currTrialN], maxTrialDuration, ['rt','rsp','selected']);
 	allTrials.push(currTrial);
 	//console.log(currTrial)
 	//console.log(allTrials)
 	// send stimuli here to trialInfo, set special keys inside trialInfo
 
+	specialKeys = [];
 	var i;
-	for (i = 0; i < stimuli.length; i++) { 
-		allTrials[currTrialN]['stimulus' + parseInt(i+1,10)] = stimuli[i].id;
-		if (stimuli[i].key != null) {
-			specialKeys.push(stimuli[i].key);
+	for (i = 0; i < stimuli[currTrialN].length; i++) { 
+		allTrials[currTrialN]['stimulus' + parseInt(i+1,10)] = stimuli[currTrialN][i].id;
+		if (stimuli[currTrialN][i].key != null) {
+			specialKeys.push(stimuli[currTrialN][i].key);
 
 		}
 	}
@@ -147,9 +173,9 @@ var checkKeyPress = function(e) {
 			
 			if (currTrialN < expVariables.length) {
 				var i;
-				for (i=0;i<stimuli.length;i++) {
-					if (e.key == stimuli[i].key) {
-						allTrials[currTrialN].results.selected = stimuli[i].id;
+				for (i=0;i<stimuli[currTrialN].length;i++) {
+					if (e.key == stimuli[currTrialN][i].key) {
+						allTrials[currTrialN].results.selected = stimuli[currTrialN][i].id;
 					} else {
 					}
 				}
@@ -189,27 +215,7 @@ var nextTrial = function nextTrial() {
 		var strExpResults = JSON.stringify(allTrials);
 		document.getElementById('experimentResults').value = strExpResults;
 
-		var loadingText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-		loadingText.setAttribute("x","0");
-		loadingText.setAttribute("y",(canvas.height/2).toString());
-		loadingText.setAttribute("font-family","Arial");
-		loadingText.setAttribute("font-size","25");
-		loadingText.setAttribute("fill","black");
-		loadingText.textContent = "Loading... Please wait.";
-		svg.appendChild(loadingText);
-		var textLength = loadingText.getComputedTextLength();
-
-		if (textLength > canvas.width) { // then have text be squished to fit canvas
-			svg.removeChild(loadingText);
-			loadingText.setAttribute("textLength",canvas.width);
-			loadingText.setAttribute("lengthAdjust","spacingAndGlyphs");
-			svg.appendChild(loadingText);
-		} else { // then center the text
-			var newX = canvas.width/2 - textLength/2;
-			svg.removeChild(loadingText);
-			loadingText.setAttribute("x",newX.toString());
-			svg.appendChild(loadingText);
-		}
+		drawLoadingText();
 
 		document.getElementById('exp').submit()
 	}
@@ -226,8 +232,8 @@ var endTrial = function endTrial() {
 	t2 = performance.now();
 	clearTimeout(trialTimer);
 	var i;
-	for (i=0;i<stimuli.length;i++) {
-		allTrials[currTrialN]['stimulus' + parseInt(i+1,10) +'Loaded'] = stimuli[i].loaded;
+	for (i=0;i<stimuli[currTrialN].length;i++) {
+		allTrials[currTrialN]['stimulus' + parseInt(i+1,10) +'Loaded'] = stimuli[currTrialN][i].loaded;
 	}
 	var color;
 	if (allTrials[currTrialN].results == null || t2 - t1 > maxTrialDuration) { // did not respond
@@ -241,6 +247,7 @@ var endTrial = function endTrial() {
 	} else {
 		color = GREEN;
 	}
+	console.log(allTrials[currTrialN]);
 	setConfirmationColor(color);
 	inConfirmation = true;
 	confirmTimer = setTimeout(nextTrial,confirmationTime);

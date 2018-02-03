@@ -1,5 +1,20 @@
 console.log("loaded components.js ");
 
+var generateOffScreenCanvases = function generateOffScreenCanvases() {
+	var i;
+	for (i=0;i<expVariables.length;i++) {
+		var trialVariables = expVariables[i];
+		var offscreenCanvas = document.createElement('canvas');
+		offscreenCanvas.id = "trial"+i;
+		svg.append(offscreenCanvas);
+		offscreenCanvas.width = window.innerWidth;
+		offscreenCanvas.height = window.innerHeight;
+		var offscreenContext = offscreenCanvas.getContext('2d');
+
+		drawStimuliToCanvas(trialVariables, i, offscreenContext);
+	}
+}
+
 // trial class should store the stimuli array, ['trialN', 'trialStartTime', 'trialEndTime', 'stimulus', 'rsp', 'rt']
 var trial = class trial {
 	constructor(trialN, stimuli, maxTrialTime, results) {
@@ -86,10 +101,9 @@ var imageStimulus = class imageStimulus {
 	  * 	alerts browser if param position is not valid
 	  *		also checks if image fails to load and records it
 	*/
-	drawImage(position) {
-		var trialN = currTrialN;
+	drawImage(position, trialN, canvasCtx) {
 		var imageStim = this;
-		this.trialN = currTrialN;
+		this.trialN = trialN;
 		var img = this.imgObject;
 
 		this.loaded = false;
@@ -139,9 +153,11 @@ var imageStimulus = class imageStimulus {
 				alertSmallWindow();
 
 			} else {
-				ctx.drawImage(img, positionCoords[0], positionCoords[1], scaledWidth, scaledHeight);
+				canvasCtx.drawImage(img, positionCoords[0], positionCoords[1], scaledWidth, scaledHeight);
 			}
-
+			nImagesLoaded += 1;
+			if (nImagesLoaded == nStimuli)
+				startFirstTrial();
 		};
 		img.setAttribute("src", this.src);
 	}
@@ -560,6 +576,36 @@ var instructionsText = class instructionsText {
 			svg.removeChild(instructionsObj);
 		}
 	}
+}
+
+var loadingText;
+function drawLoadingText() {
+	loadingText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+	loadingText.setAttribute("x","0");
+	loadingText.setAttribute("y",(canvas.height/2).toString());
+	loadingText.setAttribute("font-family","Arial");
+	loadingText.setAttribute("font-size","25");
+	loadingText.setAttribute("fill","black");
+	loadingText.textContent = "Loading... Please wait.";
+	svg.appendChild(loadingText);
+	var textLength = loadingText.getComputedTextLength();
+
+	if (textLength > canvas.width) { // then have text be squished to fit canvas
+		svg.removeChild(loadingText);
+		loadingText.setAttribute("textLength",canvas.width);
+		loadingText.setAttribute("lengthAdjust","spacingAndGlyphs");
+		svg.appendChild(loadingText);
+	} else { // then center the text
+		var newX = canvas.width/2 - textLength/2;
+		svg.removeChild(loadingText);
+		loadingText.setAttribute("x",newX.toString());
+		svg.appendChild(loadingText);
+	}
+}
+
+function removeLoadingText() {
+	if (svg.contains(loadingText))
+		svg.removeChild(loadingText);
 }
 
 const BLACK = "#000000";
