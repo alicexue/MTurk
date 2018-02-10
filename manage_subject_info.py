@@ -70,6 +70,25 @@ def get_subjectId(expId, workerId):
 	else:
 		return False
 
+def get_workerId(expId, subjectId):
+	csvWorkerIds = _thisDir + '/' + expId +'/' + expId + '_subject_worker_ids.csv'
+	csvSubjectIds = _thisDir + '/' + expId +'/' + expId + '_subject_assignment_info.csv'
+	if os.path.exists(csvSubjectIds):
+		df = pd.read_csv(csvSubjectIds)
+		timestamps = df.loc[df['subjectId'] == subjectId]['timestamp'].values
+		if len(timestamps) > 0:
+			timestamp = timestamps[0]
+			if os.path.exists(csvWorkerIds):
+				df2 = pd.read_csv(csvWorkerIds)
+				workerIds = df2.loc[df2['timestamp'] == timestamp]['workerId'].values
+				if len(workerIds) > 0:
+					return workerIds[0]
+				else: 
+					return False
+		else:
+			return False
+
+
 def get_assignmentId(expId, subjectId):
 	csvLocation = _thisDir + '/' + expId +'/' + expId + '_subject_assignment_info.csv'
 	if os.path.exists(csvLocation):
@@ -91,7 +110,7 @@ def get_turkSubmitTo(expId, subjectId):
 		if len(turkSubmitTo) > 0:
 			return turkSubmitTo[0]
 		else: 
-			return False # assignmentId doesn't exist
+			return False # turkSubmitTo doesn't exist
 	else:
 		return False
 

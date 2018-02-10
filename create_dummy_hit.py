@@ -87,6 +87,7 @@ print "Your account balance is {}".format(user_balance['AvailableBalance'])
 # Write expId and live value to xml file first
 tree = ET.parse("my_external_question.xml")
 root = tree.getroot()
+expId = "dummy_MDMMT"
 url = root.find('{http://mechanicalturk.amazonaws.com/AWSMechanicalTurkDataSchemas/2006-07-14/ExternalQuestion.xsd}ExternalURL')
 url.text = "https://calkins.psych.columbia.edu/" + expId + "?" + "live=" + str(create_hits_in_live)
 tree.write("my_external_question.xml")
@@ -100,8 +101,8 @@ question_sample = open("my_external_question.xml", "r").read()
 
 masters = {
     "live": {
-            'QualificationTypeId': '2F1QJWKUDD8XADTFD2Q0G6UTO95ALH',
-            'Comparator': 'Exists'
+        'QualificationTypeId': '2F1QJWKUDD8XADTFD2Q0G6UTO95ALH',
+        'Comparator': 'Exists'
     },
     "sandbox": {
         'QualificationTypeId': '2ARFPLSP75KLA8M8DH1HTEQVJT3SY6',
@@ -133,18 +134,17 @@ worker_requirements = [
     'RequiredToPreview': True,
     },
     master_quals
-
 ]
 
 # Create the HIT
 response = client.create_hit(
     MaxAssignments=100,
     LifetimeInSeconds=604800,
-    AssignmentDurationInSeconds=3600,
+    AssignmentDurationInSeconds=300,
     Reward=mturk_environment['reward'],
-    Title='What snack do you prefer?',
+    Title='Dummy Compensation HIT for "What snack do you prefer?"',
     Keywords='research,psych,psychology,food,preferences',
-    Description='You will rate how much you like snack foods and which one you prefer. We have allocated an hour for you to complete this study, but it should take you about 30 minutes. This HIT cannot be completed on a mobile device. You need a mouse and a keyboard.',
+    Description='This is a dummy HIT to compensate for a previous HIT. Only people who satisfactorily completed that HIT will have this HIT approved. All other assignments will be rejected.',
     Question=question_sample,
     QualificationRequirements=worker_requirements,
 )

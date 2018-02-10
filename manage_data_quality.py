@@ -8,7 +8,6 @@ import sys
 _thisDir = os.path.dirname(os.path.abspath(__file__)).decode(sys.getfilesystemencoding())
 os.chdir(_thisDir)
 
-# double check if this code is right
 def check_subject_data(expId, subjectId):
 	subjectFolder = _thisDir + '/' + expId + '/' + subjectId + '/'
 

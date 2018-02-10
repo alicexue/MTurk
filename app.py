@@ -369,7 +369,9 @@ def thankyou():
 	name = 'thankyou'
 	if 'assignmentId' in request.args:
 		assignmentId = request.args.get('assignmentId')
-		return render_template('thankyou.html', assignmentId=assignmentId)
+		live = request.args.get('live')
+		live = live == "True"
+		return render_template('thankyou.html', assignmentId=assignmentId, live=live)
 	else:
 		return redirect(url_for('unauthorized_error'))
 
@@ -436,6 +438,38 @@ def page_not_found(e):
 @app.errorhandler(500)
 def page_not_found(e):
     return render_template('500.html'), 500
+
+@app.route("/dummy_MDMMT", methods = ["GET","POST"])
+def dummy_MDMMT():
+	expId = "MDMMT"
+	if request.method == "GET" and 'assignmentId' in request.args and 'hitId' in request.args:
+		assignmentId = request.args.get('assignmentId')
+		hitId = request.args.get('hitId')
+		return render_template('dummy_hit.html', assignmentId=assignmentId, hitId=hitId)
+	elif request.method == "POST" and 'assignmentId' in request.args and 'hitId' in request.args:
+		if 'workerId' in request.args:
+			workerId = request.args.get('workerId')
+		else:
+			workerId = request.form['workerId']
+		assignmentId = request.args.get('assignmentId')
+		hitId = request.args.get('hitId')
+		live = True
+		if workerId_exists(expId, workerId):
+			if 'workerId' in request.args and 'turkSubmitTo' in request.args:
+				workerId = request.args.get('workerId')
+				turkSubmitTo = request.args.get('turkSubmitTo')
+				store_subject_info("dummyMDMMT", workerId, assignmentId, hitId, turkSubmitTo)
+				return redirect(url_for('thankyou', assignmentId=assignmentId, live=live))
+			else:
+				return redirect(url_for('accept_hit'))
+		else:
+			return redirect(url_for('return_dummy_MDMMT', preview='True', assignmentId=assignmentId, hitId=hitId))
+	else:
+		return redirect(url_for('unauthorized_error'))
+
+@app.route("/return_dummy_MDMMT", methods = ["GET"])
+def return_dummy_MDMMT():
+	return render_template('return_dummy_hit.html')
 
 if __name__ == "__main__":
 	app.debug = False
