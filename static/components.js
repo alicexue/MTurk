@@ -1,6 +1,6 @@
 console.log("loaded components.js ");
 
-var generateOffScreenCanvases = function generateOffScreenCanvases() {
+var generateOffScreenCanvases = function() {
 	var i;
 	for (i=0;i<expVariables.length;i++) {
 		var trialVariables = expVariables[i];
@@ -45,7 +45,7 @@ var trialResults = class trialResults {
   * @param {float} timePressedExp: time key was pressed relative to experiment start 
   * @param {float} timePressedTrial: time key was pressed relative to trial start 
 */
-function keyPressInfo(key,trialN,timePressedExp,timePressedTrial) {
+var keyPressInfo = function(key,trialN,timePressedExp,timePressedTrial) {
 	this.key = key,
 	this.trialN = trialN,
 	this.timePressedExp = timePressedExp,
@@ -174,7 +174,7 @@ var imageStimulus = class imageStimulus {
   * @returns new array of scaled dimensions: [width, height]
 */
 // dimensions is [width, height]
-var rescaleImgSize = function rescaleImgSize(dimensions, widthPercent, rescaleHeight) {
+var rescaleImgSize = function(dimensions, widthPercent, rescaleHeight) {
 	// percent of window to be width of image
 	var width = dimensions[0];
 	var height = dimensions[1];
@@ -211,7 +211,7 @@ var rescaleImgSize = function rescaleImgSize(dimensions, widthPercent, rescaleHe
 */
 var blankScreenCover;
 var alertText;
-var alertSmallWindow = function alertSmallWindow() {
+var alertSmallWindow = function() {
 	if (!svg.contains(blankScreenCover)) {
 		blankScreenCover = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
 		blankScreenCover.setAttribute("x","0");
@@ -261,7 +261,7 @@ var alertSmallWindow = function alertSmallWindow() {
   *	@returns array of x, y coordinates if positionName is valid string,
   * 	returns null otherwise	
 */
-var getImgPosition = function getImgPosition(img, positionName) {
+var getImgPosition = function(img, positionName) {
 	var padding = canvas.width * .02; // adjusts the amount of white space between two images
 	var positionCoords;
 	if (positionName == 'CENTER') {
@@ -487,6 +487,9 @@ var ratingScale = class ratingScale {
 		//console.log(allTrials)
 		//console.log(currTrialN)
 		//console.log(allTrials[currTrialN]);
+		console.log('in components.js');
+		console.log(t2-t1);
+		console.log(t2_UNIX - t1_UNIX);
 		allTrials[currTrialN].results.rt = t2 - t1; 
 		allTrials[currTrialN].receivedResponse = true;
 		allTrials[currTrialN].results.rating = rating;
@@ -519,7 +522,7 @@ var ratingScale = class ratingScale {
  * Intermediary function called when mouse is over rating bar
  * Calls updateSelector for the scale
 */
-var moveSelector = function moveSelector(evt) {
+var moveSelector = function(evt) {
 	scale.updateSelector(evt);
 }
 
@@ -529,6 +532,7 @@ var moveSelector = function moveSelector(evt) {
 */
 var getRating = function(evt) {
 	if (!svg.contains(blankScreenCover)) { 
+		t2_UNIX = Date.now();
 		scale.recordRating(evt);
 	}
 }
@@ -579,7 +583,7 @@ var instructionsText = class instructionsText {
 }
 
 var loadingText;
-function drawLoadingText() {
+var drawLoadingText = function() {
 	loadingText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
 	loadingText.setAttribute("x","0");
 	loadingText.setAttribute("y",(canvas.height/2).toString());
@@ -603,7 +607,7 @@ function drawLoadingText() {
 	}
 }
 
-function removeLoadingText() {
+var removeLoadingText = function() {
 	if (svg.contains(loadingText))
 		svg.removeChild(loadingText);
 }
@@ -621,7 +625,7 @@ var confirmationBox;
   * Use case: Turns red when trial timed out and no response was received
   * @param {string} color: svg color name or code to set the box color 
 */
-var setConfirmationColor = function setConfirmationColor(color) {
+var setConfirmationColor = function(color) {
 	if (!svg.contains(blankScreenCover)) {
 		if (svg.contains(confirmationBox)) {
 			svg.removeChild(confirmationBox);

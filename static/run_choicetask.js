@@ -19,7 +19,7 @@ var allTrials = [];
   * @param {array} inputExpVariables: each element is a dictionary containing trial information
   *		elements are in the order of trials
 */
-var setTrialVariables = function setTrialVariables(inputExpVariables) {
+var setTrialVariables = function(inputExpVariables) {
 	expVariables = inputExpVariables
 }
 
@@ -39,6 +39,8 @@ var confirmTimer;
 var inConfirmation = false;
 
 var t1, t2;
+var t1_UNIX;
+var t2_UNIX;
 var trialTimer;
 var maxTrialDuration = 4000; // in ms
 
@@ -51,13 +53,13 @@ var rescaleHeight = false;
 */
 var nStimuli;
 var nImagesLoaded = 0;
-var startExperiment = function startExperiment() {
+var startExperiment = function() {
 	nStimuli = expVariables.length * 2;
 	drawLoadingText();
 	generateOffScreenCanvases();
 }
 
-var drawStimuliToCanvas = function drawStimuliToCanvas(trialVariables, trialN, canvasCtx) {
+var drawStimuliToCanvas = function(trialVariables, trialN, canvasCtx) {
 	var stimulus1 = trialVariables['stimulus1'];
 	var stimulus2 = trialVariables['stimulus2'];
 	var stim1Bid = trialVariables['stim1Bid'];
@@ -74,7 +76,7 @@ var drawStimuliToCanvas = function drawStimuliToCanvas(trialVariables, trialN, c
 	stimuli[trialN] = [img1, img2];
 }
 
-var startFirstTrial = function startFirstTrial() {
+var startFirstTrial = function() {
 	removeLoadingText();
 	drawTrialDisplay(expVariables[currTrialN]); 
 }
@@ -87,7 +89,7 @@ var startFirstTrial = function startFirstTrial() {
   * @param {python dictionary/js object} trialVariables: has keys and values for trial parameters
 */
 var instructions;
-var drawTrialDisplay = function draw(trialVariables) {
+var drawTrialDisplay = function(trialVariables) {
 	// condition is a dictionary - each key can be used to set trial conditions
 
 	var stim1Bid = trialVariables['stim1Bid'];
@@ -132,7 +134,7 @@ var drawTrialDisplay = function draw(trialVariables) {
  * Sets start time for trial
  * Sets timer for trial
 */
-var pushTrialInfo = function pushTrialInfo() {
+var pushTrialInfo = function() {
 	var currTrial = new trial(currTrialN, stimuli[currTrialN], maxTrialDuration, ['rt','rsp','selected']);
 	allTrials.push(currTrial);
 	//console.log(currTrial)
@@ -150,6 +152,7 @@ var pushTrialInfo = function pushTrialInfo() {
 	}
 	
 	t1 = performance.now(); // start timer for this trial
+	t1_UNIX = Date.now();
 	trialTimer = setTimeout(endTrial,maxTrialDuration);
 	allTrials[currTrialN].trialN = currTrialN;
 	allTrials[currTrialN].trialStartTime = t1;
@@ -162,10 +165,18 @@ var pushTrialInfo = function pushTrialInfo() {
 */
 var keyIsDown = false; // keep track if key is still being held down - take one key press at a time
 var checkKeyPress = function(e) {
-	var timePressed = e.timeStamp;
+	//var timePressed = e.timeStamp; // does not seem to be compatible with all browsers - may get UNIX time instead of time relative to trial start
+	console.log(performance.now());
+	var timePressed = performance.now();
+	var timePressed_UNIX = Date.now();
+
 	if (inConfirmation == false && keyIsDown == false && timePressed > t1 && !svg.contains(blankScreenCover)) { 
 		keyIsDown = true;
 		t2 = timePressed;
+		t2_UNIX = timePressed_UNIX;
+		console.log(e.timeStamp - t1);
+		console.log(t2 - t1);
+		console.log(t2_UNIX - t1_UNIX);
 		// should check if timepressed is after trial starts
 		if (specialKeys.indexOf(e.key) > -1 && currTrialN == allTrials.length - 1) { 
 			clearTimeout(trialTimer);
@@ -200,7 +211,7 @@ var setKeyUp = function(e) {
   * Iterates currTrialN by 1, clears current screen and calls drawTrialDisplay for next trial
   * Checks if experiment has ended (there are no more trials), and ends the experiment
 */
-var nextTrial = function nextTrial() {
+var nextTrial = function() {
 	ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 	if (svg.contains(confirmationBox)) {
 		svg.removeChild(confirmationBox);
@@ -228,8 +239,9 @@ var nextTrial = function nextTrial() {
   * Changes color of confirmation box
   * Sets timer for confirmation and iterates to next trial at the end of confirmation
 */
-var endTrial = function endTrial() {
+var endTrial = function() {
 	t2 = performance.now();
+	t2_UNIX = Date.now()
 	clearTimeout(trialTimer);
 	var i;
 	for (i=0;i<stimuli[currTrialN].length;i++) {
@@ -260,7 +272,7 @@ var endTrial = function endTrial() {
  * 	 then these are removed
  * Calls on drawTrialDisplay to redraw display according to new window size
 */
-var resizeWindow = function resizeWindow() {
+var resizeWindow = function() {
 	var winWidth = window.innerWidth;
 	var winHeight = window.innerHeight;
 	canvas.width = winWidth;
