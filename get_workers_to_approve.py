@@ -71,7 +71,7 @@ while (response != "y" and response != "n"):
 			dummySubjectId = get_subjectId(dummyExpId, workerId)
 			dummyAssignmentId = get_assignmentId(dummyExpId, dummySubjectId)
 			dummyTurkSubmitTo = get_turkSubmitTo(dummyExpId, dummySubjectId)
-			print "worker:", workerId, "\tassignment:", dummyAssignmentId
+			print "To reject - worker:", workerId, "\tassignment:", dummyAssignmentId
 			if dummyTurkSubmitTo == "https://www.mturk.com" or dummyTurkSubmitTo == "https://workersandbox.mturk.com":
 				if dummyTurkSubmitTo == "https://www.mturk.com":
 					liveArg = "live"
@@ -93,7 +93,7 @@ while (response != "y" and response != "n"):
 			dummySubjectId = get_subjectId(dummyExpId, workerId)
 			dummyAssignmentId = get_assignmentId(dummyExpId, dummySubjectId)
 			dummyTurkSubmitTo = get_turkSubmitTo(dummyExpId, dummySubjectId)
-			print "worker:", workerId, "\tassignment:", dummyAssignmentId
+			print "To approve - worker:", workerId, "\tassignment:", dummyAssignmentId
 			if dummyTurkSubmitTo == "https://www.mturk.com" or dummyTurkSubmitTo == "https://workersandbox.mturk.com":
 				if dummyTurkSubmitTo == "https://www.mturk.com":
 					liveArg = "live"
