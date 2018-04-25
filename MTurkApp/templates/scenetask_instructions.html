@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Scene Task Instructions</title>
+	<center><h2>Scene Task Instructions</h2></center>
+	<link href="/static/style.css" rel="stylesheet">
+</head>
+<body>
+
+	<form method="POST">
+	<center>
+	<p>
+	If you would like to repeat the demo, click here: <input type="submit" name="submit" value="Repeat Demo" style="font-size: 30px;"> 
+	<br> 
+	<br>
+	To continue with the experiment, click here: <input type="submit" name="submit" value="Continue" style="font-size: 30px;">
+	</p>
+	</center>
+	<p>
+	Here are the instructions again: In this part of the experiment, an image of a scene will be shown at the center of the screen. Determine if the image depicts an indoor scene or an outdoor scene. Press 'u' if you think the scene is an indoors scene or 'i' if you think the scene is an outdoors scene.
+	</p>
+	
+	</form> 
+	<center>
+	<img id="instructions" src="{{ url_for('static', filename = 'scenetask_instructions.png') }}">
+	</center>
+</body>
+</html>

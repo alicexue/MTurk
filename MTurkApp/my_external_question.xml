@@ -1,0 +1,4 @@
+<ns0:ExternalQuestion xmlns:ns0="http://mechanicalturk.amazonaws.com/AWSMechanicalTurkDataSchemas/2006-07-14/ExternalQuestion.xsd">
+  <ns0:ExternalURL>https://calkins.psych.columbia.edu/MDMMT?live=False</ns0:ExternalURL>
+  <ns0:FrameHeight>600</ns0:FrameHeight>
+</ns0:ExternalQuestion>
