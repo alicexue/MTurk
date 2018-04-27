@@ -46,7 +46,7 @@ var t1_UNIX;
 var t2_UNIX;
 var trialTimer;
 var sceneDisplayTimer;
-var maxTrialDuration = 3000; // in ms
+var maxTrialDuration = 3000; // in ms - max duration to make choice
 var sceneDisplayDuration = 1500;
 
 var widthPercent = .45;
