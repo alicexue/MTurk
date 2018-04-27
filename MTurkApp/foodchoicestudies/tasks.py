@@ -83,22 +83,10 @@ def auction(expId):
 
 	if 'demo' in request.args and containsAllMTurkArgs:
 		if request.method == "GET" and request.args.get('demo') == 'TRUE':
-			stimuli = get_stimuli(foodStimFolder[expId]+'demo/','','.bmp')
-			random.shuffle(stimuli)
-
-			expVariables = [] # array of dictionaries
-
-			for i in range(0,len(stimuli)):
-				expVariables.append({"stimulus1":stimuli[i], "fullStimName":stimuli[i]+".bmp"})
-
+			expVariables = get_ratingtask_expVariables(expId, subjectId=None, demo=True)
 			return render_template('foodchoicestudies/auction.html', expVariables=expVariables, stimFolder=foodStimFolder[expId]+'demo/', instructions=oneLineInstructions)
 		else:
-
-			workerId = request.args.get('workerId')
-			assignmentId = request.args.get('assignmentId')
-			hitId = request.args.get('hitId')
-			turkSubmitTo = request.args.get('turkSubmitTo')
-			live = request.args.get('live') == "True"
+			[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)	
 
 			return redirect(url_for('instructions.auction_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 	elif containsAllMTurkArgs:
@@ -112,13 +100,7 @@ def auction(expId):
 				# trialVariables should be an array of dictionaries 
 				# each element of the array represents the condition for one trial
 				# set the variable conditions to the array of conditions
-				stimuli = get_stimuli(foodStimFolder[expId],'','.bmp')
-				random.shuffle(stimuli)
-
-				expVariables = [] # array of dictionaries
-
-				for i in range(0,len(stimuli)):
-					expVariables.append({"stimulus":stimuli[i], "fullStimName":stimuli[i]+".bmp"})
+				expVariables = get_ratingtask_expVariables(expId, subjectId=None, demo=False)
 
 				return render_template('foodchoicestudies/auction.html', expVariables=expVariables, stimFolder=foodStimFolder[expId], instructions=oneLineInstructions)
 			else:
@@ -311,107 +293,23 @@ def scenetask(expId):
 	containsAllMTurkArgs = contains_necessary_args(request.args)
 
 	if 'demo' in request.args and containsAllMTurkArgs:
-		indoor_folders = ['library-68']
-		outdoor_folders = ['woods-68']
 		if request.method == "GET" and request.args.get('demo') == 'TRUE':
-			[stim1Names, stim1Bids, stim2Names, stim2Bids] = get_two_stimuli_lists_without_bids(foodStimFolder[expId]+'demo/', '', '.bmp')
-			indoor_stimuli = []
-			outdoor_stimuli = []
-			for folder in indoor_folders:
-				indoor_stimuli += get_stimuli('/static/scenes_konk/demo/indoor/' + folder + '/', 'indoor/' + folder + '/', '.jpg')
-			for folder in outdoor_folders:
-				outdoor_stimuli += get_stimuli('/static/scenes_konk/demo/outdoor/' + folder + '/', 'outdoor/' + folder + '/', '.jpg')
-			sceneStimuli = indoor_stimuli + outdoor_stimuli
-			random.shuffle(sceneStimuli)
-
-			expVariables = []
-			
-			indoorsKey = "u"
-			outdoorsKey = "i"
-
-			expVariables = [] # array of dictionaries
-
-			for i in range(0,len(sceneStimuli)):
-				stimulus = sceneStimuli[i]
-				index = stimulus.find('/')
-				stimulusType = stimulus[0:index] # indoor / outdoor
-				expVariables.append({"sceneStimulus":stimulusType, "fullStimName":stimulus+".jpg", "indoorsKey":indoorsKey, "outdoorsKey":outdoorsKey})
-
+			expVariables = get_scenetask_expVariables(expId, subjectId=None, demo=True)
 			return render_template('foodchoicestudies/scenetask.html', expVariables=expVariables, stimFolder='/static/scenes_konk/demo/')
 		else:
-
-			workerId = request.args.get('workerId')
-			assignmentId = request.args.get('assignmentId')
-			hitId = request.args.get('hitId')
-			turkSubmitTo = request.args.get('turkSubmitTo')
-			live = request.args.get('live') == "True"
-
+			[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
 			return redirect(url_for('instructions.scenetask_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 	elif containsAllMTurkArgs:
-		indoor_folders = ['bathroom-68','bedroom-68','classroom-68','conferenceroom-68','diningroom-68','empty-68','gym-68','hairsalon-68']
-		outdoor_folders = ['beach-68','campsite-68','canyon-68','countryroad-68','field-68','garden-68','golfcourse-68','mountainwhite-68']
 		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
 
 		completedAuction = completed_task(expId, workerId, 'completedAuction')
 
 		if workerId_exists(expId, workerId) and (completedAuction == False or repeatAuction[expId] == True):
+			subjectId = get_subjectId(expId, workerId)
 			if request.method == "GET":
-				### set experiment conditions here and pass to experiment.html 
-				# trialVariables should be an array of dictionaries 
-				# each element of the array represents the condition for one trial
-				# set the variable conditions to the array of conditions
-				indoor_stimuli = []
-				outdoor_stimuli = []
-
-				for folder in indoor_folders:
-					indoor_stimuli += get_stimuli('/static/scenes_konk/indoor/' + folder + '/', 'indoor/' + folder + '/', '.jpg')
-				for folder in outdoor_folders:
-					outdoor_stimuli += get_stimuli('/static/scenes_konk/outdoor/' + folder + '/', 'outdoor/' + folder + '/', '.jpg')
-
-				# pick 3 indoor and 3 outdoor stimuli for subject to be familiarized to
-				f_indoor_stimuli = []
-				while len(f_indoor_stimuli) != 3:
-					r = random.randrange(len(indoor_stimuli))
-					if indoor_stimuli[r] not in f_indoor_stimuli:
-						f_indoor_stimuli.append(indoor_stimuli[r])
-				f_outdoor_stimuli = []
-				while len(f_outdoor_stimuli) != 3:
-					r = random.randrange(len(outdoor_stimuli))
-					if outdoor_stimuli[r] not in f_outdoor_stimuli:
-						f_outdoor_stimuli.append(outdoor_stimuli[r])
-				
-				f_stimuli = f_indoor_stimuli + f_outdoor_stimuli
-
-				random.shuffle(f_stimuli)
-
-				stimuli = []
-
-				for i in range(0, 4): # 4 repeats of stimuli
-					random.shuffle(f_stimuli)
-					stimuli += f_stimuli
-
-				subjectId = get_subjectId(expId, workerId)
-				index = subjectId.find('_')
-				subjectN = int(subjectId[index+1:])
-				
-				if (subjectN%2==0):
-					indoorsKey = "u"
-					outdoorsKey = "i"
-				else:
-					indoorsKey = "i"
-					outdoorsKey = "u"
-
-				expVariables = [] # array of dictionaries
-
-				for i in range(0,len(stimuli)):
-					stimulus = stimuli[i]
-					index = stimulus.find('/')
-					stimulusType = stimulus[0:index] # indoor / outdoor
-					expVariables.append({"sceneStimulus":stimulusType, "fullStimName":stimulus+".jpg", "indoorsKey":indoorsKey, "outdoorsKey":outdoorsKey})
-
+				expVariables = get_scenetask_expVariables(expId, subjectId=subjectId, demo=False)
 				return render_template('foodchoicestudies/scenetask.html', expVariables=expVariables, stimFolder='/static/scenes_konk/')
 			else:
-				subjectId = get_subjectId(expId, workerId)
 				expResults = json.loads(request.form['experimentResults'])
 				nextTask = get_next_task(name, expTaskOrders[expId])
 
@@ -446,7 +344,7 @@ def scenechoicetask(expId):
 	if 'demo' in request.args and containsAllMTurkArgs:
 		if request.method == "GET" and request.args.get('demo') == 'TRUE':
 
-			expVariables = get_scenetask_expVariables(expId, subjectId=None, demo=True)
+			expVariables = get_scenechoicetask_expVariables(expId, subjectId=None, demo=True)
 			return render_template('foodchoicestudies/scenechoicetask.html', expId=expId, expVariables=expVariables, sceneStimFolder='/static/scenes_konk/demo/',foodStimFolder=foodStimFolder[expId]+'demo/')
 		else:
 			[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
@@ -469,7 +367,7 @@ def scenechoicetask(expId):
 
 				if completed_task(expId, workerId, 'completedAuction2'):
 
-					expVariables = get_scenetask_expVariables(expId, subjectId, demo=False)
+					expVariables = get_scenechoicetask_expVariables(expId, subjectId, demo=False)
 					return render_template('foodchoicestudies/scenechoicetask.html', expId=expId, expVariables=expVariables, sceneStimFolder='/static/scenes_konk/',foodStimFolder=foodStimFolder[expId])
 				else:
 					return redirect(url_for('unauthorized_error'))
@@ -514,13 +412,7 @@ def familiaritytask(expId):
 				# trialVariables should be an array of dictionaries 
 				# each element of the array represents the condition for one trial
 				# set the variable conditions to the array of conditions
-				stimuli = get_stimuli(foodStimFolder[expId],'','.bmp')
-				random.shuffle(stimuli)
-
-				expVariables = [] # array of dictionaries
-
-				for i in range(0,len(stimuli)):
-					expVariables.append({"stimulus":stimuli[i], "fullStimName":stimuli[i]+".bmp"})
+				expVariables = get_ratingtask_expVariables(expId, subjectId=None, demo=False)
 
 				return render_template('foodchoicestudies/familiaritytask.html', expVariables=expVariables, stimFolder=foodStimFolder[expId], instructions=oneLineInstructions)
 			else:

@@ -271,7 +271,102 @@ def get_bid_responses(csv_name):
 	return stimBidDF
 
 
+def get_ratingtask_expVariables(expId, subjectId, demo):
+	if demo == True:
+		stimuli = get_stimuli(foodStimFolder[expId]+'demo/','','.bmp')
+	else:
+		stimuli = get_stimuli(foodStimFolder[expId],'','.bmp')
+	random.shuffle(stimuli)
+
+	expVariables = [] # array of dictionaries
+
+	for i in range(0,len(stimuli)):
+		expVariables.append({"stimulus":stimuli[i], "fullStimName":stimuli[i]+".bmp"})
+	return expVariables
+
 def get_scenetask_expVariables(expId, subjectId, demo):
+	if demo == True:
+		indoor_folders = ['library-68']
+		outdoor_folders = ['woods-68']
+		[stim1Names, stim1Bids, stim2Names, stim2Bids] = get_two_stimuli_lists_without_bids(foodStimFolder[expId]+'demo/', '', '.bmp')
+		indoor_stimuli = []
+		outdoor_stimuli = []
+		for folder in indoor_folders:
+			indoor_stimuli += get_stimuli('/static/scenes_konk/demo/indoor/' + folder + '/', 'indoor/' + folder + '/', '.jpg')
+		for folder in outdoor_folders:
+			outdoor_stimuli += get_stimuli('/static/scenes_konk/demo/outdoor/' + folder + '/', 'outdoor/' + folder + '/', '.jpg')
+		sceneStimuli = indoor_stimuli + outdoor_stimuli
+		random.shuffle(sceneStimuli)
+
+		expVariables = []
+		
+		indoorsKey = "u"
+		outdoorsKey = "i"
+
+		expVariables = [] # array of dictionaries
+
+		for i in range(0,len(sceneStimuli)):
+			stimulus = sceneStimuli[i]
+			index = stimulus.find('/')
+			stimulusType = stimulus[0:index] # indoor / outdoor
+			expVariables.append({"sceneStimulus":stimulusType, "fullStimName":stimulus+".jpg", "indoorsKey":indoorsKey, "outdoorsKey":outdoorsKey})
+	else:
+		indoor_folders = ['bathroom-68','bedroom-68','classroom-68','conferenceroom-68','diningroom-68','empty-68','gym-68','hairsalon-68']
+		outdoor_folders = ['beach-68','campsite-68','canyon-68','countryroad-68','field-68','garden-68','golfcourse-68','mountainwhite-68']
+		### set experiment conditions here and pass to experiment.html 
+		# trialVariables should be an array of dictionaries 
+		# each element of the array represents the condition for one trial
+		# set the variable conditions to the array of conditions
+		indoor_stimuli = []
+		outdoor_stimuli = []
+
+		for folder in indoor_folders:
+			indoor_stimuli += get_stimuli('/static/scenes_konk/indoor/' + folder + '/', 'indoor/' + folder + '/', '.jpg')
+		for folder in outdoor_folders:
+			outdoor_stimuli += get_stimuli('/static/scenes_konk/outdoor/' + folder + '/', 'outdoor/' + folder + '/', '.jpg')
+
+		# pick 3 indoor and 3 outdoor stimuli for subject to be familiarized to
+		f_indoor_stimuli = []
+		while len(f_indoor_stimuli) != 3:
+			r = random.randrange(len(indoor_stimuli))
+			if indoor_stimuli[r] not in f_indoor_stimuli:
+				f_indoor_stimuli.append(indoor_stimuli[r])
+		f_outdoor_stimuli = []
+		while len(f_outdoor_stimuli) != 3:
+			r = random.randrange(len(outdoor_stimuli))
+			if outdoor_stimuli[r] not in f_outdoor_stimuli:
+				f_outdoor_stimuli.append(outdoor_stimuli[r])
+		
+		f_stimuli = f_indoor_stimuli + f_outdoor_stimuli
+
+		random.shuffle(f_stimuli)
+
+		stimuli = []
+
+		for i in range(0, 4): # 4 repeats of stimuli
+			random.shuffle(f_stimuli)
+			stimuli += f_stimuli
+
+		index = subjectId.find('_')
+		subjectN = int(subjectId[index+1:])
+		
+		if (subjectN%2==0):
+			indoorsKey = "u"
+			outdoorsKey = "i"
+		else:
+			indoorsKey = "i"
+			outdoorsKey = "u"
+
+		expVariables = [] # array of dictionaries
+
+		for i in range(0,len(stimuli)):
+			stimulus = stimuli[i]
+			index = stimulus.find('/')
+			stimulusType = stimulus[0:index] # indoor / outdoor
+			expVariables.append({"sceneStimulus":stimulusType, "fullStimName":stimulus+".jpg", "indoorsKey":indoorsKey, "outdoorsKey":outdoorsKey})
+	return expVariables
+
+def get_scenechoicetask_expVariables(expId, subjectId, demo):
 	if demo == True:
 		indoor_folders = ['library-68']
 		outdoor_folders = ['woods-68']
