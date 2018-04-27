@@ -13,6 +13,7 @@ import pandas as pd
 
 from foodchoicestudies.tasks import tasks 
 from foodchoicestudies.instructions import instructions 
+from foodchoicestudies.homepages import homepages
 
 _thisDir = os.path.dirname(os.path.abspath(__file__)).decode(sys.getfilesystemencoding())
 os.chdir(_thisDir)
@@ -62,8 +63,9 @@ def internal_server_error(e):
 
 app.register_blueprint(tasks)
 app.register_blueprint(instructions)
+app.register_blueprint(homepages)
 
 if __name__ == "__main__":
-	app.debug = True
+	app.debug = False
 	app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 	app.run(host = '0.0.0.0', port = 8000)

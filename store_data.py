@@ -36,8 +36,9 @@ def append_results_to_csv(expID, subjectID, filePath, fileName, expResults, info
 	if os.path.exists(filePath):
 		origDf = pd.read_csv(path)
 		origDf = pd.concat([origDf,df])
-		origDf = origDf.reset_index()
+		origDf.reset_index(inplace=True)
 		origDf['trialN'] = origDf.index.values
+		origDf.reset_index(drop=True)
 		origDf.to_csv(path, index=False)
 		
 

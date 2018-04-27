@@ -311,7 +311,9 @@ var endTrial = function() {
 		allTrials[currTrialN].rt_UNIX = 'NaN';
 		allTrials[currTrialN].receivedResponse = false;
 		allTrials[currTrialN].trialEndTime = t2;
+		allTrials[currTrialN].trialEndTime_UNIX = t2_UNIX;
 		allTrials[currTrialN].trialDuration = t2 - t1;
+		allTrials[currTrialN].trialDuration_UNIX = t2_UNIX - t1_UNIX;
 	} else {
 		color = GREEN;
 	}

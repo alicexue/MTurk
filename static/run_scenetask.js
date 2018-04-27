@@ -55,15 +55,12 @@ var nStimuli;
 var nImagesLoaded = 0;
 var startExperiment = function() {
 	nStimuli = expVariables.length;
-	console.log(expVariables);
-	console.log(nStimuli);
 	drawLoadingText();
 	generateOffScreenCanvases(drawStimuliToCanvas, '');
 }
 
 var drawStimuliToCanvas = function(trialVariables, trialN, canvasCtx) {
 	var position = "CENTER";
-	console.log(trialVariables);
 	var stimulus = trialVariables['sceneStimulus'];
 	var fullStimName = trialVariables['fullStimName'];
 	var img = new imageStimulus(stimulus, stimFolder + fullStimName, 'NaN', widthPercent, rescaleHeight);
@@ -280,7 +277,6 @@ var endTrial = function() {
 		} else {
 			outdoorsText.setColor(color);
 		}
-		console.log(maxTrialDuration-(t2-t1));
 		timer = setTimeout(clearScreen, maxTrialDuration - (t2-t1));
 	}	
 	console.log(allTrials[currTrialN]);
