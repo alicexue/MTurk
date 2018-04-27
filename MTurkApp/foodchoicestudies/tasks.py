@@ -1,5 +1,4 @@
-from MTurkApp import app
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template, request, Blueprint
 from flask import redirect, url_for
 from flask import jsonify
 import json
@@ -11,10 +10,11 @@ from utils import *
 from store_data import *
 from manage_subject_info import *
 import pandas as pd
-from flask_core import *
+
+tasks = Blueprint('tasks',  __name__)
 
 _thisDir = os.path.dirname(os.path.abspath(__file__)).decode(sys.getfilesystemencoding())
-os.chdir(_thisDir)
+_thisDir = os.path.abspath(os.path.join(_thisDir, os.pardir))
 
 repeatAuction = {'MDMMT':False, 'MDMRTS':True}
 foodStimFolder = {'MDMMT':'/static/foodstim60/', 'MDMRTS':'/static/foodstim80/'}
@@ -30,18 +30,18 @@ expTasksToComplete = {'MDMMT':MDMMT_tasksToComplete, 'MDMRTS':MDMRTS_tasksToComp
 """
 Consent Form (home page)
 """
-@app.route("/MDMMT", methods = ["GET","POST"])
+@tasks.route("/MDMMT", methods = ["GET","POST"])
 def MDMMT():
 	expId = 'MDMMT'
 	if request.method == "GET":
 		if 'preview' in request.args and request.args.get('preview') == 'True':
-			return render_template('consent_form.html')
+			return render_template('foodchoicestudies/consent_form.html')
 		elif 'assignmentId' in request.args and 'hitId' in request.args and request.args.get('assignmentId') == 'ASSIGNMENT_ID_NOT_AVAILABLE':
 			assignmentId = request.args.get('assignmentId')
 			hitId = request.args.get('hitId')
 			return redirect(url_for('check_eligibility', expId=expId, assignmentId=assignmentId, hitId=hitId))
 		else:
-			return render_template('consent_form.html')
+			return render_template('foodchoicestudies/consent_form.html')
 	else:
 
 		if contains_necessary_args(request.args): 
@@ -71,24 +71,28 @@ def MDMMT():
 			store_subject_info(expId, workerId, expTasksToComplete[expId], assignmentId, hitId, turkSubmitTo) 
 
 		firstTask = expTaskOrders[expId][0]
+		if 'instructions' in firstTask:
+			firstTask = 'instructions.' + firstTask
+		else:
+			firstTask = 'tasks.' + firstTask
 		return redirect(url_for(firstTask, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 
 
 """
 Consent Form (home page)
 """
-@app.route("/MDMRTS", methods = ["GET","POST"])
+@tasks.route("/MDMRTS", methods = ["GET","POST"])
 def MDMRTS():
 	expId = 'MDMRTS'
 	if request.method == "GET":
 		if 'preview' in request.args and request.args.get('preview') == 'True':
-			return render_template('consent_form.html')
+			return render_template('foodchoicestudies/consent_form.html')
 		elif 'assignmentId' in request.args and 'hitId' in request.args and request.args.get('assignmentId') == 'ASSIGNMENT_ID_NOT_AVAILABLE':
 			assignmentId = request.args.get('assignmentId')
 			hitId = request.args.get('hitId')
 			return redirect(url_for('check_eligibility', expId=expId, assignmentId=assignmentId, hitId=hitId))
 		else:
-			return render_template('consent_form.html')
+			return render_template('foodchoicestudies/consent_form.html')
 	else:
 
 		if contains_necessary_args(request.args): 
@@ -118,6 +122,10 @@ def MDMRTS():
 			store_subject_info(expId, workerId, expTasksToComplete[expId], assignmentId, hitId, turkSubmitTo) 
 
 		firstTask = expTaskOrders[expId][0]
+		if 'instructions' in firstTask:
+			firstTask = 'instructions.' + firstTask
+		else:
+			firstTask = 'tasks.' + firstTask
 		return redirect(url_for(firstTask, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 
 """ 
@@ -128,7 +136,7 @@ GET: Passes list of dictionaries with stimulus information to auction.html
 POST: Saves auction data and stimuli to csv files, redirects to choice task
 
 """
-@app.route("/auction/<expId>", methods = ["GET","POST"])
+@tasks.route("/auction/<expId>", methods = ["GET","POST"])
 def auction(expId):
 	name = 'auction'
 	oneLineInstructions = "Rate how much you want to eat this food from 0 (least) to 10 (most)."
@@ -144,7 +152,7 @@ def auction(expId):
 			for i in range(0,len(stimuli)):
 				expVariables.append({"stimulus1":stimuli[i], "fullStimName":stimuli[i]+".bmp"})
 
-			return render_template('auction.html', expVariables=expVariables, stimFolder=foodStimFolder[expId]+'demo/', instructions=oneLineInstructions)
+			return render_template('foodchoicestudies/auction.html', expVariables=expVariables, stimFolder=foodStimFolder[expId]+'demo/', instructions=oneLineInstructions)
 		else:
 
 			workerId = request.args.get('workerId')
@@ -153,7 +161,7 @@ def auction(expId):
 			turkSubmitTo = request.args.get('turkSubmitTo')
 			live = request.args.get('live') == "True"
 
-			return redirect(url_for('auction_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+			return redirect(url_for('instructions.auction_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 	elif containsAllMTurkArgs:
 		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
 
@@ -173,7 +181,7 @@ def auction(expId):
 				for i in range(0,len(stimuli)):
 					expVariables.append({"stimulus":stimuli[i], "fullStimName":stimuli[i]+".bmp"})
 
-				return render_template('auction.html', expVariables=expVariables, stimFolder=foodStimFolder[expId], instructions=oneLineInstructions)
+				return render_template('foodchoicestudies/auction.html', expVariables=expVariables, stimFolder=foodStimFolder[expId], instructions=oneLineInstructions)
 			else:
 				subjectId = get_subjectId(expId, workerId)
 				expResults = json.loads(request.form['experimentResults'])
@@ -182,7 +190,7 @@ def auction(expId):
 				filePath = _thisDir + '/data/' + expId + '/' + subjectId + '/'
 				if completedAuction == False and repeatAuction[expId] == True:
 					auctionFileName = 'AuctionData1.csv'
-					nextTask = 'auction_repeat_instructions'
+					nextTask = 'instructions.auction_repeat_instructions'
 					set_completed_task(expId, workerId,'completedAuction1', True)
 				elif completedAuction == True and repeatAuction[expId] == True:
 					auctionFileName = 'AuctionData2.csv'
@@ -208,7 +216,7 @@ GET: Retrieves stimulus ratings from auction data file, sets up stimuli for choi
 POST: Saves choice task data and stimuli to csv files, redirects to thank you page
 
 """
-@app.route("/choicetask/<expId>", methods = ["GET","POST"])
+@tasks.route("/choicetask/<expId>", methods = ["GET","POST"])
 def choicetask(expId):
 	name = 'choicetask'
 	containsAllMTurkArgs = contains_necessary_args(request.args)
@@ -224,11 +232,11 @@ def choicetask(expId):
 
 			for i in range(0,len(stim1Bids)):
 				expVariables.append({"stimulus1":stim1Names[i],"stimulus2":stim2Names[i],"stim1Bid":stim1Bids[i],"stim2Bid":stim2Bids[i], "delta":deltas[i], "fullStim1Name":stim1Names[i]+".bmp", "fullStim2Name":stim2Names[i]+".bmp"})
-			return render_template('choicetask.html', expId=expId, expVariables=expVariables, stimFolder=foodStimFolder[expId]+'demo/')
+			return render_template('foodchoicestudies/choicetask.html', expId=expId, expVariables=expVariables, stimFolder=foodStimFolder[expId]+'demo/')
 		else:
 			[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
 
-			return redirect(url_for('choicetask_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+			return redirect(url_for('instructions.choicetask_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 	elif containsAllMTurkArgs:
 		# not demo - record responses now
 		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
@@ -263,7 +271,7 @@ def choicetask(expId):
 					for i in range(0,len(stim1Bids)):
 						expVariables.append({"stimulus1":stim1Names[i],"stimulus2":stim2Names[i],"stim1Bid":stim1Bids[i],"stim2Bid":stim2Bids[i], "delta":deltas[i], "fullStim1Name":stim1Names[i]+".bmp", "fullStim2Name":stim2Names[i]+".bmp"})
 
-					return render_template('choicetask.html', expId=expId, expVariables=expVariables, stimFolder=foodStimFolder[expId])
+					return render_template('foodchoicestudies/choicetask.html', expId=expId, expVariables=expVariables, stimFolder=foodStimFolder[expId])
 				else:
 					return redirect(url_for('unauthorized_error'))
 			else:
@@ -283,7 +291,7 @@ def choicetask(expId):
 	else:
 		return redirect(url_for('unauthorized_error'))
 
-@app.route("/check_eligibility/<expId>", methods = ["GET", "POST"])
+@tasks.route("/check_eligibility/<expId>", methods = ["GET", "POST"])
 def check_eligibility(expId):
 	if request.method == "GET" and 'assignmentId' in request.args and 'hitId' in request.args:
 		assignmentId = request.args.get('assignmentId')
@@ -300,57 +308,22 @@ def check_eligibility(expId):
 	else:
 		return redirect(url_for('unauthorized_error'))
 
-@app.route("/auction_error/<expId>", methods = ["GET", "POST"])
+@tasks.route("/auction_error/<expId>", methods = ["GET", "POST"])
 def auction_error(expId):
 	name = 'auction'
 	if contains_necessary_args(request.args):
 		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
 
 		if request.method == "GET":
-			return render_template('auction_error.html')
+			return render_template('foodchoicestudies/auction_error.html')
 		else:
 			nextTask = get_next_task(name, expTaskOrders[expId])
 			return redirect(url_for(nextTask, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 	else:
 		return redirect(url_for('unauthorized_error'))
 
-@app.route("/repeat_error/<expId>/<task>", methods = ["GET", "POST"])
-def repeat_error(expId, task):
-	if contains_necessary_args(request.args):
-		workerId = request.args.get('workerId')
-		assignmentId = request.args.get('assignmentId')
-		hitId = request.args.get('hitId')
-		turkSubmitTo = request.args.get('turkSubmitTo')
-		live = request.args.get('live') == "True"
-
-		if request.method == "GET":
-			return render_template('repeat_error.html')
-		else:
-			nextTask = get_next_task(task, expTaskOrders[expId])
-			return redirect(url_for(nextTask, taskName=task, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
-	else:
-		return redirect(url_for('unauthorized_error'))
-
-@app.route("/take_break/<expId>", methods = ["GET", "POST"])
-def take_break(expId):
-	task = "take_break"
-	if contains_necessary_args(request.args):
-		workerId = request.args.get('workerId')
-		assignmentId = request.args.get('assignmentId')
-		hitId = request.args.get('hitId')
-		turkSubmitTo = request.args.get('turkSubmitTo')
-		live = request.args.get('live') == "True"
-
-		if request.method == "GET":
-			return render_template('break.html')
-		else:
-			nextTask = get_next_task(task, expTaskOrders[expId])
-			return redirect(url_for(nextTask, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
-	else:
-		return redirect(url_for('unauthorized_error'))
-
 """
-@app.route("/dummy_MDMMT", methods = ["GET","POST"])
+@tasks.route("/dummy_MDMMT", methods = ["GET","POST"])
 def dummy_MDMMT():
 	expId = "MDMMT"
 	if request.method == "GET" and 'assignmentId' in request.args and 'hitId' in request.args:
@@ -378,7 +351,7 @@ def dummy_MDMMT():
 	else:
 		return redirect(url_for('unauthorized_error'))
 
-@app.route("/return_dummy_MDMMT", methods = ["GET"])
+@tasks.route("/return_dummy_MDMMT", methods = ["GET"])
 def return_dummy_MDMMT():
 	return render_template('return_dummy_hit.html')
 """
@@ -392,7 +365,7 @@ GET: Passes list of dictionaries with stimulus information to auction.html
 POST: Saves auction data and stimuli to csv files, redirects to choice task
 
 """
-@app.route("/scenetask/<expId>", methods = ["GET","POST"])
+@tasks.route("/scenetask/<expId>", methods = ["GET","POST"])
 def scenetask(expId):
 	### need to adjust complete auction stuff
 	name = 'scenetask'
@@ -425,7 +398,7 @@ def scenetask(expId):
 				stimulusType = stimulus[0:index] # indoor / outdoor
 				expVariables.append({"sceneStimulus":stimulusType, "fullStimName":stimulus+".jpg", "indoorsKey":indoorsKey, "outdoorsKey":outdoorsKey})
 
-			return render_template('scenetask.html', expVariables=expVariables, stimFolder='/static/scenes_konk/demo/')
+			return render_template('foodchoicestudies/scenetask.html', expVariables=expVariables, stimFolder='/static/scenes_konk/demo/')
 		else:
 
 			workerId = request.args.get('workerId')
@@ -434,7 +407,7 @@ def scenetask(expId):
 			turkSubmitTo = request.args.get('turkSubmitTo')
 			live = request.args.get('live') == "True"
 
-			return redirect(url_for('scenetask_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+			return redirect(url_for('instructions.scenetask_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 	elif containsAllMTurkArgs:
 		indoor_folders = ['bathroom-68','bedroom-68','classroom-68','conferenceroom-68','diningroom-68','empty-68','gym-68','hairsalon-68']
 		outdoor_folders = ['beach-68','campsite-68','canyon-68','countryroad-68','field-68','garden-68','golfcourse-68','mountainwhite-68']
@@ -497,7 +470,7 @@ def scenetask(expId):
 					stimulusType = stimulus[0:index] # indoor / outdoor
 					expVariables.append({"sceneStimulus":stimulusType, "fullStimName":stimulus+".jpg", "indoorsKey":indoorsKey, "outdoorsKey":outdoorsKey})
 
-				return render_template('scenetask.html', expVariables=expVariables, stimFolder='/static/scenes_konk/')
+				return render_template('foodchoicestudies/scenetask.html', expVariables=expVariables, stimFolder='/static/scenes_konk/')
 			else:
 				subjectId = get_subjectId(expId, workerId)
 				expResults = json.loads(request.form['experimentResults'])
@@ -525,7 +498,7 @@ GET: Retrieves stimulus ratings from auction data file, sets up stimuli for choi
 POST: Saves choice task data and stimuli to csv files, redirects to thank you page
 
 """
-@app.route("/scenechoicetask/<expId>", methods = ["GET","POST"])
+@tasks.route("/scenechoicetask/<expId>", methods = ["GET","POST"])
 def scenechoicetask(expId):
 	name = 'scenechoicetask'
 
@@ -560,11 +533,11 @@ def scenechoicetask(expId):
 				else:
 					sceneStimulusStatus = 'familiar'
 				expVariables.append({"sceneStimulus":stimulusType, "stimulus1":stim1Names[i],"stimulus2":stim2Names[i],"stim1Bid":stim1Bids[i],"stim2Bid":stim2Bids[i], "delta":deltas[i], "fullSceneStimName":sceneStimulus+".jpg", "fullStim1Name":stim1Names[i]+".bmp", "fullStim2Name":stim2Names[i]+".bmp","sceneStimulusStatus":sceneStimulusStatus})
-			return render_template('scenechoicetask.html', expId=expId, expVariables=expVariables, sceneStimFolder='/static/scenes_konk/demo/',foodStimFolder=foodStimFolder[expId]+'demo/')
+			return render_template('foodchoicestudies/scenechoicetask.html', expId=expId, expVariables=expVariables, sceneStimFolder='/static/scenes_konk/demo/',foodStimFolder=foodStimFolder[expId]+'demo/')
 		else:
 			[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
 
-			return redirect(url_for('scenechoicetask_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+			return redirect(url_for('instructions.scenechoicetask_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 	elif containsAllMTurkArgs:
 		indoor_folders = ['bathroom-68','bedroom-68','classroom-68','conferenceroom-68','diningroom-68','empty-68','gym-68','hairsalon-68']
 		outdoor_folders = ['beach-68','campsite-68','canyon-68','countryroad-68','field-68','garden-68','golfcourse-68','mountainwhite-68']
@@ -629,7 +602,7 @@ def scenechoicetask(expId):
 						stimulusType = sceneStimulus[0:index] # indoor / outdoor
 						expVariables.append({"sceneStimulus":stimulusType, "stimulus1":stim1Names[i],"stimulus2":stim2Names[i],"stim1Bid":stim1Bids[i],"stim2Bid":stim2Bids[i], "delta":deltas[i], "fullSceneStimName":sceneStimulus+".jpg", "fullStim1Name":stim1Names[i]+".bmp", "fullStim2Name":stim2Names[i]+".bmp","sceneStimulusStatus":sceneStimuliStatus[i]})
 
-					return render_template('scenechoicetask.html', expId=expId, expVariables=expVariables, sceneStimFolder='/static/scenes_konk/',foodStimFolder=foodStimFolder[expId])
+					return render_template('foodchoicestudies/scenechoicetask.html', expId=expId, expVariables=expVariables, sceneStimFolder='/static/scenes_konk/',foodStimFolder=foodStimFolder[expId])
 				else:
 					return redirect(url_for('unauthorized_error'))
 			else:
@@ -641,12 +614,12 @@ def scenechoicetask(expId):
 				else:
 					append_results_to_csv(expId, subjectId, filePath, 'SceneChoiceTaskData.csv', expResults, {})
 					set_completed_task(expId, workerId, 'completedSceneChoiceTask', True)
-					nextTask = 'familiaritytask_instructions'
+					nextTask = 'instructions.familiaritytask_instructions'
 				
 				return redirect(url_for(nextTask, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 
 		elif workerId_exists(expId, workerId) and completedChoiceTask == True:
-			return redirect(url_for('repeat_error', task=name, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+			return redirect(url_for('tasks.repeat_error', task=name, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 		else:
 			return redirect(url_for('unauthorized_error'))
 	else:
@@ -656,7 +629,7 @@ def scenechoicetask(expId):
 """ 
 Familiarity Task
 """
-@app.route("/familiaritytask/<expId>", methods = ["GET","POST"])
+@tasks.route("/familiaritytask/<expId>", methods = ["GET","POST"])
 def familiaritytask(expId):
 	name = 'familiaritytask'
 	oneLineInstructions = "How familiar are you with this food? Rate it from 0 (never eaten before) to 10 (eat a few times a week)."
@@ -681,7 +654,7 @@ def familiaritytask(expId):
 				for i in range(0,len(stimuli)):
 					expVariables.append({"stimulus":stimuli[i], "fullStimName":stimuli[i]+".bmp"})
 
-				return render_template('familiaritytask.html', expVariables=expVariables, stimFolder=foodStimFolder[expId], instructions=oneLineInstructions)
+				return render_template('foodchoicestudies/familiaritytask.html', expVariables=expVariables, stimFolder=foodStimFolder[expId], instructions=oneLineInstructions)
 			else:
 				subjectId = get_subjectId(expId, workerId)
 				expResults = json.loads(request.form['experimentResults'])
@@ -694,8 +667,35 @@ def familiaritytask(expId):
 
 				return redirect(url_for(nextTask, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 		elif workerId_exists(expId, workerId) and completedFamiliarityTask == True:
-			return redirect(url_for('repeat_error', task=name, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+			return redirect(url_for('tasks.repeat_error', task=name, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 		else:
 			return redirect(url_for('unauthorized_error'))
+	else:
+		return redirect(url_for('unauthorized_error'))
+
+@tasks.route("/repeat_error/<expId>/<task>", methods = ["GET", "POST"])
+def repeat_error(expId, task):
+	if contains_necessary_args(request.args):
+		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
+
+		if request.method == "GET":
+			return render_template('repeat_error.html')
+		else:
+			nextTask = get_next_task(task, expTaskOrders[expId])
+			return redirect(url_for(nextTask, taskName=task, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+	else:
+		return redirect(url_for('unauthorized_error'))
+
+@tasks.route("/take_break/<expId>", methods = ["GET", "POST"])
+def take_break(expId):
+	task = "take_break"
+	if contains_necessary_args(request.args):
+		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
+
+		if request.method == "GET":
+			return render_template('break.html')
+		else:
+			nextTask = get_next_task(task, expTaskOrders[expId])
+			return redirect(url_for(nextTask, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 	else:
 		return redirect(url_for('unauthorized_error'))

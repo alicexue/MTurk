@@ -1,5 +1,4 @@
-from MTurkApp import app
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template, request, session, Blueprint
 from flask import redirect, url_for
 from flask import jsonify
 import json
@@ -12,9 +11,13 @@ from store_data import *
 from manage_subject_info import *
 import pandas as pd
 
+from foodchoicestudies.tasks import tasks 
+from foodchoicestudies.instructions import instructions 
 
 _thisDir = os.path.dirname(os.path.abspath(__file__)).decode(sys.getfilesystemencoding())
 os.chdir(_thisDir)
+
+app = Flask(__name__)
 
 @app.route("/thankyou", methods = ["GET"])
 def thankyou():
@@ -31,11 +34,7 @@ def thankyou():
 def feedback(expId):
 	name = 'feedback'
 	if contains_necessary_args(request.args):
-		workerId = request.args.get('workerId')
-		assignmentId = request.args.get('assignmentId')
-		hitId = request.args.get('hitId')
-		turkSubmitTo = request.args.get('turkSubmitTo')
-		live = request.args.get('live') == "True"
+		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
 		if request.method == "GET":
 			return render_template('feedback.html')
 		else:
@@ -60,3 +59,11 @@ def page_not_found(e):
 @app.errorhandler(500)
 def page_not_found(e):
     return render_template('500.html'), 500
+
+app.register_blueprint(tasks)
+app.register_blueprint(instructions)
+
+if __name__ == "__main__":
+	app.debug = False
+	app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+	app.run(host = '0.0.0.0', port = 8000)

@@ -6,7 +6,6 @@ import pandas as pd
 import numpy as np
 
 _thisDir = os.path.dirname(os.path.abspath(__file__)).decode(sys.getfilesystemencoding())
-os.chdir(_thisDir)
 
 """
 Given name of current task and list of tasks, return the task that should be next
@@ -20,13 +19,21 @@ For example:
 	print get_next_task('auction', tasks) 		# return 'choicetask'
 	print get_next_task('choicetask', tasks) 	# return 'thankyou'
 	print get_next_task('hello', tasks) 		# return None
+
+*** For url_for
 """
 def get_next_task(currentTask, taskOrder):
 	for i in range(0, len(taskOrder)):
 		task = taskOrder[i]
 		if currentTask == task:
 			if i < len(taskOrder) - 1:
-				return taskOrder[i+1]
+				nextTask = taskOrder[i+1]
+				if nextTask == 'feedback' or nextTask == 'thankyou':
+					return nextTask
+				elif 'instructions' in nextTask:
+					return 'instructions.' + nextTask
+				else:
+					return 'tasks.' + nextTask
 			else:
 				return 'thankyou'
 	return None

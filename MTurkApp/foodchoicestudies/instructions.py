@@ -1,5 +1,4 @@
-from MTurkApp import app
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template, request, Blueprint
 from flask import redirect, url_for
 from flask import jsonify
 import json
@@ -11,13 +10,27 @@ from utils import *
 from store_data import *
 from manage_subject_info import *
 import pandas as pd
-from flask_core import *
-from flask_foodchoicestudies import *
+
+_thisDir = os.path.dirname(os.path.abspath(__file__)).decode(sys.getfilesystemencoding())
+_thisDir = os.path.abspath(os.path.join(_thisDir, os.pardir))
+
+repeatAuction = {'MDMMT':False, 'MDMRTS':True}
+foodStimFolder = {'MDMMT':'/static/foodstim60/', 'MDMRTS':'/static/foodstim80/'}
+MDMMT_taskOrder = ['auction_demo_instructions', 'auction', 'choicetask_demo_instructions', 'choicetask', 'feedback'] # order of tasks in experiment
+MDMRTS_taskOrder = ['auction_demo_instructions', 'auction', 'scenetask_demo_instructions', 'scenetask', 'scenechoicetask_demo_instructions', 'scenechoicetask', 'take_break', 'scenechoicetask', 'familiaritytask_instructions', 'familiaritytask', 'feedback'] # order of tasks in experiment
+# feedback here doesn't get applied
+expTaskOrders = {'MDMMT':MDMMT_taskOrder, 'MDMRTS':MDMRTS_taskOrder} # dictionary of experiments - key is exp name, value is order of tasks
+
+MDMMT_tasksToComplete = {'completedAuction':False, 'completedChoiceTask':False} # for manage_subject_data
+MDMRTS_tasksToComplete = {'completedAuction1':False, 'completedAuction2':False, 'completeSceneTask':False, 'completedSceneChoiceTask':False, 'completedFamiliarityTask':False} # for manage_subject_data
+expTasksToComplete = {'MDMMT':MDMMT_tasksToComplete, 'MDMRTS':MDMRTS_tasksToComplete} 
+
+instructions = Blueprint('instructions', __name__)
 
 """
 Auction Instructions
 """
-@app.route("/auction_instructions/<expId>", methods = ["GET","POST"])
+@instructions.route("/auction_instructions/<expId>", methods = ["GET","POST"])
 def auction_instructions(expId):
 	name = 'auction'
 	assignmentId = None
@@ -31,16 +44,16 @@ def auction_instructions(expId):
 			if request.method == "GET":
 				stimuli = get_stimuli(foodStimFolder[expId],'','.bmp')
 				nStim = len(stimuli)
-				return render_template('auction_instructions.html', nStim=nStim)
+				return render_template('foodchoicestudies/auction_instructions.html', nStim=nStim)
 			else:
 				if request.form['submit'] == 'Continue':
 					if assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE': # if in preview
 						nextTask = get_next_task(name, expTaskOrders[expId])
 						return redirect(url_for(nextTask, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 					else:
-						return redirect(url_for('auction', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+						return redirect(url_for('tasks.auction', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 				else:
-					return redirect(url_for('auction', demo='TRUE', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+					return redirect(url_for('tasks.auction', demo='TRUE', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 		else:
 			return redirect(url_for('unauthorized_error'))
 	else:
@@ -49,7 +62,7 @@ def auction_instructions(expId):
 """
 Auction Demo Instructions
 """
-@app.route("/auction_demo_instructions/<expId>", methods = ["GET","POST"])
+@instructions.route("/auction_demo_instructions/<expId>", methods = ["GET","POST"])
 def auction_demo_instructions(expId):
 	name = 'auction'
 	assignmentId = None
@@ -64,9 +77,9 @@ def auction_demo_instructions(expId):
 			if request.method == "GET":
 				stimuli = get_stimuli(foodStimFolder[expId],'','.bmp')
 				nStim = len(stimuli)
-				return render_template('auction_demo_instructions.html', nStim = nStim)
+				return render_template('foodchoicestudies/auction_demo_instructions.html', nStim = nStim)
 			else:
-				return redirect(url_for('auction', demo='TRUE', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+				return redirect(url_for('tasks.auction', demo='TRUE', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 		else:
 			return redirect(url_for('unauthorized_error'))
 	else:
@@ -75,7 +88,7 @@ def auction_demo_instructions(expId):
 """
 Auction Repeat Instructions
 """
-@app.route("/auction_repeat_instructions/<expId>", methods = ["GET","POST"])
+@instructions.route("/auction_repeat_instructions/<expId>", methods = ["GET","POST"])
 def auction_repeat_instructions(expId):
 	name = 'auction'
 	assignmentId = None
@@ -88,9 +101,9 @@ def auction_repeat_instructions(expId):
 			if request.method == "GET":
 				stimuli = get_stimuli(foodStimFolder[expId],'','.bmp')
 				nStim = len(stimuli)
-				return render_template('auction_repeat_instructions.html', nStim=nStim)
+				return render_template('foodchoicestudies/auction_repeat_instructions.html', nStim=nStim)
 			else:
-				return redirect(url_for('auction', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+				return redirect(url_for('tasks.auction', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 		else:
 			return redirect(url_for('unauthorized_error'))
 	else:
@@ -99,72 +112,72 @@ def auction_repeat_instructions(expId):
 """
 Choice Task Instructions
 """
-@app.route("/choicetask_instructions/<expId>", methods = ["GET","POST"])
+@instructions.route("/choicetask_instructions/<expId>", methods = ["GET","POST"])
 def choicetask_instructions(expId):
-	name = 'choicetask'
-	taskHTML = 'choicetask_instructions.html'
+	taskEndpoint = 'tasks.choicetask'
+	taskHTML = 'foodchoicestudies/choicetask_instructions.html'
 	demo = False 
-	return route_for_instructions(expId, taskHTML, name, demo, request)
+	return route_for_instructions(expId, taskHTML, taskEndpoint, demo, request)
 
 """
 Scene Choice Task Instructions
 """
-@app.route("/scenechoicetask_instructions/<expId>", methods = ["GET","POST"])
+@instructions.route("/scenechoicetask_instructions/<expId>", methods = ["GET","POST"])
 def scenechoicetask_instructions(expId):
-	name = 'scenechoicetask'
-	taskHTML = 'scenechoicetask_instructions.html'
+	taskEndpoint = 'tasks.scenechoicetask'
+	taskHTML = 'foodchoicestudies/scenechoicetask_instructions.html'
 	demo = False 
-	return route_for_instructions(expId, taskHTML, name, demo, request)
+	return route_for_instructions(expId, taskHTML, taskEndpoint, demo, request)
 
 """
 Scene Task Demo Instructions
 """
-@app.route("/scenetask_demo_instructions/<expId>", methods = ["GET","POST"])
+@instructions.route("/scenetask_demo_instructions/<expId>", methods = ["GET","POST"])
 def scenetask_demo_instructions(expId):
-	name = 'scenetask'
-	taskHTML = 'scenetask_demo_instructions.html'
+	taskEndpoint = 'tasks.scenetask'
+	taskHTML = 'foodchoicestudies/scenetask_demo_instructions.html'
 	demo = True 
-	return route_for_instructions(expId, taskHTML, name, demo, request)
+	return route_for_instructions(expId, taskHTML, taskEndpoint, demo, request)
 
 """
 Scene Task Instructions
 """
-@app.route("/scenetask_instructions/<expId>", methods = ["GET","POST"])
+@instructions.route("/scenetask_instructions/<expId>", methods = ["GET","POST"])
 def scenetask_instructions(expId):
-	name = 'scenetask'
-	taskHTML = 'scenetask_instructions.html'
+	taskEndpoint = 'tasks.scenetask'
+	taskHTML = 'foodchoicestudies/scenetask_instructions.html'
 	demo = False 
-	return route_for_instructions(expId, taskHTML, name, demo, request)
+	return route_for_instructions(expId, taskHTML, taskEndpoint, demo, request)
 
 """
 Choice Task Demo Instructions
 """
-@app.route("/choicetask_demo_instructions/<expId>", methods = ["GET","POST"])
+@instructions.route("/choicetask_demo_instructions/<expId>", methods = ["GET","POST"])
 def choicetask_demo_instructions(expId):
-	name = 'choicetask'
-	taskHTML = 'choicetask_demo_instructions.html'
+	taskEndpoint = 'tasks.choicetask'
+	taskHTML = 'foodchoicestudies/choicetask_demo_instructions.html'
 	demo = True 
-	return route_for_instructions(expId, taskHTML, name, demo, request)
+	return route_for_instructions(expId, taskHTML, taskEndpoint, demo, request)
 
 """
 Scene Choice Task Demo Instructions
 """
-@app.route("/scenechoicetask_demo_instructions/<expId>", methods = ["GET","POST"])
+@instructions.route("/scenechoicetask_demo_instructions/<expId>", methods = ["GET","POST"])
 def scenechoicetask_demo_instructions(expId):
-	name = 'scenechoicetask'
-	taskHTML = 'scenechoicetask_demo_instructions.html'
+	taskEndpoint = 'tasks.scenechoicetask'
+	taskHTML = 'foodchoicestudies/scenechoicetask_demo_instructions.html'
 	demo = True 
-	return route_for_instructions(expId, taskHTML, name, demo, request)
+	return route_for_instructions(expId, taskHTML, taskEndpoint, demo, request)
 
 """
 Familiarity Task Instructions
 """
-@app.route("/familiaritytask_instructions/<expId>", methods = ["GET","POST"])
+@instructions.route("/familiaritytask_instructions/<expId>", methods = ["GET","POST"])
 def familiaritytask_instructions(expId):
-	name = 'familiaritytask'
-	taskHTML = 'familiaritytask_instructions.html'
+	taskEndpoint = 'tasks.familiaritytask'
+	taskHTML = 'foodchoicestudies/familiaritytask_instructions.html'
 	demo = False
-	return route_for_instructions(expId, taskHTML, name, demo, request)
+	return route_for_instructions(expId, taskHTML, taskEndpoint, demo, request)
 
 """
 Renders HTML for instructions page or redirects to task based on arguments in request 
