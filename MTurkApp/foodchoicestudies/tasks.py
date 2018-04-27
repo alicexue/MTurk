@@ -444,42 +444,15 @@ def scenechoicetask(expId):
 	containsAllMTurkArgs = contains_necessary_args(request.args)
 
 	if 'demo' in request.args and containsAllMTurkArgs:
-		indoor_folders = ['library-68']
-		outdoor_folders = ['woods-68']
 		if request.method == "GET" and request.args.get('demo') == 'TRUE':
-			[stim1Names, stim1Bids, stim2Names, stim2Bids] = get_two_stimuli_lists_without_bids(foodStimFolder[expId]+'demo/', '', '.bmp')
-			indoor_stimuli = []
-			outdoor_stimuli = []
-			for folder in indoor_folders:
-				indoor_stimuli += get_stimuli('/static/scenes_konk/demo/indoor/' + folder + '/', 'indoor/' + folder + '/', '.jpg')
-			for folder in outdoor_folders:
-				outdoor_stimuli += get_stimuli('/static/scenes_konk/demo/outdoor/' + folder + '/', 'outdoor/' + folder + '/', '.jpg')
-			sceneStimuli = indoor_stimuli + outdoor_stimuli
-			random.shuffle(sceneStimuli)
 
-			expVariables = [] # array of dictionaries
-
-			deltas = []
-			for i in range(0,len(sceneStimuli)):
-				deltas.append(stim2Bids[i] - stim1Bids[i])
-
-			for i in range(0,len(sceneStimuli)):
-				sceneStimulus = sceneStimuli[i]
-				index = sceneStimulus.find('/')
-				stimulusType = sceneStimulus[0:index] # indoor / outdoor
-				if (i%2==0):
-					sceneStimulusStatus = 'novel'
-				else:
-					sceneStimulusStatus = 'familiar'
-				expVariables.append({"sceneStimulus":stimulusType, "stimulus1":stim1Names[i],"stimulus2":stim2Names[i],"stim1Bid":stim1Bids[i],"stim2Bid":stim2Bids[i], "delta":deltas[i], "fullSceneStimName":sceneStimulus+".jpg", "fullStim1Name":stim1Names[i]+".bmp", "fullStim2Name":stim2Names[i]+".bmp","sceneStimulusStatus":sceneStimulusStatus})
+			expVariables = get_scenetask_expVariables(expId, subjectId=None, demo=True)
 			return render_template('foodchoicestudies/scenechoicetask.html', expId=expId, expVariables=expVariables, sceneStimFolder='/static/scenes_konk/demo/',foodStimFolder=foodStimFolder[expId]+'demo/')
 		else:
 			[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
 
 			return redirect(url_for('instructions.scenechoicetask_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 	elif containsAllMTurkArgs:
-		indoor_folders = ['bathroom-68','bedroom-68','classroom-68','conferenceroom-68','diningroom-68','empty-68','gym-68','hairsalon-68']
-		outdoor_folders = ['beach-68','campsite-68','canyon-68','countryroad-68','field-68','garden-68','golfcourse-68','mountainwhite-68']
 		# not demo - record responses now
 		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
 		subjectId = get_subjectId(expId, workerId)
@@ -496,51 +469,7 @@ def scenechoicetask(expId):
 
 				if completed_task(expId, workerId, 'completedAuction2'):
 
-					if not os.path.exists(dataDir + expId + '/' + subjectId + '/' + subjectId + '_TrialList_SceneChoiceTask.csv'):
-						## subject hasn't done any portion of the Choice Scene Task yet
-
-						auctionFileName = '_AuctionData2.csv'
-						stimBidDict = get_bid_responses(dataDir + expId + '/' + subjectId + '/' + subjectId + auctionFileName)
-						#[stim1Names, stim1Bids, stim2Names, stim2Bids] = get_two_stimuli_lists(stimBidDict, foodStimFolder[expId], '', '.bmp')
-						indoor_stimuli = []
-						outdoor_stimuli = []
-						for folder in indoor_folders:
-							indoor_stimuli += get_stimuli('/static/scenes_konk/indoor/' + folder + '/', 'indoor/' + folder + '/', '.jpg')
-						for folder in outdoor_folders:
-							outdoor_stimuli += get_stimuli('/static/scenes_konk/outdoor/' + folder + '/', 'outdoor/' + folder + '/', '.jpg')
-
-						familiarStim = get_familiar_stimuli(dataDir + expId + '/' + subjectId + '/' + subjectId + '_SceneTask.csv', 'sceneStimulusPath')
-						familiar_indoor_stimuli = familiarStim['indoor']
-						familiar_outdoor_stimuli = familiarStim['outdoor']
-
-						shuffledDf = get_scene_food_stimuli(stimBidDict, familiar_indoor_stimuli, familiar_outdoor_stimuli, indoor_stimuli, outdoor_stimuli, foodStimFolder[expId], '', '.bmp')
-						
-						shuffledDf.to_csv(dataDir + expId + '/' + subjectId + '/' + subjectId + '_TrialList_SceneChoiceTask.csv', index=False)
-						shuffledDf = shuffledDf[0:len(shuffledDf)/2]
-
-					else:
-						shuffledDf = pd.read_csv(dataDir + expId + '/' + subjectId + '/' + subjectId + '_TrialList_SceneChoiceTask.csv')
-						shuffledDf = shuffledDf[len(shuffledDf)/2:]
-
-					stim1Names = shuffledDf['stimulus1'].values
-					stim2Names = shuffledDf['stimulus2'].values
-					stim1Bids = shuffledDf['stim1Bid'].values
-					stim2Bids = shuffledDf['stim2Bid'].values
-					sceneStimuli = shuffledDf['sceneStimulus'].values
-					sceneStimuliStatus = shuffledDf['sceneStimulusFamiliarity'].values 
-
-					expVariables = [] # array of dictionaries
-
-					deltas = []
-					for i in range(0,len(stim1Bids)):
-						deltas.append(stim2Bids[i] - stim1Bids[i])
-
-					for i in range(0,len(stim1Bids)):
-						sceneStimulus = sceneStimuli[i]
-						index = sceneStimulus.find('/')
-						stimulusType = sceneStimulus[0:index] # indoor / outdoor
-						expVariables.append({"sceneStimulus":stimulusType, "stimulus1":stim1Names[i],"stimulus2":stim2Names[i],"stim1Bid":stim1Bids[i],"stim2Bid":stim2Bids[i], "delta":deltas[i], "fullSceneStimName":sceneStimulus+".jpg", "fullStim1Name":stim1Names[i]+".bmp", "fullStim2Name":stim2Names[i]+".bmp","sceneStimulusStatus":sceneStimuliStatus[i]})
-
+					expVariables = get_scenetask_expVariables(expId, subjectId, demo=False)
 					return render_template('foodchoicestudies/scenechoicetask.html', expId=expId, expVariables=expVariables, sceneStimFolder='/static/scenes_konk/',foodStimFolder=foodStimFolder[expId])
 				else:
 					return redirect(url_for('unauthorized_error'))
