@@ -15,12 +15,12 @@ from expInfo import *
 _thisDir = os.path.dirname(os.path.abspath(__file__)).decode(sys.getfilesystemencoding())
 _thisDir = os.path.abspath(os.path.join(_thisDir, os.pardir))
 
-instructions = Blueprint('instructions', __name__)
+instructions = Blueprint('instructions', __name__, url_prefix='/<expId>')
 
 """
 Auction Instructions
 """
-@instructions.route("/auction_instructions/<expId>", methods = ["GET","POST"])
+@instructions.route("/auction_instructions", methods = ["GET","POST"])
 def auction_instructions(expId):
 	name = 'auction'
 	assignmentId = None
@@ -52,7 +52,7 @@ def auction_instructions(expId):
 """
 Auction Demo Instructions
 """
-@instructions.route("/auction_demo_instructions/<expId>", methods = ["GET","POST"])
+@instructions.route("/auction_demo_instructions", methods = ["GET","POST"])
 def auction_demo_instructions(expId):
 	name = 'auction'
 	assignmentId = None
@@ -78,7 +78,7 @@ def auction_demo_instructions(expId):
 """
 Auction Repeat Instructions
 """
-@instructions.route("/auction_repeat_instructions/<expId>", methods = ["GET","POST"])
+@instructions.route("/auction_repeat_instructions", methods = ["GET","POST"])
 def auction_repeat_instructions(expId):
 	name = 'auction'
 	assignmentId = None
@@ -102,7 +102,7 @@ def auction_repeat_instructions(expId):
 """
 Choice Task Instructions
 """
-@instructions.route("/choicetask_instructions/<expId>", methods = ["GET","POST"])
+@instructions.route("/choicetask_instructions", methods = ["GET","POST"])
 def choicetask_instructions(expId):
 	taskEndpoint = 'tasks.choicetask'
 	taskHTML = 'foodchoicestudies/choicetask_instructions.html'
@@ -112,7 +112,7 @@ def choicetask_instructions(expId):
 """
 Scene Choice Task Instructions
 """
-@instructions.route("/scenechoicetask_instructions/<expId>", methods = ["GET","POST"])
+@instructions.route("/scenechoicetask_instructions", methods = ["GET","POST"])
 def scenechoicetask_instructions(expId):
 	taskEndpoint = 'tasks.scenechoicetask'
 	taskHTML = 'foodchoicestudies/scenechoicetask_instructions.html'
@@ -122,7 +122,7 @@ def scenechoicetask_instructions(expId):
 """
 Scene Task Demo Instructions
 """
-@instructions.route("/scenetask_demo_instructions/<expId>", methods = ["GET","POST"])
+@instructions.route("/scenetask_demo_instructions", methods = ["GET","POST"])
 def scenetask_demo_instructions(expId):
 	taskEndpoint = 'tasks.scenetask'
 	taskHTML = 'foodchoicestudies/scenetask_demo_instructions.html'
@@ -132,7 +132,7 @@ def scenetask_demo_instructions(expId):
 """
 Scene Task Instructions
 """
-@instructions.route("/scenetask_instructions/<expId>", methods = ["GET","POST"])
+@instructions.route("/scenetask_instructions", methods = ["GET","POST"])
 def scenetask_instructions(expId):
 	taskEndpoint = 'tasks.scenetask'
 	taskHTML = 'foodchoicestudies/scenetask_instructions.html'
@@ -142,7 +142,7 @@ def scenetask_instructions(expId):
 """
 Choice Task Demo Instructions
 """
-@instructions.route("/choicetask_demo_instructions/<expId>", methods = ["GET","POST"])
+@instructions.route("/choicetask_demo_instructions", methods = ["GET","POST"])
 def choicetask_demo_instructions(expId):
 	taskEndpoint = 'tasks.choicetask'
 	taskHTML = 'foodchoicestudies/choicetask_demo_instructions.html'
@@ -152,7 +152,7 @@ def choicetask_demo_instructions(expId):
 """
 Scene Choice Task Demo Instructions
 """
-@instructions.route("/scenechoicetask_demo_instructions/<expId>", methods = ["GET","POST"])
+@instructions.route("/scenechoicetask_demo_instructions", methods = ["GET","POST"])
 def scenechoicetask_demo_instructions(expId):
 	taskEndpoint = 'tasks.scenechoicetask'
 	taskHTML = 'foodchoicestudies/scenechoicetask_demo_instructions.html'
@@ -162,7 +162,7 @@ def scenechoicetask_demo_instructions(expId):
 """
 Familiarity Task Instructions
 """
-@instructions.route("/familiaritytask_instructions/<expId>", methods = ["GET","POST"])
+@instructions.route("/familiaritytask_instructions", methods = ["GET","POST"])
 def familiaritytask_instructions(expId):
 	taskEndpoint = 'tasks.familiaritytask'
 	taskHTML = 'foodchoicestudies/familiaritytask_instructions.html'
