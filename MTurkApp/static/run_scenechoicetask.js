@@ -37,7 +37,7 @@ var svg = document.getElementById("mySVG");
 svg.setAttribute("width", (window.innerWidth).toString());
 svg.setAttribute("height", (window.innerHeight).toString());
 
-var confirmationTime = 500; // in ms
+var confirmationTime = 50; // in ms
 var confirmTimer;
 var inConfirmation = false;
 
@@ -46,8 +46,8 @@ var t1_UNIX;
 var t2_UNIX;
 var trialTimer;
 var sceneDisplayTimer;
-var maxTrialDuration = 3000; // in ms
-var sceneDisplayDuration = 1500;
+var maxTrialDuration = 30; // in ms
+var sceneDisplayDuration = 15;
 
 var widthPercent = .45;
 var rescaleHeight = false;

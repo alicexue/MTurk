@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 
 _thisDir = os.path.dirname(os.path.abspath(__file__)).decode(sys.getfilesystemencoding())
+_thisDir = os.path.abspath(os.path.join(_thisDir, os.pardir))
 
 """
 Given name of current task and list of tasks, return the task that should be next

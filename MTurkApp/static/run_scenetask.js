@@ -34,7 +34,7 @@ var svg = document.getElementById("mySVG");
 svg.setAttribute("width", (window.innerWidth).toString());
 svg.setAttribute("height", (window.innerHeight).toString());
 
-var confirmationTime = 500; // in ms
+var confirmationTime = 50; // in ms
 var confirmTimer;
 var inConfirmation = false;
 var timer; // for between answering and maxTrialDuration
@@ -43,7 +43,7 @@ var t1, t2;
 var t1_UNIX;
 var t2_UNIX;
 var trialTimer;
-var maxTrialDuration = 3000; // in ms
+var maxTrialDuration = 30; // in ms
 
 var widthPercent = .45;
 var rescaleHeight = false;

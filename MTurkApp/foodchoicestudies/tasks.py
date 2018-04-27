@@ -6,26 +6,17 @@ import random
 import csv
 import os
 import sys
+import pandas as pd
 from utils import * 
 from store_data import *
 from manage_subject_info import *
-import pandas as pd
+from expInfo import *
 
 tasks = Blueprint('tasks',  __name__)
 
 _thisDir = os.path.dirname(os.path.abspath(__file__)).decode(sys.getfilesystemencoding())
-_thisDir = os.path.abspath(os.path.join(_thisDir, os.pardir))
-
-repeatAuction = {'MDMMT':False, 'MDMRTS':True}
-foodStimFolder = {'MDMMT':'/static/foodstim60/', 'MDMRTS':'/static/foodstim80/'}
-MDMMT_taskOrder = ['auction_demo_instructions', 'auction', 'choicetask_demo_instructions', 'choicetask', 'feedback'] # order of tasks in experiment
-MDMRTS_taskOrder = ['auction_demo_instructions', 'auction', 'scenetask_demo_instructions', 'scenetask', 'scenechoicetask_demo_instructions', 'scenechoicetask', 'take_break', 'scenechoicetask', 'familiaritytask_instructions', 'familiaritytask', 'feedback'] # order of tasks in experiment
-# feedback here doesn't get applied
-expTaskOrders = {'MDMMT':MDMMT_taskOrder, 'MDMRTS':MDMRTS_taskOrder} # dictionary of experiments - key is exp name, value is order of tasks
-
-MDMMT_tasksToComplete = {'completedAuction':False, 'completedChoiceTask':False} # for manage_subject_data
-MDMRTS_tasksToComplete = {'completedAuction1':False, 'completedAuction2':False, 'completeSceneTask':False, 'completedSceneChoiceTask':False, 'completedFamiliarityTask':False} # for manage_subject_data
-expTasksToComplete = {'MDMMT':MDMMT_tasksToComplete, 'MDMRTS':MDMRTS_tasksToComplete} 
+_parentDir = os.path.abspath(os.path.join(_thisDir, os.pardir))
+dataDir = _parentDir + '/data/'
 
 """
 Consent Form (home page)
@@ -187,7 +178,7 @@ def auction(expId):
 				expResults = json.loads(request.form['experimentResults'])
 				nextTask = get_next_task(name, expTaskOrders[expId])
 
-				filePath = _thisDir + '/data/' + expId + '/' + subjectId + '/'
+				filePath = dataDir + expId + '/' + subjectId + '/'
 				if completedAuction == False and repeatAuction[expId] == True:
 					auctionFileName = 'AuctionData1.csv'
 					nextTask = 'instructions.auction_repeat_instructions'
@@ -260,7 +251,7 @@ def choicetask(expId):
 						auctionFileName = '_AuctionData2.csv'
 					else:
 						auctionFileName = '_AuctionData.csv'
-					stimBidDict = get_bid_responses(_thisDir + '/data/' + expId + '/' + subjectId + '/' + subjectId + auctionFileName)
+					stimBidDict = get_bid_responses(dataDir + expId + '/' + subjectId + '/' + subjectId + auctionFileName)
 					[stim1Names, stim1Bids, stim2Names, stim2Bids] = get_two_stimuli_lists(stimBidDict, foodStimFolder[expId], '', '.bmp')
 					expVariables = [] # array of dictionaries
 
@@ -276,7 +267,7 @@ def choicetask(expId):
 					return redirect(url_for('unauthorized_error'))
 			else:
 				expResults = json.loads(request.form['experimentResults'])
-				filePath = _thisDir + '/data/' + expId + '/' + subjectId + '/'
+				filePath = dataDir + expId + '/' + subjectId + '/'
 				results_to_csv(expId, subjectId, filePath, 'ChoiceTaskData.csv', expResults, {})
 
 				set_completed_task(expId, workerId, 'completedChoiceTask', True)
@@ -476,7 +467,7 @@ def scenetask(expId):
 				expResults = json.loads(request.form['experimentResults'])
 				nextTask = get_next_task(name, expTaskOrders[expId])
 
-				filePath = _thisDir + '/data/' + expId + '/' + subjectId + '/'
+				filePath = dataDir + expId + '/' + subjectId + '/'
 				results_to_csv(expId, subjectId, filePath, 'SceneTask.csv', expResults, {})
 
 				set_completed_task(expId, workerId, 'completedSceneTask', True)
@@ -557,11 +548,11 @@ def scenechoicetask(expId):
 
 				if completed_task(expId, workerId, 'completedAuction2'):
 
-					if not os.path.exists(_thisDir + '/data/' + expId + '/' + subjectId + '/' + subjectId + '_TrialList_SceneChoiceTask.csv'):
+					if not os.path.exists(dataDir + expId + '/' + subjectId + '/' + subjectId + '_TrialList_SceneChoiceTask.csv'):
 						## subject hasn't done any portion of the Choice Scene Task yet
 
 						auctionFileName = '_AuctionData2.csv'
-						stimBidDict = get_bid_responses(_thisDir + '/data/' + expId + '/' + subjectId + '/' + subjectId + auctionFileName)
+						stimBidDict = get_bid_responses(dataDir + expId + '/' + subjectId + '/' + subjectId + auctionFileName)
 						#[stim1Names, stim1Bids, stim2Names, stim2Bids] = get_two_stimuli_lists(stimBidDict, foodStimFolder[expId], '', '.bmp')
 						indoor_stimuli = []
 						outdoor_stimuli = []
@@ -570,17 +561,17 @@ def scenechoicetask(expId):
 						for folder in outdoor_folders:
 							outdoor_stimuli += get_stimuli('/static/scenes_konk/outdoor/' + folder + '/', 'outdoor/' + folder + '/', '.jpg')
 
-						familiarStim = get_familiar_stimuli(_thisDir + '/data/' + expId + '/' + subjectId + '/' + subjectId + '_SceneTask.csv', 'sceneStimulusPath')
+						familiarStim = get_familiar_stimuli(dataDir + expId + '/' + subjectId + '/' + subjectId + '_SceneTask.csv', 'sceneStimulusPath')
 						familiar_indoor_stimuli = familiarStim['indoor']
 						familiar_outdoor_stimuli = familiarStim['outdoor']
 
 						shuffledDf = get_scene_food_stimuli(stimBidDict, familiar_indoor_stimuli, familiar_outdoor_stimuli, indoor_stimuli, outdoor_stimuli, foodStimFolder[expId], '', '.bmp')
 						
-						shuffledDf.to_csv(_thisDir + '/data/' + expId + '/' + subjectId + '/' + subjectId + '_TrialList_SceneChoiceTask.csv', index=False)
+						shuffledDf.to_csv(dataDir + expId + '/' + subjectId + '/' + subjectId + '_TrialList_SceneChoiceTask.csv', index=False)
 						shuffledDf = shuffledDf[0:len(shuffledDf)/2]
 
 					else:
-						shuffledDf = pd.read_csv(_thisDir + '/data/' + expId + '/' + subjectId + '/' + subjectId + '_TrialList_SceneChoiceTask.csv')
+						shuffledDf = pd.read_csv(dataDir + expId + '/' + subjectId + '/' + subjectId + '_TrialList_SceneChoiceTask.csv')
 						shuffledDf = shuffledDf[len(shuffledDf)/2:]
 
 					stim1Names = shuffledDf['stimulus1'].values
@@ -607,8 +598,8 @@ def scenechoicetask(expId):
 					return redirect(url_for('unauthorized_error'))
 			else:
 				expResults = json.loads(request.form['experimentResults'])
-				filePath = _thisDir + '/data/' + expId + '/' + subjectId + '/'
-				if not os.path.exists(_thisDir + '/data/' + expId + '/' + subjectId + '/' + subjectId + '_SceneChoiceTaskData.csv'):
+				filePath = dataDir + expId + '/' + subjectId + '/'
+				if not os.path.exists(dataDir + expId + '/' + subjectId + '/' + subjectId + '_SceneChoiceTaskData.csv'):
 					results_to_csv(expId, subjectId, filePath, 'SceneChoiceTaskData.csv', expResults, {})
 					nextTask = get_next_task(name, expTaskOrders[expId])
 				else:
@@ -660,7 +651,7 @@ def familiaritytask(expId):
 				expResults = json.loads(request.form['experimentResults'])
 				nextTask = get_next_task(name, expTaskOrders[expId])
 
-				filePath = _thisDir + '/data/' + expId + '/' + subjectId + '/'
+				filePath = dataDir + expId + '/' + subjectId + '/'
 				fileName = 'FamiliarityData.csv'
 				set_completed_task(expId, workerId,'completedFamiliarityTask', True)
 				results_to_csv(expId, subjectId, filePath, fileName, expResults, {})
