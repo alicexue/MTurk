@@ -1,4 +1,4 @@
-console.log("loaded run_auction.js ");
+console.log("loaded run_ratingtask.js ");
 var expVariables; 
 
 var recordAllKeyPresses = true;
@@ -104,7 +104,7 @@ var drawTrialDisplay = function(trialVariables) {
 	var scaledHeight = scaledImgDimensions[1];
 
 	if (instructions == null) {
-		instructions = new textBox(instructions, "Rate how much you want to eat this food from 0 (least) to 10 (most).", 20, BLACK);
+		instructions = new textBox(instructions, oneLineInstructionsText, 20, BLACK);
 	} else {
 		instructions.removeText();
 	}

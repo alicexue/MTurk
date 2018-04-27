@@ -19,12 +19,12 @@ os.chdir(_thisDir)
 repeatAuction = {'MDMMT':False, 'MDMRTS':True}
 foodStimFolder = {'MDMMT':'/static/foodstim60/', 'MDMRTS':'/static/foodstim80/'}
 MDMMT_taskOrder = ['auction_demo_instructions', 'auction', 'choicetask_demo_instructions', 'choicetask', 'feedback'] # order of tasks in experiment
-MDMRTS_taskOrder = ['auction_demo_instructions', 'auction', 'scenetask_demo_instructions', 'scenetask', 'scenechoicetask_demo_instructions', 'scenechoicetask', 'take_break', 'scenechoicetask', 'feedback'] # order of tasks in experiment
+MDMRTS_taskOrder = ['auction_demo_instructions', 'auction', 'scenetask_demo_instructions', 'scenetask', 'scenechoicetask_demo_instructions', 'scenechoicetask', 'take_break', 'scenechoicetask', 'familiaritytask_instructions', 'familiaritytask', 'feedback'] # order of tasks in experiment
 # feedback here doesn't get applied
 expTaskOrders = {'MDMMT':MDMMT_taskOrder, 'MDMRTS':MDMRTS_taskOrder} # dictionary of experiments - key is exp name, value is order of tasks
 
 MDMMT_tasksToComplete = {'completedAuction':False, 'completedChoiceTask':False} # for manage_subject_data
-MDMRTS_tasksToComplete = {'completedAuction1':False, 'completedAuction2':False, 'completeSceneTask':False, 'completedSceneChoiceTask':False} # for manage_subject_data
+MDMRTS_tasksToComplete = {'completedAuction1':False, 'completedAuction2':False, 'completeSceneTask':False, 'completedSceneChoiceTask':False, 'completedFamiliarityTask':False} # for manage_subject_data
 expTasksToComplete = {'MDMMT':MDMMT_tasksToComplete, 'MDMRTS':MDMRTS_tasksToComplete} 
 
 """
@@ -131,6 +131,7 @@ POST: Saves auction data and stimuli to csv files, redirects to choice task
 @app.route("/auction/<expId>", methods = ["GET","POST"])
 def auction(expId):
 	name = 'auction'
+	oneLineInstructions = "Rate how much you want to eat this food from 0 (least) to 10 (most)."
 	containsAllMTurkArgs = contains_necessary_args(request.args)
 
 	if 'demo' in request.args and containsAllMTurkArgs:
@@ -143,7 +144,7 @@ def auction(expId):
 			for i in range(0,len(stimuli)):
 				expVariables.append({"stimulus1":stimuli[i], "fullStimName":stimuli[i]+".bmp"})
 
-			return render_template('auction.html', expVariables=expVariables, stimFolder=foodStimFolder[expId]+'demo/')
+			return render_template('auction.html', expVariables=expVariables, stimFolder=foodStimFolder[expId]+'demo/', instructions=oneLineInstructions)
 		else:
 
 			workerId = request.args.get('workerId')
@@ -172,7 +173,7 @@ def auction(expId):
 				for i in range(0,len(stimuli)):
 					expVariables.append({"stimulus":stimuli[i], "fullStimName":stimuli[i]+".bmp"})
 
-				return render_template('auction.html', expVariables=expVariables, stimFolder=foodStimFolder[expId])
+				return render_template('auction.html', expVariables=expVariables, stimFolder=foodStimFolder[expId], instructions=oneLineInstructions)
 			else:
 				subjectId = get_subjectId(expId, workerId)
 				expResults = json.loads(request.form['experimentResults'])
@@ -348,6 +349,7 @@ def take_break(expId):
 	else:
 		return redirect(url_for('unauthorized_error'))
 
+"""
 @app.route("/dummy_MDMMT", methods = ["GET","POST"])
 def dummy_MDMMT():
 	expId = "MDMMT"
@@ -379,6 +381,8 @@ def dummy_MDMMT():
 @app.route("/return_dummy_MDMMT", methods = ["GET"])
 def return_dummy_MDMMT():
 	return render_template('return_dummy_hit.html')
+"""
+
 
 """ 
 Scene Task
@@ -637,11 +641,59 @@ def scenechoicetask(expId):
 				else:
 					append_results_to_csv(expId, subjectId, filePath, 'SceneChoiceTaskData.csv', expResults, {})
 					set_completed_task(expId, workerId, 'completedSceneChoiceTask', True)
-					nextTask = 'feedback'
+					nextTask = 'familiaritytask_instructions'
 				
 				return redirect(url_for(nextTask, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 
 		elif workerId_exists(expId, workerId) and completedChoiceTask == True:
+			return redirect(url_for('repeat_error', task=name, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+		else:
+			return redirect(url_for('unauthorized_error'))
+	else:
+		return redirect(url_for('unauthorized_error'))
+
+
+""" 
+Familiarity Task
+"""
+@app.route("/familiaritytask/<expId>", methods = ["GET","POST"])
+def familiaritytask(expId):
+	name = 'familiaritytask'
+	oneLineInstructions = "How familiar are you with this food? Rate it from 0 (never eaten before) to 10 (eat a few times a week)."
+	containsAllMTurkArgs = contains_necessary_args(request.args)
+
+	if containsAllMTurkArgs:
+		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
+
+		completedFamiliarityTask = completed_task(expId, workerId,'completedFamiliarityTask') 
+
+		if workerId_exists(expId, workerId) and completedFamiliarityTask == False:
+			if request.method == "GET":
+				### set experiment conditions here and pass to experiment.html 
+				# trialVariables should be an array of dictionaries 
+				# each element of the array represents the condition for one trial
+				# set the variable conditions to the array of conditions
+				stimuli = get_stimuli(foodStimFolder[expId],'','.bmp')
+				random.shuffle(stimuli)
+
+				expVariables = [] # array of dictionaries
+
+				for i in range(0,len(stimuli)):
+					expVariables.append({"stimulus":stimuli[i], "fullStimName":stimuli[i]+".bmp"})
+
+				return render_template('familiaritytask.html', expVariables=expVariables, stimFolder=foodStimFolder[expId], instructions=oneLineInstructions)
+			else:
+				subjectId = get_subjectId(expId, workerId)
+				expResults = json.loads(request.form['experimentResults'])
+				nextTask = get_next_task(name, expTaskOrders[expId])
+
+				filePath = _thisDir + '/data/' + expId + '/' + subjectId + '/'
+				fileName = 'FamiliarityData.csv'
+				set_completed_task(expId, workerId,'completedFamiliarityTask', True)
+				results_to_csv(expId, subjectId, filePath, fileName, expResults, {})
+
+				return redirect(url_for(nextTask, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+		elif workerId_exists(expId, workerId) and completedFamiliarityTask == True:
 			return redirect(url_for('repeat_error', task=name, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 		else:
 			return redirect(url_for('unauthorized_error'))

@@ -53,6 +53,7 @@ Auction Demo Instructions
 def auction_demo_instructions(expId):
 	name = 'auction'
 	assignmentId = None
+
 	if 'assignmentId' in request.args:
 		assignmentId = request.args.get('assignmentId')
 
@@ -87,7 +88,7 @@ def auction_repeat_instructions(expId):
 			if request.method == "GET":
 				stimuli = get_stimuli(foodStimFolder[expId],'','.bmp')
 				nStim = len(stimuli)
-				return render_template('auction_repeat_instructions.html', nStim = nStim)
+				return render_template('auction_repeat_instructions.html', nStim=nStim)
 			else:
 				return redirect(url_for('auction', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 		else:
@@ -104,31 +105,6 @@ def choicetask_instructions(expId):
 	taskHTML = 'choicetask_instructions.html'
 	demo = False 
 	return route_for_instructions(expId, taskHTML, name, demo, request)
-"""
-	assignmentId = None
-	if 'assignmentId' in request.args:
-		assignmentId = request.args.get('assignmentId')
-
-	if contains_necessary_args(request.args) or assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE':
-		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
-
-		if workerId_exists(expId, workerId) or assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE':
-			if request.method == "GET":
-				return render_template('choicetask_instructions.html', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live)
-			else:
-				if request.form['submit'] == 'Continue':
-					if assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE':
-						return redirect(url_for('accept_hit'))
-					else:
-						return redirect(url_for('choicetask', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
-				else:
-					return redirect(url_for('choicetask', demo='TRUE', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
-		else:
-			return redirect(url_for('unauthorized_error'))
-	else:
-		return redirect(url_for('unauthorized_error'))
-"""
-
 
 """
 Scene Choice Task Instructions
@@ -139,30 +115,6 @@ def scenechoicetask_instructions(expId):
 	taskHTML = 'scenechoicetask_instructions.html'
 	demo = False 
 	return route_for_instructions(expId, taskHTML, name, demo, request)
-"""
-	assignmentId = None
-	if 'assignmentId' in request.args:
-		assignmentId = request.args.get('assignmentId')
-
-	if contains_necessary_args(request.args) or assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE':
-		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
-
-		if workerId_exists(expId, workerId) or assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE':
-			if request.method == "GET":
-				return render_template('scenechoicetask_instructions.html', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live)
-			else:
-				if request.form['submit'] == 'Continue':
-					if assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE':
-						return redirect(url_for('accept_hit'))
-					else:
-						return redirect(url_for('scenechoicetask', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
-				else:
-					return redirect(url_for('scenechoicetask', demo='TRUE', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
-		else:
-			return redirect(url_for('unauthorized_error'))
-	else:
-		return redirect(url_for('unauthorized_error'))
-"""
 
 """
 Scene Task Demo Instructions
@@ -173,25 +125,6 @@ def scenetask_demo_instructions(expId):
 	taskHTML = 'scenetask_demo_instructions.html'
 	demo = True 
 	return route_for_instructions(expId, taskHTML, name, demo, request)
-"""
-	assignmentId = None
-	if 'assignmentId' in request.args:
-		assignmentId = request.args.get('assignmentId')
-
-	if contains_necessary_args(request.args) or assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE':
-
-		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
-
-		if workerId_exists(expId, workerId) or assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE':
-			if request.method == "GET":
-				return render_template('scenetask_demo_instructions.html', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live)
-			else:
-				return redirect(url_for('scenetask', demo='TRUE', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
-		else:
-			return redirect(url_for('unauthorized_error'))
-	else:
-		return redirect(url_for('unauthorized_error'))
-"""
 
 """
 Scene Task Instructions
@@ -202,30 +135,6 @@ def scenetask_instructions(expId):
 	taskHTML = 'scenetask_instructions.html'
 	demo = False 
 	return route_for_instructions(expId, taskHTML, name, demo, request)
-"""
-	assignmentId = None
-	if 'assignmentId' in request.args:
-		assignmentId = request.args.get('assignmentId')
-
-	if contains_necessary_args(request.args) or assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE':
-		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
-
-		if workerId_exists(expId, workerId) or assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE':
-			if request.method == "GET":
-				return render_template('scenetask_instructions.html', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live)
-			else:
-				if request.form['submit'] == 'Continue':
-					if assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE':
-						return redirect(url_for('accept_hit'))
-					else:
-						return redirect(url_for('scenetask', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
-				else:
-					return redirect(url_for('scenetask', demo='TRUE', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
-		else:
-			return redirect(url_for('unauthorized_error'))
-	else:
-		return redirect(url_for('unauthorized_error'))
-"""
 
 """
 Choice Task Demo Instructions
@@ -236,25 +145,6 @@ def choicetask_demo_instructions(expId):
 	taskHTML = 'choicetask_demo_instructions.html'
 	demo = True 
 	return route_for_instructions(expId, taskHTML, name, demo, request)
-"""
-	assignmentId = None
-	if 'assignmentId' in request.args:
-		assignmentId = request.args.get('assignmentId')
-
-	if contains_necessary_args(request.args) or assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE':
-
-		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
-
-		if workerId_exists(expId, workerId) or assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE':
-			if request.method == "GET":
-				return render_template('choicetask_demo_instructions.html', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live)
-			else:
-				return redirect(url_for('choicetask', demo='TRUE', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
-		else:
-			return redirect(url_for('unauthorized_error'))
-	else:
-		return redirect(url_for('unauthorized_error'))
-"""
 
 """
 Scene Choice Task Demo Instructions
@@ -265,25 +155,16 @@ def scenechoicetask_demo_instructions(expId):
 	taskHTML = 'scenechoicetask_demo_instructions.html'
 	demo = True 
 	return route_for_instructions(expId, taskHTML, name, demo, request)
+
 """
-	assignmentId = None
-	if 'assignmentId' in request.args:
-		assignmentId = request.args.get('assignmentId')
-
-	if contains_necessary_args(request.args) or assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE':
-
-		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
-
-		if workerId_exists(expId, workerId) or assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE':
-			if request.method == "GET":
-				return render_template('scenechoicetask_demo_instructions.html', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live)
-			else:
-				return redirect(url_for('scenechoicetask', demo='TRUE', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
-		else:
-			return redirect(url_for('unauthorized_error'))
-	else:
-		return redirect(url_for('unauthorized_error'))
+Familiarity Task Instructions
 """
+@app.route("/familiaritytask_instructions/<expId>", methods = ["GET","POST"])
+def familiaritytask_instructions(expId):
+	name = 'familiaritytask'
+	taskHTML = 'familiaritytask_instructions.html'
+	demo = False
+	return route_for_instructions(expId, taskHTML, name, demo, request)
 
 """
 Renders HTML for instructions page or redirects to task based on arguments in request 
@@ -321,6 +202,5 @@ def route_for_instructions(expId, taskHTML, taskEndpoint, demo, request):
 					return redirect(url_for(taskEndpoint, demo=demoValue, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 		else:
 			return redirect(url_for('unauthorized_error'))
-
 	else:
 		return redirect(url_for('unauthorized_error'))

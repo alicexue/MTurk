@@ -478,10 +478,13 @@ var ratingScale = class ratingScale {
 
 		t2 = evt.timeStamp;
 		allTrials[currTrialN].rt = t2 - t1; 
+		allTrials[currTrialN].rt_UNIX = t2_UNIX - t1_UNIX; 
 		allTrials[currTrialN].receivedResponse = true;
 		allTrials[currTrialN].rating = rating;
 		allTrials[currTrialN].trialEndTime = t2;
+		allTrials[currTrialN].trialEndTime_UNIX = t2_UNIX;
 		allTrials[currTrialN].trialDuration = t2 - t1;
+		allTrials[currTrialN].trialDuration = t2_UNIX - t1_UNIX;
 		endTrial();
 	}
 
