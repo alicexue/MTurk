@@ -173,10 +173,18 @@ def check_eligibility(expId):
 		workerId = request.form['workerId']
 		assignmentId = request.args.get('assignmentId')
 		hitId = request.args.get('hitId')
-		if workerId_exists(expId, workerId) and completed_task(expId, workerId, 'completedAuction') and completed_choice_task(expId, workerId, 'completedChoiceTask'):
-			return render_template('return_hit.html')
+		if expId == "MDMMT":
+			if workerId_exists(expId, workerId) and completed_task(expId, workerId, 'completedAuction') and completed_task(expId, workerId, 'completedChoiceTask'):
+				return render_template('return_hit.html')
+			else:
+				return redirect(url_for(expId, preview='True', assignmentId=assignmentId, hitId=hitId))
+		elif expId == "MDMRTS":
+			if workerId_exists(expId, workerId) and completed_task(expId, workerId, 'completedAuction1') and completed_task(expId, workerId, 'completedFamiliarityTask'):
+				return render_template('return_hit.html')
+			else:
+				return redirect(url_for("homepages."+expId, preview='True', assignmentId=assignmentId, hitId=hitId))
 		else:
-			return redirect(url_for(expId, preview='True', assignmentId=assignmentId, hitId=hitId))
+			return redirect(url_for('unauthorized_error'))
 	else:
 		return redirect(url_for('unauthorized_error'))
 

@@ -16,24 +16,24 @@ homepages = Blueprint('homepages',  __name__)
 """
 Consent Form (home page)
 """
-@homepages.route("/MDMRTS", methods = ["GET","POST"])
-@homepages.route("/MDMMT", methods = ["GET","POST"])
-@homepages.route("/MDMRTS/consentform", methods = ["GET","POST"])
-@homepages.route("/MDMMT/consentform", methods = ["GET","POST"])
+@homepages.route("/MDMRTS", methods = ["GET","POST"], endpoint="MDMRTS")
+@homepages.route("/MDMMT", methods = ["GET","POST"], endpoint="MDMMT")
+@homepages.route("/MDMRTS/consentform", methods = ["GET","POST"], endpoint="MDMRTS")
+@homepages.route("/MDMMT/consentform", methods = ["GET","POST"], endpoint="MDMMT")
 def foodchoicestudies():
 	if "MDMMT" in request.path:
 		expId = "MDMMT"
 	elif "MDMRTS" in request.path:
 		expId = "MDMRTS"
 	else:
-		return render_template('404.html'), 404
+		return 404
 	if request.method == "GET":
 		if 'preview' in request.args and request.args.get('preview') == 'True':
 			return render_template('foodchoicestudies/consent_form.html')
 		elif 'assignmentId' in request.args and 'hitId' in request.args and request.args.get('assignmentId') == 'ASSIGNMENT_ID_NOT_AVAILABLE':
 			assignmentId = request.args.get('assignmentId')
 			hitId = request.args.get('hitId')
-			return redirect(url_for('check_eligibility', expId=expId, assignmentId=assignmentId, hitId=hitId))
+			return redirect(url_for('tasks.check_eligibility', expId=expId, assignmentId=assignmentId, hitId=hitId))
 		else:
 			return render_template('foodchoicestudies/consent_form.html')
 	else:
