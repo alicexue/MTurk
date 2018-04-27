@@ -23,6 +23,8 @@ Consent Form (home page)
 """
 @tasks.route("/", methods = ["GET","POST"])
 def expHome(expId):
+	if expId not in expTaskOrders.keys():
+		return render_template('404.html'), 404
 	if request.method == "GET":
 		if 'preview' in request.args and request.args.get('preview') == 'True':
 			return render_template('foodchoicestudies/consent_form.html')
