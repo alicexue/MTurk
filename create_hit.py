@@ -56,13 +56,13 @@ environments = {
             "endpoint": "https://mturk-requester.us-east-1.amazonaws.com",
             "preview": "https://www.mturk.com/mturk/preview",
             "manage": "https://requester.mturk.com/mturk/manageHITs",
-            "reward": "3.00"
+            "reward": "6.00"
         },
         "sandbox": {
             "endpoint": "https://mturk-requester-sandbox.us-east-1.amazonaws.com",
             "preview": "https://workersandbox.mturk.com/mturk/preview",
             "manage": "https://requestersandbox.mturk.com/mturk/manageHITs",
-            "reward": "3.00"
+            "reward": "6.00"
         },
 }
 mturk_environment = environments["live"] if create_hits_in_live else environments["sandbox"]
@@ -114,9 +114,9 @@ if create_hits_in_live:
 else:
     master_quals = masters["sandbox"]
 
-worker_requirements = [
-    
-    {
+workers = {
+    "live": {
+    [{
     # Worker_Locale
     'QualificationTypeId': '00000000000000000071',
     'Comparator': 'EqualTo',
@@ -132,9 +132,25 @@ worker_requirements = [
     'IntegerValues': [100],
     'RequiredToPreview': True,
     },
-    master_quals
+    master_quals],
+    "sandbox": {
+    [{
+    # Worker_Locale
+    'QualificationTypeId': '00000000000000000071',
+    'Comparator': 'EqualTo',
+    'LocaleValues': [{
+        'Country':"US",
+        }],
+    'RequiredToPreview': True,
+    }, 
+    master_quals],
+    }
+}
 
-]
+if create_hits_in_live:
+    worker_requirements = workers["live"]
+else:
+    worker_requirements = workers["sandbox"]
 
 # Create the HIT
 response = client.create_hit(
@@ -144,7 +160,7 @@ response = client.create_hit(
     Reward=mturk_environment['reward'],
     Title='What snack do you prefer?',
     Keywords='research,psych,psychology,food,preferences',
-    Description='You will rate how much you like snack foods and which one you prefer. We have allocated an hour for you to complete this study, but it should take you about 30 minutes. This HIT cannot be completed on a mobile device. You need a mouse and a keyboard.',
+    Description='You will rate how much you like snack foods and which one you prefer. We have allocated 1hr and 30 minutes for you to complete this study, but it should take you up to 1hr. This HIT cannot be completed on a mobile device. You need a mouse and a keyboard.',
     Question=question_sample,
     QualificationRequirements=worker_requirements,
 )

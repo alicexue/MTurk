@@ -35,7 +35,7 @@ def foodchoicestudies():
 			hitId = request.args.get('hitId')
 			return redirect(url_for('tasks.check_eligibility', expId=expId, assignmentId=assignmentId, hitId=hitId))
 		else:
-			return render_template('foodchoicestudies/consent_form.html')
+			return render_template('foodchoicestudies/' + expId + '_consent_form.html')
 	else:
 
 		if contains_necessary_args(request.args): 

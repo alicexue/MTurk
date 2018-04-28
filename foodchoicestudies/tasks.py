@@ -357,7 +357,7 @@ Familiarity Task
 @tasks.route("/familiaritytask", methods = ["GET","POST"])
 def familiaritytask(expId):
 	name = 'familiaritytask'
-	oneLineInstructions = "How familiar are you with this food? Rate it from 0 (never eaten before) to 10 (eat a few times a week)."
+	oneLineInstructions = "How familiar are you with this food? Rate it from 0 (never eaten before) to 10 (eaten the most)."
 	containsAllMTurkArgs = contains_necessary_args(request.args)
 
 	if containsAllMTurkArgs:

@@ -191,7 +191,7 @@ def route_for_instructions(expId, taskHTML, taskEndpoint, demo, request):
 				return render_template(taskHTML, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live)
 			else:
 				if 'submit' in request.form.keys() and request.form['submit'] == 'Continue':
-					if assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE':
+					if assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE' and ((expId=="MDMMT" and "choicetask" in taskEndpoint) or (expId=="MDMRTS" and "scenechoicetask" in taskEndpoint)): # in preview
 						return redirect(url_for('accept_hit'))
 					else:
 						return redirect(url_for(taskEndpoint, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
