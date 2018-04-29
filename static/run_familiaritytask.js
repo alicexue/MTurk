@@ -119,7 +119,6 @@ var drawTrialDisplay = function(trialVariables) {
 	}
 	scale.drawRatingScale(canvas.width/2,canvas.height/2 + scaledHeight/2 + 10); // draws/redraws scale
 
-	console.log(scale.ratingBarWidth); 
 	if (leftRating == null) {
 		leftRating = new textBox(leftRating, "never eaten before", 20, BLACK);
 	} else {

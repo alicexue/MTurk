@@ -107,7 +107,8 @@ def choicetask(expId):
 			return render_template('foodchoicestudies/choicetask.html', expId=expId, expVariables=expVariables, stimFolder=foodStimFolder[expId]+'demo/')
 		else:
 			[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
-
+			if assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE':
+				return redirect(url_for('accept_hit'))
 			return redirect(url_for('instructions.choicetask_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 	elif containsAllMTurkArgs:
 		# not demo - record responses now
@@ -307,7 +308,8 @@ def scenechoicetask(expId):
 			return render_template('foodchoicestudies/scenechoicetask.html', expId=expId, expVariables=expVariables, sceneStimFolder='/static/scenes_konk/demo/',foodStimFolder=foodStimFolder[expId]+'demo/')
 		else:
 			[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
-
+			if assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE':
+				return redirect(url_for('accept_hit'))
 			return redirect(url_for('instructions.scenechoicetask_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 	elif containsAllMTurkArgs:
 		# not demo - record responses now
@@ -325,7 +327,6 @@ def scenechoicetask(expId):
 				# set the variable conditions to the array of conditions
 
 				if completed_task(expId, workerId, 'completedAuction2'):
-
 					expVariables = get_scenechoicetask_expVariables(expId, subjectId, demo=False)
 					return render_template('foodchoicestudies/scenechoicetask.html', expId=expId, expVariables=expVariables, sceneStimFolder='/static/scenes_konk/',foodStimFolder=foodStimFolder[expId])
 				else:

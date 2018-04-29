@@ -41,7 +41,7 @@ def foodchoicestudies():
 		if contains_necessary_args(request.args): 
 			# worker accepted HIT 
 			[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
-			if workerId_exists(expId, workerId) and completed_task(expId, workerId, 'completedAuction') and completed_choice_task(expId, workerId, 'completedChoiceTask'):
+			if workerId_exists(expId, workerId) and (completed_task(expId, workerId, 'completedAuction') or completed_task(expId, workerId, 'completedAuction1')):
 				return render_template('return_hit.html')
 			elif not workerId_exists(expId, workerId):
 				store_subject_info(expId, workerId, expTasksToComplete[expId], assignmentId, hitId, turkSubmitTo) 
