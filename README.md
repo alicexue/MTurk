@@ -1,4 +1,4 @@
-#Web App to Run Studies on Amazon Mechanical Turk
+## Web App to Run Studies on Amazon Mechanical Turk
 
 One study is up and running [here](http://calkins.psych.columbia.edu/MDMMT).
 
