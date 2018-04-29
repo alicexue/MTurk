@@ -89,6 +89,7 @@ tree = ET.parse("my_external_question.xml")
 root = tree.getroot()
 url = root.find('{http://mechanicalturk.amazonaws.com/AWSMechanicalTurkDataSchemas/2006-07-14/ExternalQuestion.xsd}ExternalURL')
 url.text = "https://calkins.psych.columbia.edu/" + expId + "?" + "live=" + str(create_hits_in_live)
+print url.text
 tree.write("my_external_question.xml")
 
 # The question we ask the workers is contained in this file.
@@ -114,9 +115,9 @@ if create_hits_in_live:
 else:
     master_quals = masters["sandbox"]
 
-workers = {
-    "live": {
-    [{
+worker_requirements_options = {
+    "live" :[
+    {
     # Worker_Locale
     'QualificationTypeId': '00000000000000000071',
     'Comparator': 'EqualTo',
@@ -125,6 +126,7 @@ workers = {
         }],
     'RequiredToPreview': True,
     },
+    
     {
     # Worker_NumberHITsApproved
     'QualificationTypeId': '00000000000000000040',
@@ -133,8 +135,8 @@ workers = {
     'RequiredToPreview': True,
     },
     master_quals],
-    "sandbox": {
-    [{
+    "sandbox":[
+    {
     # Worker_Locale
     'QualificationTypeId': '00000000000000000071',
     'Comparator': 'EqualTo',
@@ -142,15 +144,13 @@ workers = {
         'Country':"US",
         }],
     'RequiredToPreview': True,
-    }, 
-    master_quals],
-    }
+    }]
 }
 
 if create_hits_in_live:
-    worker_requirements = workers["live"]
+    worker_requirements = worker_requirements_options["live"]
 else:
-    worker_requirements = workers["sandbox"]
+    worker_requirements = worker_requirements_options["sandbox"]
 
 # Create the HIT
 response = client.create_hit(
