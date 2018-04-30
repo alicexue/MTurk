@@ -29,7 +29,7 @@ def foodchoicestudies():
 		return 404
 	if request.method == "GET":
 		if 'preview' in request.args and request.args.get('preview') == 'True':
-			return render_template('foodchoicestudies/consent_form.html')
+			return render_template('foodchoicestudies/' + expId + '_consent_form.html')
 		elif 'assignmentId' in request.args and 'hitId' in request.args and request.args.get('assignmentId') == 'ASSIGNMENT_ID_NOT_AVAILABLE':
 			assignmentId = request.args.get('assignmentId')
 			hitId = request.args.get('hitId')
