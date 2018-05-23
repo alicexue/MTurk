@@ -1,5 +1,6 @@
 # Copyright 2017 Amazon.com, Inc. or its affiliates
 # Modified by Alice Xue - January 2018
+# Approves all assignments that have not yet been reviewed for the HIT whose id has been passed
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,7 +35,7 @@ if(len(sys.argv) < 2):
 hit_id = sys.argv[1]
 
 # By default, we use the free-to-use Sandbox
-create_hits_in_live = False
+create_hits_in_live = True
 
 environments = {
         "live": {
@@ -66,7 +67,7 @@ print 'Hit {} status: {}'.format(hit_id, hit['HIT']['HITStatus'])
 response = client.list_assignments_for_hit(
     HITId=hit_id,
     AssignmentStatuses=['Submitted', 'Approved'],
-    MaxResults=10,
+    MaxResults=100,
 )
 
 assignments = response['Assignments']

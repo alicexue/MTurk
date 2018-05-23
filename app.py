@@ -11,14 +11,28 @@ from store_data import *
 from manage_subject_info import *
 import pandas as pd
 
+"""
+Import bluepints
+"""
 from foodchoicestudies.tasks import tasks 
 from foodchoicestudies.instructions import instructions 
 from foodchoicestudies.homepages import homepages
 
+from dummy.pages import pages
+
 _thisDir = os.path.dirname(os.path.abspath(__file__)).decode(sys.getfilesystemencoding())
-os.chdir(_thisDir)
 
 app = Flask(__name__)
+"""
+Register blueprints
+"""
+# MDMMT and MDMRTS
+app.register_blueprint(tasks)
+app.register_blueprint(instructions)
+app.register_blueprint(homepages)
+
+# dummyHIT
+app.register_blueprint(pages)
 
 @app.route("/thankyou", methods = ["GET"])
 def thankyou():
@@ -60,10 +74,6 @@ def page_not_found(e):
 @app.errorhandler(500)
 def internal_server_error(e):
     return render_template('500.html'), 500
-
-app.register_blueprint(tasks)
-app.register_blueprint(instructions)
-app.register_blueprint(homepages)
 
 if __name__ == "__main__":
 	app.debug = False

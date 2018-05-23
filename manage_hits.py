@@ -78,6 +78,8 @@ elif op_request == "list_asgmts":
 	args.append("Assignments[].{AssignmentId: AssignmentId, Status: AssignmentStatus, WorkerId: WorkerId}")
 	args.append("--output")
 	args.append("table")
+	args.append("--max-results")
+	args.append("100")
 
 if not live:
 	args.append("--endpoint-url")

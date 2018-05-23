@@ -50,19 +50,20 @@ else:
     sys.exit(-1)
 
 expId = sys.argv[3]
+expId = "dummyHIT"
 
 environments = {
         "live": {
             "endpoint": "https://mturk-requester.us-east-1.amazonaws.com",
             "preview": "https://www.mturk.com/mturk/preview",
             "manage": "https://requester.mturk.com/mturk/manageHITs",
-            "reward": "3.00"
+            "reward": "5.00"
         },
         "sandbox": {
             "endpoint": "https://mturk-requester-sandbox.us-east-1.amazonaws.com",
             "preview": "https://workersandbox.mturk.com/mturk/preview",
             "manage": "https://requestersandbox.mturk.com/mturk/manageHITs",
-            "reward": "3.00"
+            "reward": "5.00"
         },
 }
 mturk_environment = environments["live"] if create_hits_in_live else environments["sandbox"]
@@ -87,7 +88,6 @@ print "Your account balance is {}".format(user_balance['AvailableBalance'])
 # Write expId and live value to xml file first
 tree = ET.parse("my_external_question.xml")
 root = tree.getroot()
-expId = "dummy_MDMMT"
 url = root.find('{http://mechanicalturk.amazonaws.com/AWSMechanicalTurkDataSchemas/2006-07-14/ExternalQuestion.xsd}ExternalURL')
 url.text = "https://calkins.psych.columbia.edu/" + expId + "?" + "live=" + str(create_hits_in_live)
 tree.write("my_external_question.xml")
@@ -115,8 +115,8 @@ if create_hits_in_live:
 else:
     master_quals = masters["sandbox"]
 
-worker_requirements = [
-    
+worker_requirements_options = {
+    "live" :[
     {
     # Worker_Locale
     'QualificationTypeId': '00000000000000000071',
@@ -126,6 +126,7 @@ worker_requirements = [
         }],
     'RequiredToPreview': True,
     },
+    
     {
     # Worker_NumberHITsApproved
     'QualificationTypeId': '00000000000000000040',
@@ -133,18 +134,33 @@ worker_requirements = [
     'IntegerValues': [100],
     'RequiredToPreview': True,
     },
-    master_quals
-]
+    master_quals],
+    "sandbox":[
+    {
+    # Worker_Locale
+    'QualificationTypeId': '00000000000000000071',
+    'Comparator': 'EqualTo',
+    'LocaleValues': [{
+        'Country':"US",
+        }],
+    'RequiredToPreview': True,
+    }]
+}
+
+if create_hits_in_live:
+    worker_requirements = worker_requirements_options["live"]
+else:
+    worker_requirements = worker_requirements_options["sandbox"]
 
 # Create the HIT
 response = client.create_hit(
-    MaxAssignments=100,
-    LifetimeInSeconds=604800,
+    MaxAssignments=10,
+    LifetimeInSeconds=172800,
     AssignmentDurationInSeconds=300,
     Reward=mturk_environment['reward'],
-    Title='Dummy Compensation HIT for "What snack do you prefer?"',
+    Title='Compensation HIT',
     Keywords='research,psych,psychology,food,preferences',
-    Description='This is a dummy HIT to compensate for a previous HIT. Only people who satisfactorily completed that HIT will have this HIT approved. All other assignments will be rejected.',
+    Description='This is a compensation HIT for HIT Type 3AX4X2ATFHB73ZKCBC0FWD1ZJJYDYI. You should have received a direct link to this HIT if you are qualified to accept it. All other assignments will be rejected.',
     Question=question_sample,
     QualificationRequirements=worker_requirements,
 )

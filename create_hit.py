@@ -19,7 +19,6 @@ from xml.etree import ElementTree as ET
 import datetime
 import pandas as pd
 import os
-import sys
 
 ##### Example command line input: python create_hit.py None sandbox MDMMT
 
@@ -56,13 +55,13 @@ environments = {
             "endpoint": "https://mturk-requester.us-east-1.amazonaws.com",
             "preview": "https://www.mturk.com/mturk/preview",
             "manage": "https://requester.mturk.com/mturk/manageHITs",
-            "reward": "6.00"
+            "reward": "5.00"
         },
         "sandbox": {
             "endpoint": "https://mturk-requester-sandbox.us-east-1.amazonaws.com",
             "preview": "https://workersandbox.mturk.com/mturk/preview",
             "manage": "https://requestersandbox.mturk.com/mturk/manageHITs",
-            "reward": "6.00"
+            "reward": "5.00"
         },
 }
 mturk_environment = environments["live"] if create_hits_in_live else environments["sandbox"]
@@ -154,13 +153,13 @@ else:
 
 # Create the HIT
 response = client.create_hit(
-    MaxAssignments=100,
+    MaxAssignments=90,
     LifetimeInSeconds=604800,
-    AssignmentDurationInSeconds=3600,
+    AssignmentDurationInSeconds=4500,
     Reward=mturk_environment['reward'],
     Title='What snack do you prefer?',
     Keywords='research,psych,psychology,food,preferences',
-    Description='You will rate how much you like snack foods and which one you prefer. We have allocated 1hr and 30 minutes for you to complete this study, but it should take you up to 1hr. This HIT cannot be completed on a mobile device. You need a mouse and a keyboard.',
+    Description='You will rate how much you like snack foods and which one you prefer. We have allocated 75 minutes for you to complete this study, but it should take you up to 45 minutes. This HIT cannot be completed on a mobile device. You need a mouse and a keyboard.',
     Question=question_sample,
     QualificationRequirements=worker_requirements,
 )

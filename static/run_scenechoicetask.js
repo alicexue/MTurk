@@ -166,6 +166,7 @@ var drawChoiceDisplay = function(trialVariables) {
 	allTrials[currTrialN]['stimulus2Bid'] = stim2Bid;
 	allTrials[currTrialN]['sceneStimulus'] = trialVariables['sceneStimulus'];
 	allTrials[currTrialN]['sceneStimulusStatus'] = trialVariables['sceneStimulusStatus'];
+	allTrials[currTrialN]['sceneStimulusName'] = trialVariables['fullSceneStimName'];
 	allTrials[currTrialN]['delta'] = delta;
 
 	if (confirmationBox == null) {

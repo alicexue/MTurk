@@ -15,7 +15,7 @@ if sys.argv[1] != "live" and sys.argv[1] != "sandbox":
 live = sys.argv[1] == "live"
 assignmentId = sys.argv[2]
 
-feedback = """As we stated on the consent form, "Payment will be given upon verification that the survey was completed and response accuracy verified". In this study we asked you to rate food items and then choose between the food items you rated. Response accuracy is determined by the consistency of your choices in the 2nd task with your ratings of foods in the 1st task. To complete the HIT satisfactorily, you must have responded to at least 150 trials in the choice task and have been consistent at least 55% of the time. Your responses did not meet at least one criteria, so your HIT has been rejected."""
+feedback = """As we stated on the consent form, 'Compensation is contingent upon response completion. You are required to complete at least 90% of the task or the HIT will be rejected and you will not receive compensation. To be specific, we will check if responses were made during the task and ensure that a response was made on at least 90% of trials.' According to our records, you did not make any responses in 2 of the tasks in this study, so we have rejected your assignment. Please email us if you believe this is a mistake."""
 args = ["aws", "mturk", "reject-assignment", "--assignment-id", assignmentId, "--requester-feedback", feedback]
 
 if not live:
