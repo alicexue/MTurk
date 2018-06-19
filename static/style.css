@@ -34,8 +34,13 @@ p {
 	line-height: 22px;
 }
 
-form{
+form {
 	font-family: "Arial";
+}
+
+ul {
+	font-family: "Arial";
+	padding-left: 60px;
 }
 
 body {

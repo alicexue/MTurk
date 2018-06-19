@@ -478,13 +478,10 @@ var ratingScale = class ratingScale {
 
 		t2 = evt.timeStamp;
 		allTrials[currTrialN].rt = t2 - t1; 
-		allTrials[currTrialN].rt_UNIX = t2_UNIX - t1_UNIX; 
 		allTrials[currTrialN].receivedResponse = true;
 		allTrials[currTrialN].rating = rating;
 		allTrials[currTrialN].trialEndTime = t2;
-		allTrials[currTrialN].trialEndTime_UNIX = t2_UNIX;
 		allTrials[currTrialN].trialDuration = t2 - t1;
-		allTrials[currTrialN].trialDuration = t2_UNIX - t1_UNIX;
 		endTrial();
 	}
 
@@ -539,7 +536,7 @@ var textBox = class textBox {
 		this.color = color;
 	}
 
-	showText(x, y) {
+	showText(x, y, fontSize=this.fontSize) {
 		var textObj = this.textObj;
 		if (!svg.contains(blankScreenCover)) {
 			if (!svg.contains(textObj)) {		
@@ -547,7 +544,7 @@ var textBox = class textBox {
 				textObj.setAttribute("x",x.toString());
 				textObj.setAttribute("y",y.toString());
 				textObj.setAttribute("font-family","Arial");
-				textObj.setAttribute("font-size",this.fontSize);
+				textObj.setAttribute("font-size",fontSize);
 				textObj.setAttribute("fill",this.color);
 				textObj.textContent = this.text;
 				svg.appendChild(textObj);
@@ -580,6 +577,14 @@ var textBox = class textBox {
 			svg.removeChild(textObj);
 		}
 		this.textObj = textObj;
+	}
+
+	setText(newText) {
+		var textObj = this.textObj;
+		if (svg.contains(textObj)) {
+			textObj.textContent=newText;
+		}
+		this.text = newText;
 	}
 
 	setColor(color) {
@@ -664,5 +669,46 @@ var box = class box {
 			boxObj.setAttribute("fill",color);
 		}
 		this.boxObj = boxObj;
+	}
+}
+
+/*
+ *** SVG RECTANGLE ***
+ */
+var rect = class rect {
+	constructor(rectObj) {
+		this.rectObj = rectObj;
+	}
+
+	showRect(x, y, color, width, length) {
+		var rectObj = this.rectObj;
+		if (!svg.contains(blankScreenCover)) {
+			if (!svg.contains(rectObj)) {		
+				rectObj = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+				rectObj.setAttribute("x",(x - width/2).toString());
+				rectObj.setAttribute("y",(y).toString());
+				rectObj.setAttribute("width",width.toString());
+				rectObj.setAttribute("height",length.toString());
+				rectObj.setAttribute("fill",color);
+				svg.appendChild(rectObj);
+				this.rectObj = rectObj;
+			}
+		}
+	}
+
+	removeRect() {
+		var rectObj = this.rectObj;
+		if (svg.contains(rectObj)) {
+			svg.removeChild(rectObj);
+		}
+		this.rectObj = rectObj;
+	}
+
+	setColor(color) {
+		var rectObj = this.rectObj;
+		if (svg.contains(rectObj)) {
+			rectObj.setAttribute("fill",color);
+		}
+		this.rectObj = rectObj;
 	}
 }

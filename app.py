@@ -20,9 +20,12 @@ from foodchoicestudies.homepages import homepages
 
 from dummy.pages import pages
 
+from kangacuriositytask.curiosity_tasks import curiosity_tasks
+
 _thisDir = os.path.dirname(os.path.abspath(__file__)).decode(sys.getfilesystemencoding())
 
 app = Flask(__name__)
+
 """
 Register blueprints
 """
@@ -33,6 +36,9 @@ app.register_blueprint(homepages)
 
 # dummyHIT
 app.register_blueprint(pages)
+
+# Kanga
+app.register_blueprint(curiosity_tasks)
 
 @app.route("/thankyou", methods = ["GET"])
 def thankyou():
