@@ -19,7 +19,7 @@ _parentDir = os.path.abspath(os.path.join(_thisDir, os.pardir))
 dataDir = _parentDir + '/data/'
 curiosity_study_ids=['Kanga']
 
-expTasksToComplete={'Kanga':['kanga_task']}
+expTasksToComplete={'completedKangaTask':False}
 
 @curiosity_tasks.route("/consent_form", methods = ["GET","POST"])
 def consent_form(expId):
@@ -31,7 +31,7 @@ def consent_form(expId):
 			if contains_necessary_args(request.args): 
 				# worker accepted HIT 
 				[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
-				if workerId_exists(expId, workerId) and (completed_task(expId, workerId, 'completedAuction') or completed_task(expId, workerId, 'completedAuction1')):
+				if workerId_exists(expId, workerId) and (completed_task(expId, workerId, 'completedKangaTask')):
 					return render_template('return_hit.html')
 				elif not workerId_exists(expId, workerId):
 					store_subject_info(expId, workerId, expTasksToComplete, assignmentId, hitId, turkSubmitTo) 
@@ -109,6 +109,7 @@ def kanga_task(expId):
 				subjectId = get_subjectId(expId, workerId)
 				expResults = json.loads(request.form['experimentResults'])
 				filePath = dataDir + expId + '/' + subjectId + '/'
+				set_completed_task(expId, workerId, 'completedKangaTask', True)
 				results_to_csv(expId, subjectId, filePath, 'results.csv', expResults, {})
 				return redirect(url_for('thankyou',expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 		else:
