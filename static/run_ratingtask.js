@@ -83,6 +83,8 @@ var startFirstTrial = function() {
   * @param {python dictionary/js object} trialVariables: has keys and values for trial parameters
 */
 var instructions;
+var leftRating;
+var rightRating;
 var drawTrialDisplay = function(trialVariables) {
 	// condition is a dictionary - each key can be used to set trial conditions
 	ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
@@ -103,19 +105,36 @@ var drawTrialDisplay = function(trialVariables) {
 	var scaledImgDimensions = rescaleImgSize([origImgWidth,origImgHeight], widthPercent, rescaleHeight);
 	var scaledHeight = scaledImgDimensions[1];
 
+	instructionsText=trialVariables['question']
 	if (instructions == null) {
-		instructions = new textBox(instructions, oneLineInstructionsText, 20, BLACK);
+		instructions = new textBox(instructions, instructionsText, 20, BLACK);
 	} else {
 		instructions.removeText();
 	}
 	instructions.showText(0, canvas.height/2 - scaledHeight/2 - 30);
 
 	if (scale == null) { // set up scale for first trial
-		scale = new ratingScale(0,10,1,.01,canvas.width/2,canvas.height/2 + scaledHeight/2 + 10, ["0", "", "", "", "", "5", "", "", "", "", "10"]);
+		scale = new ratingScale(trialVariables['rs_min'],trialVariables['rs_max'],trialVariables['rs_tickIncrement'],trialVariables['rs_increment'],canvas.width/2,canvas.height/2 + scaledHeight/2 + 10, trialVariables['rs_labelNames']);
 	} else {
 		scale.removeScale(); // removes current scale
 	}
 	scale.drawRatingScale(canvas.width/2,canvas.height/2 + scaledHeight/2 + 10); // draws/redraws scale
+	
+	leftRatingText=trialVariables['leftRatingText']
+	if (leftRating == null) {
+		leftRating = new textBox(leftRating, leftRatingText, 20, BLACK);
+	} else {
+		leftRating.removeText();
+	}
+	leftRating.showText(0 - scale.ratingBarWidth/2, canvas.height/2 + scaledHeight/2 + 85);
+
+	rightRatingText=trialVariables['rightRatingText']
+	if (rightRating == null) {
+		rightRating = new textBox(rightRating, rightRatingText, 20, BLACK);
+	} else {
+		rightRating.removeText();
+	}
+	rightRating.showText(0 + scale.ratingBarWidth/2, canvas.height/2 + scaledHeight/2 + 85);
 }
 
 

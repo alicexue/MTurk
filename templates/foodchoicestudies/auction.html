@@ -25,7 +25,6 @@
 
 		<script>
 			setTrialVariables({{expVariables|tojson|safe}}); 
-			var oneLineInstructionsText = {{instructions|tojson|safe}};
 			var stimFolder = {{stimFolder|tojson|safe}};
 			// curly brackets are for jinja2 templates, which returns expVariables from app.py
 			startExperiment();

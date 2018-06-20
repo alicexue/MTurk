@@ -21,11 +21,10 @@
 
 		<script src="{{ url_for('static', filename='components.js') }}"></script>
 
-		<script src="{{ url_for('static', filename='run_familiaritytask.js') }}"></script>
+		<script src="{{ url_for('static', filename='run_ratingtask.js') }}"></script>
 
 		<script>
 			setTrialVariables({{expVariables|tojson|safe}}); 
-			var oneLineInstructionsText = {{instructions|tojson|safe}};
 			var stimFolder = {{stimFolder|tojson|safe}};
 			// curly brackets are for jinja2 templates, which returns expVariables from app.py
 			startExperiment();

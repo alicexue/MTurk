@@ -1,5 +1,4 @@
 data
 *.pyc
 .DS_Store
-dummy
 dummyHIT_subjects_to_compensate.csv

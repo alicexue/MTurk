@@ -477,6 +477,8 @@ var ratingScale = class ratingScale {
 		rating = rating*this.increment;
 
 		t2 = evt.timeStamp;
+		//console.log(t2-t1);
+		//console.log(rating);
 		allTrials[currTrialN].rt = t2 - t1; 
 		allTrials[currTrialN].receivedResponse = true;
 		allTrials[currTrialN].rating = rating;

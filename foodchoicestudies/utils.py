@@ -270,8 +270,15 @@ def get_bid_responses(csv_name):
 	stimBidDF = stimBidDF.rename(index=str, columns={"rating": "bid", "stimulus1": "stimulus"})
 	return stimBidDF
 
-
-def get_ratingtask_expVariables(expId, subjectId, demo):
+"""
+Creates list of dictionaries where each dictionary holds the variables for one trial
+@param question: question to be displayed above image
+@param leftRatingText: text to display below left most part of rating scale
+@param rightRatingText: text to display below right most part of rating scale
+The last few params correspond to the variables used to construct the rating scale
+@param rs_min:
+"""
+def get_ratingtask_expVariables(expId, subjectId, demo, question, leftRatingText, rightRatingText, rs_min, rs_max, rs_tickIncrement, rs_increment, rs_labelNames):
 	if demo == True:
 		stimuli = get_stimuli(foodStimFolder[expId]+'demo/','','.bmp')
 	else:
@@ -281,7 +288,7 @@ def get_ratingtask_expVariables(expId, subjectId, demo):
 	expVariables = [] # array of dictionaries
 
 	for i in range(0,len(stimuli)):
-		expVariables.append({"stimulus":stimuli[i], "fullStimName":stimuli[i]+".bmp"})
+		expVariables.append({'stimulus':stimuli[i], 'fullStimName':stimuli[i]+'.bmp', 'question':question, 'leftRatingText':leftRatingText, 'rightRatingText':rightRatingText, 'rs_min':rs_min, 'rs_max':rs_max, 'rs_tickIncrement':rs_tickIncrement, 'rs_increment':rs_increment, 'rs_labelNames':rs_labelNames})
 	return expVariables
 
 def get_scenetask_expVariables(expId, subjectId, demo):
