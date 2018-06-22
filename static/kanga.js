@@ -464,7 +464,7 @@ var drawConfirmationDisplay = function() {
 	} else if (allTrials[currTrialN].rsp == 'p') {
 		knowRect.setColor(color);
 	} else {
-		drawFixation = false; //!!!
+		drawFixation = false; 
 		drawConfirmation = false;
 		drawTooSlowDisplay();
 	}
@@ -484,7 +484,7 @@ var drawConfirmationDisplay = function() {
 var callNextDisplay = function() {
 	clearTimeout(confirmTimer);
 	inConfirmation = false;
-	if (rateAnswerResponseKeys.indexOf(allTrials[currTrialN].C_Worth) > -1) {
+	if ('C_Worth' in allTrials[currTrialN] && rateAnswerResponseKeys.indexOf(allTrials[currTrialN].C_Worth) > -1) {
 		removeRateAnswerDisplay();
 		nextTrial();
 	} else if (allTrials[currTrialN].rsp == 'q') {
