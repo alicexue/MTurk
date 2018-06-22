@@ -272,11 +272,16 @@ def get_bid_responses(csv_name):
 
 """
 Creates list of dictionaries where each dictionary holds the variables for one trial
-@param question: question to be displayed above image
-@param leftRatingText: text to display below left most part of rating scale
-@param rightRatingText: text to display below right most part of rating scale
-The last few params correspond to the variables used to construct the rating scale
-@param rs_min:
+Args:
+	question: question to be displayed above image
+	leftRatingText: text to display below left most part of rating scale
+	rightRatingText: text to display below right most part of rating scale
+	*The last few params correspond to the variables used to construct the rating scale
+	rs_min: minimum value on rating scale
+	rs_max: maximum value on rating scale
+	rs_tickIncrement: numerical difference between the ratings that are labeled
+	rs_increment: numerical difference between consecutive ratings
+	rs_labelNames: array of labels for each tick
 """
 def get_ratingtask_expVariables(expId, subjectId, demo, question, leftRatingText, rightRatingText, rs_min, rs_max, rs_tickIncrement, rs_increment, rs_labelNames):
 	if demo == True:
