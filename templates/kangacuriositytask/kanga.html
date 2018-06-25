@@ -27,7 +27,7 @@
 		<script src="{{ url_for('static', filename='kanga.js') }}"></script>
 
 		<script>
-			setTrialVariables({{expVariables|tojson|safe}}); 
+			var expVariables={{expVariables|tojson|safe}};
 			// curly brackets are for jinja2 templates, which returns expVariables from app.py
 			startExperiment();
 		</script>

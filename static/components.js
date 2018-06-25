@@ -318,6 +318,27 @@ var ratingScale = class ratingScale {
 		this.labelNames = labelNames;
 	}
 
+	setRatingScaleParams(min, max, tickIncrement, increment, x, y, labelNames) {
+		if (min >= max) {
+			alert("Invalid parameters for ratingScale! min must be smaller than max");
+		}
+		if (tickIncrement > max - min) {
+			alert("Invalid tickIncrement for ratingScale!");
+		}
+		if (increment > max - min) {
+			alert("Invalid increment for ratingScale!");
+		}
+		this.ratingScale = svg;
+
+		this.min = min;
+		this.max = max;
+		this.tickIncrement = tickIncrement;
+		this.increment = increment;
+		this.x = x;
+		this.y = y;
+		this.labelNames = labelNames;
+	}
+
 	/*
 	 * Draws rating bar and selector
 	 * @param {double} x: coordinate of center of rating scale

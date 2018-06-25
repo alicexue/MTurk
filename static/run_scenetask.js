@@ -1,5 +1,6 @@
 console.log("loaded run_scenetask.js ");
-var expVariables; 
+
+// var expVariables set in HTML
 
 var allKeyPresses = [];
 
@@ -13,15 +14,6 @@ var specialKeys = [];
 
 var expResults = [];
 var allTrials = [];
-
-/*
-  * Called from script in choicetask.html to initialize expVariables
-  * @param {array} inputExpVariables: each element is a dictionary containing trial information
-  *		elements are in the order of trials
-*/
-var setTrialVariables = function(inputExpVariables) {
-	expVariables = inputExpVariables
-}
 
 // canvas is the drawing platform on which stimuli are draw
 var canvas = document.getElementById("myCanvas");

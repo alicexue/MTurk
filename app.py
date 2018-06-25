@@ -12,7 +12,7 @@ from manage_subject_info import *
 import pandas as pd
 
 """
-Import bluepints
+Import blueprints
 """
 from foodchoicestudies.tasks import tasks 
 from foodchoicestudies.instructions import instructions 
@@ -21,6 +21,8 @@ from foodchoicestudies.homepages import homepages
 from dummy.pages import pages
 
 from kangacuriositytask.curiosity_tasks import curiosity_tasks
+
+from foodstimvalidation.fsv import fsv
 
 _thisDir = os.path.dirname(os.path.abspath(__file__)).decode(sys.getfilesystemencoding())
 
@@ -39,6 +41,9 @@ app.register_blueprint(pages)
 
 # Kanga
 app.register_blueprint(curiosity_tasks)
+
+# Ratings task
+app.register_blueprint(fsv)
 
 @app.route("/thankyou", methods = ["GET"])
 def thankyou():

@@ -1,6 +1,6 @@
-console.log("loaded run_ratingtask.js ");
+console.log("loaded run_familiaritytask.js ");
 
-// var expVariables set in HTML
+// var expVariables set in HTML 
 
 var recordAllKeyPresses = true;
 var allKeyPresses = [];
@@ -97,39 +97,33 @@ var drawTrialDisplay = function(trialVariables) {
 	var scaledImgDimensions = rescaleImgSize([origImgWidth,origImgHeight], widthPercent, rescaleHeight);
 	var scaledHeight = scaledImgDimensions[1];
 
-	instructionsText=trialVariables['question']
 	if (instructions == null) {
-		instructions = new textBox(instructions, instructionsText, 20, BLACK);
+		instructions = new textBox(instructions, oneLineInstructionsText, 20, BLACK);
 	} else {
 		instructions.removeText();
 	}
-	instructions.setText(instructionsText);
 	instructions.showText(0, canvas.height/2 - scaledHeight/2 - 30);
 
 	if (scale == null) { // set up scale for first trial
-		scale = new ratingScale(trialVariables['rs_min'],trialVariables['rs_max'],trialVariables['rs_tickIncrement'],trialVariables['rs_increment'],canvas.width/2,canvas.height/2 + scaledHeight/2 + 10, trialVariables['rs_labelNames']);
+		console.log(trialVariables);
+		scale = new ratingScale(0,10,1,.01,canvas.width/2,canvas.height/2 + scaledHeight/2 + 10, ["0", "", "", "", "", "5", "", "", "", "", "10"]);
 	} else {
 		scale.removeScale(); // removes current scale
 	}
-	scale.setRatingScaleParams(trialVariables['rs_min'],trialVariables['rs_max'],trialVariables['rs_tickIncrement'],trialVariables['rs_increment'],canvas.width/2,canvas.height/2 + scaledHeight/2 + 10, trialVariables['rs_labelNames']);
 	scale.drawRatingScale(canvas.width/2,canvas.height/2 + scaledHeight/2 + 10); // draws/redraws scale
-	
-	leftRatingText=trialVariables['leftRatingText']
+
 	if (leftRating == null) {
-		leftRating = new textBox(leftRating, leftRatingText, 20, BLACK);
+		leftRating = new textBox(leftRating, "never eaten before", 20, BLACK);
 	} else {
 		leftRating.removeText();
 	}
-	leftRating.setText(leftRatingText);
 	leftRating.showText(0 - scale.ratingBarWidth/2, canvas.height/2 + scaledHeight/2 + 85);
 
-	rightRatingText=trialVariables['rightRatingText']
 	if (rightRating == null) {
-		rightRating = new textBox(rightRating, rightRatingText, 20, BLACK);
+		rightRating = new textBox(rightRating, "eaten the most", 20, BLACK);
 	} else {
 		rightRating.removeText();
 	}
-	rightRating.setText(rightRatingText);
 	rightRating.showText(0 + scale.ratingBarWidth/2, canvas.height/2 + scaledHeight/2 + 85);
 }
 
@@ -193,8 +187,8 @@ var endTrial = function() {
 */
 var nextTrial = function() {
 	ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-	scale.removeScale();
-	instructions.removeText();
+	//scale.removeScale();
+	//instructions.removeText();
 	currTrialN+=1; // iterate to next trial
 	if (currTrialN < expVariables.length) {
 		drawTrialDisplay(expVariables[currTrialN]);

@@ -3,7 +3,7 @@ const WHITE = "#ffffff";
 const GREY = "#999999";
 const LIGHTBLUE = "#99ccff";
 
-var expVariables; 
+// var expVariables set in HTML
 
 var allKeyPresses = [];
 
@@ -45,15 +45,6 @@ var waitPeriodTimer;
 
 var t1, t2;
 var trialTimer;
-
-/*
-  * Called from script in choicetask.html to initialize expVariables
-  * @param {array} inputExpVariables: each element is a dictionary containing trial information
-  *		elements are in the order of trials
-*/
-var setTrialVariables = function(inputExpVariables) {
-	expVariables = inputExpVariables
-}
 
 /*
  * Called in the HTML

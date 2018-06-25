@@ -22,6 +22,7 @@ dataDir = _parentDir + '/data/'
 
 expTasksToComplete={'completedKangaTask':False}
 
+@curiosity_tasks.route("", methods = ["GET","POST"])
 @curiosity_tasks.route("/consent_form", methods = ["GET","POST"])
 def consent_form():
 	if request.method == "GET":

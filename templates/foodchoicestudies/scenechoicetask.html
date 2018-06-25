@@ -24,7 +24,7 @@
 		<script src="{{ url_for('static', filename='run_scenechoicetask.js') }}"></script>
 
 		<script>
-			setTrialVariables({{expVariables|tojson|safe}}); 
+			var expVariables={{expVariables|tojson|safe}};
 			var sceneStimFolder = {{sceneStimFolder|tojson|safe}};
 			var foodStimFolder = {{foodStimFolder|tojson|safe}};
 			// curly brackets are for jinja2 templates, which returns expVariables from app.py

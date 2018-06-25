@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link href="/static/style.css" rel="stylesheet">
+		<title>Questionnaire</title>
+		<center><h1>Questionnaire</h1></center>
+	</head>
+
+	<p>People differ in the ways they act and think in different situations. This is a test to measure some of the ways in which you act and think. Read each statement and put select the appropriate circle on the right side of the page. Do not spend too much time on any statement. Answer quickly and honestly.</p>
+
+	<form method="POST">
+		<table>
+			{% for i in range(0,questions|length) %}
+			{% if i%15==0 and i!=questions|length %}
+			<tr>
+				<th align="left"></th>
+				<th style="width:15%">Rarely/Never</th>
+				<th style="width:15%">Occasionally</th>
+				<th style="width:15%">Often</th>
+			<th style="width:15%">Almost Always/Always</th>  		
+			</tr>
+			{% endif %}
+			<tr>
+				<tr>
+				<th><p align="left" name={{"q"+(i+1)|string}} value={{questions[i]}}>{% print i+1 %}. {% print questions[i] %}</p></th>
+				<th><input type="radio" name={{"a"+(i+1)|string}} value="Rarely/Never" required></th>
+				<th><input type="radio" name={{"a"+(i+1)|string}} value="Occasionally" required></th>
+				<th><input type="radio" name={{"a"+(i+1)|string}} value="Often" required></th>
+				<th><input type="radio" name={{"a"+(i+1)|string}} value="Almost Always/Always" required></th>
+			</tr> 
+			{% endfor %}
+
+		</table>
+		<center><input type="submit" value="Submit" style="font-size: 30px;"></center>
+	<br><br>
+	</form>
+
+</html>
