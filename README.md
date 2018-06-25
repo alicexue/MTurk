@@ -1,5 +1,7 @@
 # Web App to Run Studies on Amazon Mechanical Turk
 
+*See [MTurk_Web_App_Guide.pdf](https://github.com/alicexue/MTurk/blob/master/MTurk_Web_App_Guide.pdf) for more details. (Download the file to have access to the web links)*
+
 One study is up and running [here](http://calkins.psych.columbia.edu/MDMMT).
 
 This web app uses the Flask framework. All of the middleware is in python. 
@@ -23,5 +25,3 @@ MTurk references:
 
 Other MTurk references:
 [Code samples for creating external HIT](https://github.com/aws-samples/mturk-code-samples)
-
-See [MTurk_Web_App_Guide.pdf](https://github.com/alicexue/MTurk/blob/master/MTurk_Web_App_Guide.pdf) for more details. (Download the file to have access to the web links)
