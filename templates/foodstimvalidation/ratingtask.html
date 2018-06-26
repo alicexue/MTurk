@@ -26,9 +26,77 @@
 		<script>
 			var expVariables={{expVariables|tojson|safe}};
 			var stimFolder = {{stimFolder|tojson|safe}};
-			// curly brackets are for jinja2 templates, which returns expVariables from app.py
-			startExperiment();
+
+			var allTrials = [];
+			var currTrialN = 0;
+
+			var currTrial = new trial({'question':'How hungry are you right now?'});
+			allTrials.push(currTrial);
+
+			var instructions;
+			instructionsText='How hungry are you?'
+			instructions = new textBox(instructions, instructionsText, 20, BLACK);
+			instructions.showText(0, canvas.height/2 - 60);
+
+			var scale;
+			scale = new ratingScale(0,10,1,0.01,canvas.width/2,canvas.height/2, ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]);
+			scale.drawRatingScale(canvas.width/2,canvas.height/2); // draws/redraws scale
+
+			leftRatingText='not at all'
+			leftRating = new textBox(leftRating, leftRatingText, 20, BLACK);
+			leftRating.showText(0 - scale.ratingBarWidth/2, canvas.height/2 + 85);
+
+			rightRatingText='starving'
+			rightRating = new textBox(rightRating, rightRatingText, 20, BLACK);
+			rightRating.showText(0 + scale.ratingBarWidth/2, canvas.height/2 + 85);
+
+			var t1 = performance.now();
+
+			// overwrite the function getRating(evt) in components.js
+			waitingForHungerRsp = true;
+			var getRating = function(evt) {
+				if (!svg.contains(blankScreenCover)) { 
+					if (waitingForHungerRsp) {
+						var nRatingValues = (scale.max - scale.min)/scale.increment;
+						var nScaleValues = scale.ratingBarWidth/scale.increment;
+						var clickX = evt.clientX;
+
+						// mouse listener is on the selector, not the bar itself
+						// so mouse can actually be clicked on a location before the bar
+						// this readjusts the location of the click so it can only be at the max or min
+						if (clickX < scale.ratingBarX) {
+							clickX = scale.ratingBarX
+						} else if (clickX > scale.ratingBarX + scale.ratingBarWidth) {
+							clickX = scale.ratingBarX + scale.ratingBarWidth;
+						}
+
+						var rating = clickX - scale.ratingBarX + scale.min;
+						rating = rating / nScaleValues * nRatingValues;
+						rating = rating/scale.increment;
+						rating = Math.floor(rating);
+						rating = rating*scale.increment;
+						t2 = evt.timeStamp;
+						allTrials[currTrialN].rt = t2 - t1; 
+						instructions.removeText();
+						scale.removeScale();
+						leftRating.removeText();
+						rightRating.removeText();
+
+						allTrials = [];
+						currTrialN = 0;
+						waitingForHungerRsp = false;
+						startExperiment();
+					} 
+					else {
+						if (!svg.contains(blankScreenCover)) { 
+							t2_UNIX = Date.now();
+							scale.recordRating(evt);
+						}
+					}
+				}
+			}
 		</script>
+
 	</form>
 	</center>
 </body>

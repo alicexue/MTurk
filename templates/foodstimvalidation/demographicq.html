@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link href="/static/style.css" rel="stylesheet">
+		<title>Demographic Questions</title>
+		<center><h2>Demographic Questions</h2></center>
+	</head>
+
+	<p>Please answer each question as accurately as possible.</p>
+	
+	<form method="POST" style="padding: 30px 30px;">
+		{% for i in range(0,info|length) %}
+			{% set q_a_pair = info[i] %}
+			{% for q, a in q_a_pair.items() %}
+				{{ i+1 }}. {{ q }}
+				<input type="hidden" name={{"q"+(i+1)|string}} value="{{ q }}">
+				{% if a|length > 0 %}
+					<select name={{"a"+(i+1)|string}} required>
+						<option selected disabled hidden value=''></option>
+					{% for option in a %}
+						<option value="{{ option }}">{{ option }}</option>
+						{{ option|string }}
+					{% endfor %}
+					</select>
+				{% else %}
+					{% if 'height' in q %}
+						<input type="number" name={{"a"+(i+1)|string + "_1"}} required></input> ft 
+						<input type="number" name={{"a"+(i+1)|string + "_2"}} required></input> in
+					{% elif 'weight' in q %}
+						<input type="number" name={{"a"+(i+1)|string}} required></input> lbs
+					{% endif %}
+				{% endif %}
+				
+				<br><br>
+
+			{% endfor %}
+		{% endfor %}
+
+		<br>
+		<center><input type="submit" value="Submit" style="font-size: 30px;"></center>
+		</p>
+	</form>
+	
+</html>

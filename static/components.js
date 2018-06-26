@@ -496,7 +496,6 @@ var ratingScale = class ratingScale {
 		rating = rating/this.increment;
 		rating = Math.floor(rating);
 		rating = rating*this.increment;
-
 		t2 = evt.timeStamp;
 		//console.log(t2-t1);
 		//console.log(rating);

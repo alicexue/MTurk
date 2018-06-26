@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link href="/static/style.css" rel="stylesheet">
+		<title>Questionnaire 2</title>
+		<center><h2>Questionnaire 2</h2></center>
+	</head>
+
+	<body>
+	<p>Please choose a response for each of the following statements.</p>
+
+	<form method="POST">
+		<table>
+			{% for i in range(0,questions|length) %}
+			<tr>
+				<th align="left"></th>
+				<th style="width:10%">{{ option1[i] }}</th>
+				<th style="width:10%">{{ option2[i] }}</th>
+				<th style="width:10%">{{ option3[i] }}</th>
+				<th style="width:10%">{{ option4[i] }}</th>  	
+				<th style="width:10%">{{ option5[i] }}</th>  	
+				<th style="width:10%">{{ option6[i] }}</th>  		
+			</tr>
+			<tr>
+				<th><p align="left" name={{"q"+(i+1)|string}} value={{questions[i]}}>{{ i+1 }}. {{ questions[i] }}</p></th>
+				<input type="hidden" name={{"q"+(i+1)|string}} value="{{questions[i]}}">
+				<th><input type="radio" name={{"a"+(i+1)|string}} value="{{option1[i]}}" required></th>
+				<th><input type="radio" name={{"a"+(i+1)|string}} value="{{option2[i]}}" required></th>
+				<th><input type="radio" name={{"a"+(i+1)|string}} value="{{option3[i]}}" required></th>
+				<th><input type="radio" name={{"a"+(i+1)|string}} value="{{option4[i]}}" required></th>
+				<th><input type="radio" name={{"a"+(i+1)|string}} value="{{option5[i]}}" required></th>
+				<th><input type="radio" name={{"a"+(i+1)|string}} value="{{option5[i]}}" required></th>
+			</tr> 
+			{% endfor %}
+		</table>
+
+		<table>
+			<tr>
+				<th align="left"></th>
+				<th style="width:30%">Yes</th>
+				<th style="width:30%">No</th>
+			</tr>
+			<tr>
+				<tr>
+				<th><p align="left" name="q31" value='Lost 20 pounds or more in the last 6 months?'>31. Lost 20 pounds or more in the last 6 months?</p></th>
+				<input type="hidden" name="q31" value='Lost 20 pounds or more in the last 6 months?'>
+				<th><input type="radio" name="a31" value="Yes" required></th>
+				<th><input type="radio" name="a31" value="No" required></th>
+			</tr> 
+		</table>
+		<center><input type="submit" value="Submit" style="font-size: 30px;"></center>
+	<br><br>
+	</form>
+	</body>
+</html>
