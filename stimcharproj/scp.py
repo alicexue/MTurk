@@ -11,10 +11,10 @@ from utils import *
 from store_data import *
 from manage_subject_info import *
 
-expId='FSV'
+expId='SCP'
 foodStimFolder='/static/foodstim2/'
 
-fsv = Blueprint('fsv',  __name__, url_prefix='/FSV')
+scp = Blueprint('scp',  __name__, url_prefix='/SCP')
 
 _thisDir = os.path.dirname(os.path.abspath(__file__)).decode(sys.getfilesystemencoding())
 _parentDir = os.path.abspath(os.path.join(_thisDir, os.pardir))
@@ -22,12 +22,12 @@ dataDir = _parentDir + '/data/'
 
 expTasksToComplete={'completedRatingsTask':False,'completedChoiceTask':False,'completedTREQr18':False,'completedEAT26':False}
 
-@fsv.route("", methods = ["GET","POST"])
-@fsv.route("/consent_form", methods = ["GET","POST"])
+@scp.route("", methods = ["GET","POST"])
+@scp.route("/consent_form", methods = ["GET","POST"])
 def consent_form():
 	if request.method == "GET":
 		#if 'preview' in request.args and request.args.get('preview') == 'True':
-		return render_template('foodstimvalidation/consent_form.html')
+		return render_template('stimcharproj/consent_form.html')
 	else:
 		if contains_necessary_args(request.args): 
 			# worker accepted HIT 
@@ -54,31 +54,31 @@ def consent_form():
 			store_subject_info(expId, workerId, expTasksToComplete, assignmentId, hitId, turkSubmitTo) 
 		return redirect(url_for('.ratingtask_demo_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 
-@fsv.route("/ratingtask_demo_instructions", methods = ["GET","POST"])
+@scp.route("/ratingtask_demo_instructions", methods = ["GET","POST"])
 def ratingtask_demo_instructions():
 	containsAllMTurkArgs = contains_necessary_args(request.args)
 	if containsAllMTurkArgs:
 		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
 	if request.method == "GET" and containsAllMTurkArgs:
-		return render_template('foodstimvalidation/ratingtask_demo_instructions.html')
+		return render_template('stimcharproj/ratingtask_demo_instructions.html')
 	elif containsAllMTurkArgs:
 		return redirect(url_for('.ratingtask',demo=True,expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 	else:
 		return redirect(url_for('unauthorized_error'))
 
-@fsv.route("/ratingtask_instructions", methods = ["GET","POST"])
+@scp.route("/ratingtask_instructions", methods = ["GET","POST"])
 def ratingtask_instructions():
 	containsAllMTurkArgs = contains_necessary_args(request.args)
 	if containsAllMTurkArgs:
 		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
 	if request.method == "GET" and containsAllMTurkArgs:
-		return render_template('foodstimvalidation/ratingtask_instructions.html')
+		return render_template('stimcharproj/ratingtask_instructions.html')
 	elif containsAllMTurkArgs:
 		return redirect(url_for('.ratingtask',expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 	else:
 		return redirect(url_for('unauthorized_error'))
 
-@fsv.route("/ratingtask", methods = ["GET","POST"])
+@scp.route("/ratingtask", methods = ["GET","POST"])
 def ratingtask():
 	oneLineInstructions = "Rate how much you want to eat this food from 0 (least) to 10 (most)."
 	containsAllMTurkArgs = contains_necessary_args(request.args)
@@ -86,7 +86,7 @@ def ratingtask():
 	if 'demo' in request.args and containsAllMTurkArgs:
 		if request.method == "GET" and request.args.get('demo') == 'True':
 			expVariables = get_ratingtask_expVariables(stimFolder='/static/foodstim2/demo/',demo=True)
-			return render_template('foodstimvalidation/ratingtask.html', demo='True',expVariables=expVariables, stimFolder='/static/foodstim2/demo/')
+			return render_template('stimcharproj/ratingtask.html', demo='True',expVariables=expVariables, stimFolder='/static/foodstim2/demo/')
 		else:
 			[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
 			"""
@@ -105,7 +105,7 @@ def ratingtask():
 				# set the variable conditions to the array of conditions
 				expVariables = get_ratingtask_expVariables(stimFolder='/static/foodstim2/',demo=False)
 
-				return render_template('foodstimvalidation/ratingtask.html', demo='False', expVariables=expVariables, stimFolder='/static/foodstim2/')
+				return render_template('stimcharproj/ratingtask.html', demo='False', expVariables=expVariables, stimFolder='/static/foodstim2/')
 			else:
 				subjectId = get_subjectId(expId, workerId)
 
@@ -125,13 +125,13 @@ def ratingtask():
 	else:
 		return redirect(url_for('unauthorized_error'))
 
-@fsv.route("/choicetask_demo_instructions", methods = ["GET","POST"])
+@scp.route("/choicetask_demo_instructions", methods = ["GET","POST"])
 def choicetask_demo_instructions():
 	containsAllMTurkArgs = contains_necessary_args(request.args)
 	if containsAllMTurkArgs:
 		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
 	if request.method == "GET" and containsAllMTurkArgs:
-		return render_template('foodstimvalidation/choicetask_demo_instructions.html')
+		return render_template('stimcharproj/choicetask_demo_instructions.html')
 	elif containsAllMTurkArgs:
 		if 'submit' in request.form.keys() and request.form['submit'] == 'Continue':
 			return redirect(url_for('.choicetask', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
@@ -142,13 +142,13 @@ def choicetask_demo_instructions():
 	else:
 		return redirect(url_for('unauthorized_error'))
 
-@fsv.route("/choicetask_instructions", methods = ["GET","POST"])
+@scp.route("/choicetask_instructions", methods = ["GET","POST"])
 def choicetask_instructions():
 	containsAllMTurkArgs = contains_necessary_args(request.args)
 	if containsAllMTurkArgs:
 		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
 	if request.method == "GET" and containsAllMTurkArgs:
-		return render_template('foodstimvalidation/choicetask_instructions.html')
+		return render_template('stimcharproj/choicetask_instructions.html')
 	elif containsAllMTurkArgs:
 		if 'submit' in request.form.keys() and request.form['submit'] == 'Continue':
 			return redirect(url_for('.choicetask', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
@@ -159,7 +159,7 @@ def choicetask_instructions():
 	else:
 		return redirect(url_for('unauthorized_error'))
 
-@fsv.route("/choicetask", methods = ["GET","POST"])
+@scp.route("/choicetask", methods = ["GET","POST"])
 def choicetask():
 	name = 'choicetask'
 	containsAllMTurkArgs = contains_necessary_args(request.args)
@@ -175,7 +175,7 @@ def choicetask():
 
 			for i in range(0,len(stim1Bids)):
 				expVariables.append({"stimulus1":stim1Names[i],"stimulus2":stim2Names[i],"stim1Bid":stim1Bids[i],"stim2Bid":stim2Bids[i], "delta":deltas[i], "fullStim1Name":stim1Names[i]+".bmp", "fullStim2Name":stim2Names[i]+".bmp"})
-			return render_template('foodstimvalidation/choicetask.html', expId=expId, expVariables=expVariables, stimFolder=foodStimFolder+'demo/')
+			return render_template('stimcharproj/choicetask.html', expId=expId, expVariables=expVariables, stimFolder=foodStimFolder+'demo/')
 		else:
 			[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
 			if assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE':
@@ -211,7 +211,7 @@ def choicetask():
 				for i in range(0,len(stim1Bids)):
 					expVariables.append({"stimulus1":stim1Names[i],"stimulus2":stim2Names[i],"stim1Bid":stim1Bids[i],"stim2Bid":stim2Bids[i], "delta":deltas[i], "fullStim1Name":stim1Names[i]+".bmp", "fullStim2Name":stim2Names[i]+".bmp"})
 
-				return render_template('foodstimvalidation/choicetask.html', expId=expId, expVariables=expVariables, stimFolder=foodStimFolder)
+				return render_template('stimcharproj/choicetask.html', expId=expId, expVariables=expVariables, stimFolder=foodStimFolder)
 			else:
 				expResults = json.loads(request.form['experimentResults'])
 				filePath = dataDir + expId + '/' + subjectId + '/'
@@ -225,14 +225,14 @@ def choicetask():
 	else:
 		return redirect(url_for('unauthorized_error'))
 
-@fsv.route("/demographicq", methods = ["GET", "POST"])
+@scp.route("/demographicq", methods = ["GET", "POST"])
 def demographicq():
 	info=get_demographicq()
 	containsAllMTurkArgs = contains_necessary_args(request.args)
 	if containsAllMTurkArgs:
 		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
 	if request.method == "GET" and containsAllMTurkArgs:
-		return render_template('foodstimvalidation/demographicq.html', info=info)
+		return render_template('stimcharproj/demographicq.html', info=info)
 	elif containsAllMTurkArgs: # in request.method == "POST"
 		subjectId = get_subjectId(expId, workerId)
 		q_and_a = [] # list of dictionaries where questions are keys and answers are values
@@ -260,14 +260,14 @@ def demographicq():
 		return redirect(url_for('unauthorized_error'))
 
 
-@fsv.route("/TREQr18", methods = ["GET", "POST"])
+@scp.route("/TREQr18", methods = ["GET", "POST"])
 def TREQr18():
 	questions, option1, option2, option3, option4=get_TREQr18()
 	containsAllMTurkArgs = contains_necessary_args(request.args)
 	if containsAllMTurkArgs:
 		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
 	if request.method == "GET" and containsAllMTurkArgs:
-		return render_template('foodstimvalidation/TREQ-r18.html', questions=questions, option1=option1, option2=option2, option3=option3, option4=option4)
+		return render_template('stimcharproj/TREQ-r18.html', questions=questions, option1=option1, option2=option2, option3=option3, option4=option4)
 	elif containsAllMTurkArgs: # in request.method == "POST"
 		subjectId = get_subjectId(expId, workerId)
 		q_and_a = [] # list of dictionaries where questions are keys and answers are values
@@ -286,14 +286,14 @@ def TREQr18():
 	else:
 		return redirect(url_for('unauthorized_error'))
 
-@fsv.route("/EAT26", methods = ["GET", "POST"])
+@scp.route("/EAT26", methods = ["GET", "POST"])
 def EAT26():
 	questions, option1, option2, option3, option4, option5, option6 =get_EAT26()
 	containsAllMTurkArgs = contains_necessary_args(request.args)
 	if containsAllMTurkArgs:
 		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
 	if request.method == "GET" and containsAllMTurkArgs:
-		return render_template('foodstimvalidation/EAT26.html', questions=questions, option1=option1, option2=option2, option3=option3, option4=option4, option5=option5, option6=option6)
+		return render_template('stimcharproj/EAT26.html', questions=questions, option1=option1, option2=option2, option3=option3, option4=option4, option5=option5, option6=option6)
 	elif containsAllMTurkArgs: # in request.method == "POST"
 		subjectId = get_subjectId(expId, workerId)
 		q_and_a = [] # list of dictionaries where questions are keys and answers are values
@@ -316,13 +316,13 @@ def EAT26():
 	else:
 		return redirect(url_for('unauthorized_error'))
 
-@fsv.route("/debrief", methods = ["GET","POST"])
+@scp.route("/debrief", methods = ["GET","POST"])
 def debrief():
 	containsAllMTurkArgs = contains_necessary_args(request.args)
 	if containsAllMTurkArgs:
 		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
 	if request.method == "GET" and containsAllMTurkArgs:
-		return render_template('foodstimvalidation/debrief.html')
+		return render_template('stimcharproj/debrief.html')
 	elif containsAllMTurkArgs:
 		return redirect(url_for('feedback',expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 	else:

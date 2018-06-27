@@ -22,7 +22,7 @@ from dummy.pages import pages
 
 from kangacuriositytask.curiosity_tasks import curiosity_tasks
 
-from foodstimvalidation.fsv import fsv
+from stimcharproj.scp import scp
 
 _thisDir = os.path.dirname(os.path.abspath(__file__)).decode(sys.getfilesystemencoding())
 
@@ -43,7 +43,7 @@ app.register_blueprint(pages)
 app.register_blueprint(curiosity_tasks)
 
 # Ratings task
-app.register_blueprint(fsv)
+app.register_blueprint(scp)
 
 @app.route("/thankyou", methods = ["GET"])
 def thankyou():
