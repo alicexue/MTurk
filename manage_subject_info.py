@@ -30,7 +30,7 @@ def store_subject_info(expId, workerId, tasksToComplete, assignmentId, hitId, tu
 		newSubject = {'subjectId':newSubjectId, 'assignmentId':assignmentId, 'hitId':hitId, 'turkSubmitTo':turkSubmitTo, 'timestamp':currentTime}
 		newSubject.update(tasksToComplete)
 		df2 = pd.DataFrame(data=newSubject, index=[0])
-		new_df = pd.concat([df,df2], axis=0, sort='True')
+		new_df = pd.concat([df,df2], axis=0)
 	new_df.to_csv(csvLocation,index=False)
 
 	# store subjectId and workerId
