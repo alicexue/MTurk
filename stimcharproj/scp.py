@@ -20,7 +20,7 @@ _thisDir = os.path.dirname(os.path.abspath(__file__)).decode(sys.getfilesystemen
 _parentDir = os.path.abspath(os.path.join(_thisDir, os.pardir))
 dataDir = _parentDir + '/data/'
 
-expTasksToComplete={'completedRatingsTask':False,'completedChoiceTask':False,'completedTREQr18':False,'completedEAT26':False}
+expTasksToComplete={'completedRatingsTask':False,'completedChoiceTask':False,'completedTFEQr18':False,'completedEAT26':False}
 
 @scp.route("", methods = ["GET","POST"])
 @scp.route("/consent_form", methods = ["GET","POST"])
@@ -219,9 +219,66 @@ def choicetask():
 
 				set_completed_task(expId, workerId, 'completedChoiceTask', True)
 
-				return redirect(url_for('.demographicq', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+				return redirect(url_for('.TFEQr18', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 		else:
 			return redirect(url_for('unauthorized_error'))
+	else:
+		return redirect(url_for('unauthorized_error'))
+
+
+@scp.route("/TFEQr18", methods = ["GET", "POST"])
+def TFEQr18():
+	questions, option1, option2, option3, option4=get_TFEQr18()
+	containsAllMTurkArgs = contains_necessary_args(request.args)
+	if containsAllMTurkArgs:
+		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
+	if request.method == "GET" and containsAllMTurkArgs:
+		return render_template('stimcharproj/TFEQr18.html', questions=questions, option1=option1, option2=option2, option3=option3, option4=option4)
+	elif containsAllMTurkArgs: # in request.method == "POST"
+		subjectId = get_subjectId(expId, workerId)
+		q_and_a = [] # list of dictionaries where questions are keys and answers are values
+		nQuestions = len(questions) + 1 # there's an additional Q at the end (1-8)
+		for i in range(0,nQuestions):
+			tmp = {}
+			tmp['questionN'] = i+1
+			tmp['question'] = request.form['q'+str(i+1)]
+			tmp['answer'] = request.form['a'+str(i+1)] # set keys and values in dictionary
+			q_and_a.append(tmp)
+
+		filePath = dataDir + expId + '/' + subjectId + '/'
+		set_completed_task(expId, workerId, 'completedTFEQr18', True)
+		results_to_csv(expId, subjectId, filePath, 'TFEQr18.csv', q_and_a, {})
+		return redirect(url_for('.EAT26',expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+	else:
+		return redirect(url_for('unauthorized_error'))
+
+@scp.route("/EAT26", methods = ["GET", "POST"])
+def EAT26():
+	questions, option1, option2, option3, option4, option5, option6 =get_EAT26()
+	containsAllMTurkArgs = contains_necessary_args(request.args)
+	if containsAllMTurkArgs:
+		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
+	if request.method == "GET" and containsAllMTurkArgs:
+		return render_template('stimcharproj/EAT26.html', questions=questions, option1=option1, option2=option2, option3=option3, option4=option4, option5=option5, option6=option6)
+	elif containsAllMTurkArgs: # in request.method == "POST"
+		subjectId = get_subjectId(expId, workerId)
+		q_and_a = [] # list of dictionaries where questions are keys and answers are values
+		nQuestions = len(questions) + 1 # there's an additional Q at the end (yes/no)
+		for i in range(0,nQuestions):
+			tmp = {}
+			tmp['questionN'] = i+1
+			tmp['question'] = request.form['q'+str(i+1)]
+			tmp['answer'] = request.form['a'+str(i+1)] # set keys and values in dictionary
+			q_and_a.append(tmp)
+
+		filePath = dataDir + expId + '/' + subjectId + '/'
+
+		hungerRatingResults=json.loads(request.form['hungerRatingResults'])
+		results_to_csv(expId, subjectId, filePath, 'HungerRating2.csv', hungerRatingResults, {})
+
+		set_completed_task(expId, workerId, 'completedEAT26', True)
+		results_to_csv(expId, subjectId, filePath, 'EAT26.csv', q_and_a, {})
+		return redirect(url_for('.demographicq',expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 	else:
 		return redirect(url_for('unauthorized_error'))
 
@@ -255,63 +312,6 @@ def demographicq():
 		filePath = dataDir + expId + '/' + subjectId + '/'
 		set_completed_task(expId, workerId, 'completedDemographicQuestionnaire', True)
 		results_to_csv(expId, subjectId, filePath, 'DemographicAnswers.csv', q_and_a, {})
-		return redirect(url_for('.TREQr18',expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
-	else:
-		return redirect(url_for('unauthorized_error'))
-
-
-@scp.route("/TREQr18", methods = ["GET", "POST"])
-def TREQr18():
-	questions, option1, option2, option3, option4=get_TREQr18()
-	containsAllMTurkArgs = contains_necessary_args(request.args)
-	if containsAllMTurkArgs:
-		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
-	if request.method == "GET" and containsAllMTurkArgs:
-		return render_template('stimcharproj/TREQ-r18.html', questions=questions, option1=option1, option2=option2, option3=option3, option4=option4)
-	elif containsAllMTurkArgs: # in request.method == "POST"
-		subjectId = get_subjectId(expId, workerId)
-		q_and_a = [] # list of dictionaries where questions are keys and answers are values
-		nQuestions = len(questions) + 1 # there's an additional Q at the end (1-8)
-		for i in range(0,nQuestions):
-			tmp = {}
-			tmp['questionN'] = i+1
-			tmp['question'] = request.form['q'+str(i+1)]
-			tmp['answer'] = request.form['a'+str(i+1)] # set keys and values in dictionary
-			q_and_a.append(tmp)
-
-		filePath = dataDir + expId + '/' + subjectId + '/'
-		set_completed_task(expId, workerId, 'completedTREQ-r18', True)
-		results_to_csv(expId, subjectId, filePath, 'TREQ-r18.csv', q_and_a, {})
-		return redirect(url_for('.EAT26',expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
-	else:
-		return redirect(url_for('unauthorized_error'))
-
-@scp.route("/EAT26", methods = ["GET", "POST"])
-def EAT26():
-	questions, option1, option2, option3, option4, option5, option6 =get_EAT26()
-	containsAllMTurkArgs = contains_necessary_args(request.args)
-	if containsAllMTurkArgs:
-		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
-	if request.method == "GET" and containsAllMTurkArgs:
-		return render_template('stimcharproj/EAT26.html', questions=questions, option1=option1, option2=option2, option3=option3, option4=option4, option5=option5, option6=option6)
-	elif containsAllMTurkArgs: # in request.method == "POST"
-		subjectId = get_subjectId(expId, workerId)
-		q_and_a = [] # list of dictionaries where questions are keys and answers are values
-		nQuestions = len(questions) + 1 # there's an additional Q at the end (yes/no)
-		for i in range(0,nQuestions):
-			tmp = {}
-			tmp['questionN'] = i+1
-			tmp['question'] = request.form['q'+str(i+1)]
-			tmp['answer'] = request.form['a'+str(i+1)] # set keys and values in dictionary
-			q_and_a.append(tmp)
-
-		filePath = dataDir + expId + '/' + subjectId + '/'
-
-		hungerRatingResults=json.loads(request.form['hungerRatingResults'])
-		results_to_csv(expId, subjectId, filePath, 'HungerRating2.csv', hungerRatingResults, {})
-
-		set_completed_task(expId, workerId, 'completedEAT26', True)
-		results_to_csv(expId, subjectId, filePath, 'EAT26.csv', q_and_a, {})
 		return redirect(url_for('.debrief',expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 	else:
 		return redirect(url_for('unauthorized_error'))
@@ -323,6 +323,18 @@ def debrief():
 		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
 	if request.method == "GET" and containsAllMTurkArgs:
 		return render_template('stimcharproj/debrief.html')
+	elif containsAllMTurkArgs:
+		return redirect(url_for('.resources',expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+	else:
+		return redirect(url_for('unauthorized_error'))
+
+@scp.route("/resources", methods = ["GET","POST"])
+def resources():
+	containsAllMTurkArgs = contains_necessary_args(request.args)
+	if containsAllMTurkArgs:
+		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
+	if request.method == "GET" and containsAllMTurkArgs:
+		return render_template('stimcharproj/resources.html')
 	elif containsAllMTurkArgs:
 		return redirect(url_for('feedback',expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 	else:

@@ -12,6 +12,21 @@
 	<form id='form' method="POST">
 		<table>
 			{% for i in range(0,questions|length) %}
+			{% if i==26 %}
+			</table>
+			<table>
+			<hr>
+			<tr>
+				<tr>
+				<th align="left"><p>In the past 6 months have you</p></th>
+				<th style="width:10%"></th>
+				<th style="width:10%"></th>
+				<th style="width:10%"></th>
+				<th style="width:10%"></th>  	
+				<th style="width:10%"></th>  	
+				<th style="width:10%"></th>  		
+			</tr>
+			{% endif %}
 			<tr>
 				<th align="left"></th>
 				<th style="width:10%">{{ option1[i] }}</th>
@@ -22,7 +37,7 @@
 				<th style="width:10%">{{ option6[i] }}</th>  		
 			</tr>
 			<tr>
-				<th><p align="left" name={{"q"+(i+1)|string}} value={{questions[i]}}>{{ i+1 }}. {{ questions[i] }}</p></th>
+				<th><p align="left" name={{"q"+(i+1)|string}} value={{questions[i]}}>{{i+1}}. {{ questions[i] }}</p></th>
 				<input type="hidden" name={{"q"+(i+1)|string}} value="{{questions[i]}}">
 				<th><input type="radio" name={{"a"+(i+1)|string}} value="{{option1[i]}}" required></th>
 				<th><input type="radio" name={{"a"+(i+1)|string}} value="{{option2[i]}}" required></th>

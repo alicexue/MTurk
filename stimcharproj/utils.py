@@ -89,8 +89,8 @@ def get_demographicq():
 		new_info.append({q:options})
 	return new_info
 
-def get_TREQr18():
-	info = pd.read_csv(_thisDir + '/TREQ-r18.csv')
+def get_TFEQr18():
+	info = pd.read_csv(_thisDir + '/TFEQr18.csv')
 	questions=info['Question']
 	option1=info['Option1']
 	option2=info['Option2']

@@ -1,21 +1,21 @@
 Question,,,,,,,,
-What is your nationality?,US citizen,Other,,,,,,
-What region of the United States are you from?,Northeast,Northwest,Southeast,Southwest,Midwest,Fareast,Farwest,Outside of the US
-What is your religious preference?,Christianity,Buddhism,Hinduism,Islam,Judaism,Not religious,Other,
 What is your age?,Under 18,18-25,26-30,31-35,36-40,41-45,Above 46,
-What is your race/ ethnicity?,American Indian or Alaska Native,Asian,Black or African American,Hispanic or Latino,Native Hawaiian or Other Pacific Islander. ,White,Not listed,Prefer not to answer
-Are you currently pregnant?,Yes,No,,,,,,
 What is your gender?,Female,Male,Transgender,Prefer not to answer,,,,
-What is your height?,,,,,,,,
-What is your weight?,,,,,,,,
-What was your lowest adult weight ever?,,,,,,,,
-What was your heighest adult weight ever?,,,,,,,,
-How often do you exercise?,Every day,Every other day,Once per week,Several times per month,Less often,,,
-Are you currently dieting?,Yes ,No,,,,,,
-Do you have a specific kind of diet?,Vegetarian (No meat),Vegan (no meat or byproducts),Pescatarian (no meat except fish),,No Specific Diet,Other,,
-Do you have any food allergies or restrictions?,Peanuts,Eggs,Fish/Shellfish,Milk,Soy,Tree Nuts,Gluten,Other
+What is your nationality? /Did you grow up in the US?,Other,,,,,,,
+What region of the United States are you from?,Northeast,Northwest,Southeast,Southwest,Midwest,Fareast,Farwest,Outside of the US
+What is your race/ ethnicity?,American Indian or Alaska Native,Asian,Black or African American,Hispanic or Latino,Native Hawaiian or Other Pacific Islander. ,White,Not listed,Prefer not to answer
+What is your religious preference?,Christianity,Buddhism,Hinduism,Islam,Judaism,Not religious,Other,
 "What is the highest degree or level of school you have completed? (If you're currently enrolled in school, please indicate the highest degree you have received.)",Less than a high school diploma,High school degree or equivalent (e.g. GED),"Some college, no degree","Associate degree (e.g. AA, AS)","Bachelor's degree (e.g. BA, BS)","Master's degree (e.g. MA, MS, MEd)","Professional degree (e.g. MD, DDS, DVM)","Doctorate (e.g. PhD, EdD)"
 What is your household income?,"Less than $20,000","$20,000 to $34,999","$35,000 to $49,999","$50,000 to $74,999","$75,000 to $99,999","Over $100,000",,
 To which social class would you say you belong?,Upper class,Upper middle class,Middle class,Lower middle class,Below the poverty level,,,
 What is your current employment status?,Employed full time (40 or more hours per week),Employed part time (up to 39 hours per week),Unemployed and currently looking for work,Unemployed and not currently looking for work,Student,Retired,Homemaker,Self-employed
+Do you have a specific kind of diet?,Vegetarian (No meat),Vegan (no meat or meat byproducts),Pescatarian (no meat except fish),,No Specific Diet,Other,,
+Do you have any food allergies or restrictions?,Peanuts,Eggs,Fish/Shellfish,Milk,Soy,Tree Nuts,Gluten,Other
 Do you feel your daily life is stressful?,Not at all,A little ,Somewhat,Very,Extremely,,,
+Are you currently pregnant?,Yes,No,,,,,,
+How often do you exercise?,Every day,Several times per week,Once per week,Several times per month,Rarely,Never,,
+What is your height?,,,,,,,,
+What is your weight?,,,,,,,,
+What was your lowest adult weight ever?,,,,,,,,
+What was your heighest adult weight ever?,,,,,,,,
+Are you currently dieting?,Yes ,No,,,,,,
