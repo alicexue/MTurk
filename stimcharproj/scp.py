@@ -200,7 +200,7 @@ def choicetask():
 				stim2Bids = [];
 
 				ratingsResultsFileName = '_RatingsResults.csv'
-				stimBidDict = get_bid_responses(dataDir + expId + '/' + subjectId + '/' + subjectId + ratingsResultsFileName)
+				stimBidDict = get_bid_responses('taste',dataDir + expId + '/' + subjectId + '/' + subjectId + ratingsResultsFileName)
 				[stim1Names, stim1Bids, stim2Names, stim2Bids] = get_two_stimuli_lists(stimBidDict, foodStimFolder, '', '.bmp')
 				expVariables = [] # array of dictionaries
 

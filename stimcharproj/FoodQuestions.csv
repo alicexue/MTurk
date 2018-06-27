@@ -1,18 +1,19 @@
 Question,LeftText,MiddleText,RightText
 Do you know what this food is?,Don't know,Know but have never eaten,Have eaten before
-How high is the food in PROTEIN?,Not at all,,Very much
-How high is the food in FAT?,Not at all,,Very much
-How high is the food in CARBOHYDRATES?,Not at all,,Very much
-How high is the food in PROTEIN?,Not at all,,Very much
-How high is the food in VITAMINS?,Not at all,,Very much
-How high is the food in SODIUM?,Not at all,,Very much
-How high is the food in SUGAR?,Not at all,,Very much
-How high is the food in GLUTEN?,Not at all,,Very much
-How high is the food in CALORIES?,Not at all,,Very much
+How high is the food in PROTEIN?,Low,,High
+How high is the food in FAT?,Low,,High
+How high is the food in CARBOHYDRATES?,Low,,High
+How high is the food in PROTEIN?,Low,,High
+How high is the food in VITAMINS?,Low,,High
+How high is the food in SODIUM?,Low,,High
+How high is the food in SUGAR?,Low,,High
+How high is the food in GLUTEN?,Low,,High
+How high is the food in CALORIES?,Low,,High
 How HEALTHY is this food?,Unhealthy,,Healthy
 How TASTY is this food?,Bad,,Good
-"Generally, how TASTY would other people think this food is?",Not at all,,Very much
-How SWEET is this food?,Not at all,,Very much
-How FILLING is this food?,Not at all,,Very much
+"Generally, how TASTY would other people think this food is?",Not at all,,Very
+Is this food more SWEET or SALTY/SAVORY?,SWEET,,SALTY/SAVORY
+How FILLING is this food?,Not at all,,Very
 Do you like the TEXTURE of this food?,Not at all,,Very much
-How DISGUSTING is this food?,Not at all,,Very much
+How DISGUSTING is this food?,Not at all,,Very
+How does this food make you FEEL?,Very sad,,Very Happy
