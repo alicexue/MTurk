@@ -131,8 +131,27 @@ def get_bid_responses(dim, csv_name):
 	stimBidDF = stimBidDF.rename(index=str, columns={"rating": "bid", "stimulus1": "stimulus"})
 	return stimBidDF
 
-"""
-def test():
+
+def find_common_items(l1,l2):
+	print l1
+	print l2
+	commonItems=[]
+	for item in l1:
+		if item in l2:
+			commonItems.append(item)
+	print commonItems
+	return commonItems
+
+def get_common_item(l1,l2):
+	commonItems=find_common_items(l1,l2)
+	if len(commonItems) != 0: # found reference item based on HEALTH and +1 positive on TASTE
+		random.shuffle(commonItems)
+		referenceItem=commonItems[0]
+		return referenceItem
+	return None
+
+### need to test, need to fix comments
+def get_reference_item():
 	taste=get_bid_responses('taste','/Users/alicexue/Documents/GitHub/MTurk/data/SCP/SCP_0008/SCP_0008_RatingsResults.csv')
 	health=get_bid_responses('health','/Users/alicexue/Documents/GitHub/MTurk/data/SCP/SCP_0008/SCP_0008_RatingsResults.csv')
 	taste=taste.sort_values("bid")
@@ -141,14 +160,50 @@ def test():
 	health.reset_index(drop=True,inplace=True)
 	sorted_taste=taste['stimulus'].values
 	sorted_health=health['stimulus'].values
+	nStim=len(taste)
+	binSize = int(round(nStim / 5.0)) # round up
+	midBin = int(nStim/binSize)/2 # round down
+	midBinIndices = [binSize*midBin,binSize*(midBin+1)]
+	neutral_taste=sorted_taste[midBinIndices[0]:midBinIndices[1]]
+	neutral_health=sorted_health[midBinIndices[0]:midBinIndices[1]]
+	print neutral_taste
 	print taste
+	print neutral_health
 	print health
-	print pd.qcut(taste['stimulus'],q=5)
-	print sorted_taste
-	print sorted_health
+	referenceItem=get_common_item(neutral_taste,neutral_health)
+	# if not found
+	# find neutral on HEALTH and +1 positive on TASTE
+	bin_plus1Indices=midBinIndices = [binSize*(midBin+1),binSize*(midBin+2)]
+	taste_plus1=sorted_taste[midBinIndices[0]:midBinIndices[1]]
+	print 'neutral on HEALTH and +1 positive on TASTE'
+	referenceItem=get_common_item(taste_plus1,neutral_health)
+	if referenceItem != None: # found reference item based on HEALTH and +1 positive on TASTE
+		return referenceItem
+	# neutral HEALTH & -1 on TASTE
+	bin_minus1Indices=midBinIndices = [binSize*(midBin-1),binSize*(midBin)]
+	taste_minus1=sorted_taste[midBinIndices[0]:midBinIndices[1]]
+	print 'neutral HEALTH & -1 on TASTE'
+	referenceItem=get_common_item(taste_minus1,neutral_health)
+	if referenceItem != None: # found reference item based on HEALTH and +1 positive on TASTE
+		return referenceItem
+	# neutral TASTE & +1 HEALTH
+	print 'neutral TASTE & +1 HEALTH'
+	bin_plus1Indices=midBinIndices = [binSize*(midBin+1),binSize*(midBin+2)]
+	health_plus1=sorted_health[midBinIndices[0]:midBinIndices[1]]
+	referenceItem=get_common_item(neutral_taste,health_plus1)
+	if referenceItem != None: # found reference item based on HEALTH and +1 positive on TASTE
+		return referenceItem
+	# neutral TASTE, -1 on HEALTH
+	print 'neutral TASTE, -1 on HEALTH'
+	bin_minus1Indices=midBinIndices = [binSize*(midBin-1),binSize*(midBin)]
+	health_minus1=sorted_taste[midBinIndices[0]:midBinIndices[1]]
+	referenceItem=get_common_item(neutral_taste,health_minus1)
+	if referenceItem != None: # found reference item based on HEALTH and +1 positive on TASTE
+		return referenceItem
 
-test()
-"""
+
+#print "REFERENCE ITEM", get_reference_item()
+
 
 """
 Pair up lists of stimuli without taking bids into account
