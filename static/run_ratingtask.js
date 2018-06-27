@@ -76,6 +76,7 @@ var startFirstTrial = function() {
 */
 var instructions;
 var leftRating;
+var middleRating;
 var rightRating;
 var drawTrialDisplay = function(trialVariables) {
 	// condition is a dictionary - each key can be used to set trial conditions
@@ -123,6 +124,15 @@ var drawTrialDisplay = function(trialVariables) {
 	leftRating.setText(leftRatingText);
 	leftRating.showText(0 - scale.ratingBarWidth/2, canvas.height/2 + scaledHeight/2 + 85);
 
+	middleRatingText=trialVariables['middleRatingText']
+	if (middleRating == null) {
+		middleRating = new textBox(middleRating, middleRatingText, 20, BLACK);
+	} else {
+		middleRating.removeText();
+	}
+	middleRating.setText(middleRatingText);
+	middleRating.showText(0, canvas.height/2 + scaledHeight/2 + 85);
+
 	rightRatingText=trialVariables['rightRatingText']
 	if (rightRating == null) {
 		rightRating = new textBox(rightRating, rightRatingText, 20, BLACK);
@@ -140,7 +150,7 @@ var drawTrialDisplay = function(trialVariables) {
  * Sets start time for trial
 */
 var pushTrialInfo = function() {
-	var currTrial = new trial({'trialN':currTrialN, 'stimuli':stimuli[currTrialN]});
+	var currTrial = new trial({'trialN':currTrialN, 'stimuli':stimuli[currTrialN], 'question':expVariables[currTrialN]['question']});
 	allTrials.push(currTrial);
 
 	// send stimuli here to trialInfo, set special keys inside trialInfo
@@ -195,6 +205,9 @@ var nextTrial = function() {
 	ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 	scale.removeScale();
 	instructions.removeText();
+	leftRating.removeText();
+	middleRating.removeText();
+	rightRating.removeText();
 	currTrialN+=1; // iterate to next trial
 	if (currTrialN < expVariables.length) {
 		drawTrialDisplay(expVariables[currTrialN]);

@@ -34,7 +34,7 @@ def auction(expId):
 
 	if 'demo' in request.args and containsAllMTurkArgs:
 		if request.method == "GET" and request.args.get('demo') == 'TRUE':
-			expVariables = get_ratingtask_expVariables(expId, subjectId=None, demo=True, question=oneLineInstructions, leftRatingText='', rightRatingText='', rs_min=0, rs_max=10, rs_tickIncrement=1, rs_increment=0.01, rs_labelNames=["0", "", "", "", "", "5", "", "", "", "", "10"])
+			expVariables = get_ratingtask_expVariables(expId, subjectId=None, demo=True, question=oneLineInstructions, leftRatingText='', middleRatingText='', rightRatingText='', rs_min=0, rs_max=10, rs_tickIncrement=1, rs_increment=0.01, rs_labelNames=["0", "", "", "", "", "5", "", "", "", "", "10"])
 			return render_template('foodchoicestudies/auction.html', expVariables=expVariables, stimFolder=foodStimFolder[expId]+'demo/')
 		else:
 			[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)	
@@ -51,7 +51,7 @@ def auction(expId):
 				# trialVariables should be an array of dictionaries 
 				# each element of the array represents the condition for one trial
 				# set the variable conditions to the array of conditions
-				expVariables = get_ratingtask_expVariables(expId, subjectId=None, demo=False, question=oneLineInstructions, leftRatingText='', rightRatingText='', rs_min=0, rs_max=10, rs_tickIncrement=1, rs_increment=0.01, rs_labelNames=["0", "", "", "", "", "5", "", "", "", "", "10"])
+				expVariables = get_ratingtask_expVariables(expId, subjectId=None, demo=False, question=oneLineInstructions, leftRatingText='', middleRatingText='', rightRatingText='', rs_min=0, rs_max=10, rs_tickIncrement=1, rs_increment=0.01, rs_labelNames=["0", "", "", "", "", "5", "", "", "", "", "10"])
 
 				return render_template('foodchoicestudies/auction.html', expVariables=expVariables, stimFolder=foodStimFolder[expId])
 			else:

@@ -1,0 +1,18 @@
+Question,LeftText,MiddleText,RightText
+Do you know what this food is?,Don't know,Know but have never eaten,Have eaten before
+How high is the food in PROTEIN?,Not at all,,Very much
+How high is the food in FAT?,Not at all,,Very much
+How high is the food in CARBOHYDRATES?,Not at all,,Very much
+How high is the food in PROTEIN?,Not at all,,Very much
+How high is the food in VITAMINS?,Not at all,,Very much
+How high is the food in SODIUM?,Not at all,,Very much
+How high is the food in SUGAR?,Not at all,,Very much
+How high is the food in GLUTEN?,Not at all,,Very much
+How high is the food in CALORIES?,Not at all,,Very much
+How HEALTHY is this food?,Unhealthy,,Healthy
+How TASTY is this food?,Bad,,Good
+"Generally, how TASTY would other people think this food is?",Not at all,,Very much
+How SWEET is this food?,Not at all,,Very much
+How FILLING is this food?,Not at all,,Very much
+Do you like the TEXTURE of this food?,Not at all,,Very much
+How DISGUSTING is this food?,Not at all,,Very much

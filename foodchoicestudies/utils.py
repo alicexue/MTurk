@@ -283,7 +283,7 @@ Args:
 	rs_increment: numerical difference between consecutive ratings
 	rs_labelNames: array of labels for each tick
 """
-def get_ratingtask_expVariables(expId, subjectId, demo, question, leftRatingText, rightRatingText, rs_min, rs_max, rs_tickIncrement, rs_increment, rs_labelNames):
+def get_ratingtask_expVariables(expId, subjectId, demo, question, leftRatingText, middleRatingText, rightRatingText, rs_min, rs_max, rs_tickIncrement, rs_increment, rs_labelNames):
 	if demo == True:
 		stimuli = get_stimuli(foodStimFolder[expId]+'demo/','','.bmp')
 	else:
@@ -293,7 +293,7 @@ def get_ratingtask_expVariables(expId, subjectId, demo, question, leftRatingText
 	expVariables = [] # array of dictionaries
 
 	for i in range(0,len(stimuli)):
-		expVariables.append({'stimulus':stimuli[i], 'fullStimName':stimuli[i]+'.bmp', 'question':question, 'leftRatingText':leftRatingText, 'rightRatingText':rightRatingText, 'rs_min':rs_min, 'rs_max':rs_max, 'rs_tickIncrement':rs_tickIncrement, 'rs_increment':rs_increment, 'rs_labelNames':rs_labelNames})
+		expVariables.append({'stimulus':stimuli[i], 'fullStimName':stimuli[i]+'.bmp', 'question':question, 'leftRatingText':leftRatingText, 'middleRatingText':rightRatingText, 'rightRatingText':rightRatingText, 'rs_min':rs_min, 'rs_max':rs_max, 'rs_tickIncrement':rs_tickIncrement, 'rs_increment':rs_increment, 'rs_labelNames':rs_labelNames})
 	return expVariables
 
 def get_scenetask_expVariables(expId, subjectId, demo):
