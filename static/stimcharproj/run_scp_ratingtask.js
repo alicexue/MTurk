@@ -41,6 +41,7 @@ var questionTimer;
 var questionDisplayDuration=2000;
 
 const GREY = "#808080";
+const LIGHTGREY = "#bfbfbf";
 
 /*
  * Called in the HTML
@@ -88,6 +89,12 @@ var drawTrialDisplay = function() {
 	ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 	if (question!=null) {
 		question.removeText();
+	}
+	if (button!=null) {
+		button.removeRect();
+	}
+	if (buttonText!=null) {
+		buttonText.removeText();
 	}
 	var stimulus = trialVariables['stimulus'];
 
@@ -171,6 +178,8 @@ var removeTrialDisplay = function() {
 }
 
 var question;
+var button;
+var buttonText;
 var drawQuestionDisplay = function() {
 	if (currTrialN == 0 || (currTrialN - 1 > 0 && expVariables[currTrialN]['question'] != expVariables[currTrialN-1]['question'])) { // question is the same as the one on the previous trial
 		removeTrialDisplay();
@@ -183,7 +192,22 @@ var drawQuestionDisplay = function() {
 		}
 		question.setText(instructionsText);
 		question.showText(0, canvas.height/2);
-		questionTimer = setTimeout(drawTrialDisplay,questionDisplayDuration);
+
+		if (button == null) {
+			button = new rect(button);
+		} else {
+			button.removeRect();
+		}
+		button.showRect(canvas.width/2, canvas.height/2+13, LIGHTGREY, 200, 25);
+
+		if (buttonText == null) {
+			buttonText = new textBox(buttonText, 'Click here to continue', 20, BLACK);
+		} else {
+			buttonText.removeText();
+		}
+		buttonText.setText('Click here to continue');
+		buttonText.showText(0, canvas.height/2+30);
+		buttonText.textObj.setAttribute("onmousedown", "drawTrialDisplay()");
 	} else {
 		drawTrialDisplay(expVariables[currTrialN]);
 	}
@@ -205,7 +229,7 @@ var pushTrialInfo = function() {
 			specialKeys.push(stimuli[currTrialN][i].key);
 		}
 	}
-	t1 = performance.now(); // start timer for this trial
+	t1 = performance.now(); 
 
 	allTrials[currTrialN].trialStartTime = t1;
 
