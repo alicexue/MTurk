@@ -285,6 +285,7 @@ var getImgPosition = function(img, positionName) {
 /*
  *** RATING SCALE ***
 */
+var indicatorLine;
 var ratingScale = class ratingScale {
 	/*
 	  * @param {int} min: smallest numerical rating value
@@ -343,13 +344,24 @@ var ratingScale = class ratingScale {
 	 * Draws rating bar and selector
 	 * @param {double} x: coordinate of center of rating scale
 	 * @param {double} y: coordinate of top of rating scale
+	 * @param {boolean} drawIndicatorLine: draw grey line at center of scale
 	*/
-	drawRatingScale(x, y) {
+	drawRatingScale(x, y, drawIndicatorLine, scaleWidth, scaleHeight) {
 		this.x = x;
 		this.y = y;
-		this.drawRatingBar(this.x, this.y);
+		this.drawRatingBar(this.x, this.y, scaleWidth, scaleHeight);
 		var right = this.ratingBarX + this.ratingBarWidth;
 		var left = this.ratingBarX;
+
+		// draw indicator line
+		if (drawIndicatorLine) {
+			if (indicatorLine == null) {
+				indicatorLine = new rect(indicatorLine);
+			} else {
+				indicatorLine.removeRect();
+			}
+			indicatorLine.showRect(x, y, GREY, 2, this.ratingBarHeight);
+		}
 
 		// set initial position of selector at random
 		var randPos = Math.random() * (right - left) + left; 
@@ -364,13 +376,19 @@ var ratingScale = class ratingScale {
 	 * @param {double} x: coordinate of center of rating scale
 	 * @param {double} y: coordinate of top of rating scale
 	*/
-	drawRatingBar(x, y) {
+	drawRatingBar(x, y, width, height) {
 		this.x = x;
 		this.y = y;
-		var width = canvas.width/2;
-		var height = canvas.height*0.04;
 		this.ratingBarWidth = width;
 		this.ratingBarHeight = height;
+		if (width == null) {
+			width = canvas.width/2;
+			this.ratingBarWidth = width;
+		}
+		if (height == null) {
+			height = canvas.height*0.04
+			this.ratingBarHeight = height;
+		}
 		this.ratingBarX = this.x - width/2;
 		this.ratingBarY = this.y;
 
@@ -492,13 +510,14 @@ var ratingScale = class ratingScale {
 		}
 
 		var rating = clickX - this.ratingBarX + this.min;
+		console.log(rating)
 		rating = rating / nScaleValues * nRatingValues;
 		rating = rating/this.increment;
 		rating = Math.floor(rating);
 		rating = rating*this.increment;
 		t2 = evt.timeStamp;
 		//console.log(t2-t1);
-		//console.log(rating);
+		console.log(rating);
 		allTrials[currTrialN].rt = t2 - t1; 
 		allTrials[currTrialN].receivedResponse = true;
 		allTrials[currTrialN].rating = rating;
@@ -516,6 +535,9 @@ var ratingScale = class ratingScale {
 		}
 		if (this.ratingScale.contains(this.selector)) {
 			this.ratingScale.removeChild(this.selector);
+		}
+		if (indicatorLine!=null) {
+			indicatorLine.removeRect();
 		}
 		var i;
 		for (i=0;i<this.tickLabels.length;i++) {

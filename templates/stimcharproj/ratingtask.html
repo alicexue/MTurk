@@ -21,116 +21,14 @@
 
 		<script src="{{ url_for('static', filename='components.js') }}"></script>
 
-		<script src="{{ url_for('static', filename='run_ratingtask.js') }}"></script>
+		<script src="{{ url_for('static', filename='stimcharproj/run_scp_ratingtask.js') }}"></script>
 
 		<input type="hidden" id="hungerRatingResults" name="hungerRatingResults" value="">
 
 		<script> 
 			var expVariables={{expVariables|tojson|safe}};
 			var stimFolder = {{stimFolder|tojson|safe}};
-			var demo = {{demo|tojson|safe}};
-		</script>
-		<script>
-			var allTrials;
-			var currTrialN;
-			var instructions;
-			var scale;
-			var tb1, tb2, tb3, tb4, tb5;
-			var t1;
-
-			if (demo == 'True') {
-				startExperiment();
-			} else {
-				allTrials = [];
-				currTrialN = 0;
-
-				var currTrial = new trial({'question':'How hungry are you right now?'});
-				allTrials.push(currTrial);
-
-				instructionsText='Please rate your hunger first. How hungry are you?'
-				instructions = new textBox(instructions, instructionsText, 20, BLACK);
-				instructions.showText(0, canvas.height/2 - 60);
-
-				scale = new ratingScale(0,10,1,0.01,canvas.width/2,canvas.height/2, ["0", "", "", "", "", "5", "", "", "", "", "10"]);
-				scale.drawRatingScale(canvas.width/2,canvas.height/2); // draws/redraws scale
-
-				// 0 is the middle of the screen / the middle of the scale
-
-				var tb1Text='Not at all'
-				tb1 = new textBox(tb1, tb1Text, 20, BLACK);
-				tb1.showText(0 - scale.ratingBarWidth/2, canvas.height/2 + 85);
-
-				var tb2Text='A little'
-				tb2 = new textBox(tb2, tb2Text, 20, BLACK);
-				tb2.showText(0 - scale.ratingBarWidth/4, canvas.height/2 + 85);
-
-				var tb3Text='Somewhat'
-				tb3 = new textBox(tb3, tb3Text, 20, BLACK);
-				tb3.showText(0, canvas.height/2 + 85);
-
-				var tb4Text='Very'
-				tb4 = new textBox(tb4, tb4Text, 20, BLACK);
-				tb4.showText(0 + scale.ratingBarWidth/4, canvas.height/2 + 85);
-
-				var tb5Text='Extremely'
-				tb5 = new textBox(tb5, tb5Text, 20, BLACK);
-				tb5.showText(0 + scale.ratingBarWidth/2, canvas.height/2 + 85);
-
-				t1 = performance.now();
-			}
-
-			// overwrite the function getRating(evt) in components.js
-			var waitingForHungerRsp = false;
-			if (demo == 'False') {
-				waitingForHungerRsp = true;
-			}
-			var getRating = function(evt) {
-				if (!svg.contains(blankScreenCover)) { 
-					if (waitingForHungerRsp) {
-						var nRatingValues = (scale.max - scale.min)/scale.increment;
-						var nScaleValues = scale.ratingBarWidth/scale.increment;
-						var clickX = evt.clientX;
-
-						// mouse listener is on the selector, not the bar itself
-						// so mouse can actually be clicked on a location before the bar
-						// this readjusts the location of the click so it can only be at the max or min
-						if (clickX < scale.ratingBarX) {
-							clickX = scale.ratingBarX
-						} else if (clickX > scale.ratingBarX + scale.ratingBarWidth) {
-							clickX = scale.ratingBarX + scale.ratingBarWidth;
-						}
-
-						var rating = clickX - scale.ratingBarX + scale.min;
-						rating = rating / nScaleValues * nRatingValues;
-						rating = rating/scale.increment;
-						rating = Math.floor(rating);
-						rating = rating*scale.increment;
-						t2 = evt.timeStamp;
-						allTrials[currTrialN].rt = t2 - t1; 
-						instructions.removeText();
-						scale.removeScale();
-
-						tb1.removeText();
-						tb2.removeText();
-						tb3.removeText();
-						tb4.removeText();
-						tb5.removeText();
-
-						var strExpResults = JSON.stringify(allTrials);
-						document.getElementById('hungerRatingResults').value = strExpResults;
-
-						allTrials = [];
-						currTrialN = 0;
-						waitingForHungerRsp = false;
-						startExperiment();
-					} else {
-						if (!svg.contains(blankScreenCover)) { 
-							t2_UNIX = Date.now();
-							scale.recordRating(evt);
-						}
-					}
-				}
-			}
+			startExperiment();
 		</script>
 
 	</form>

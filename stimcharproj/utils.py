@@ -5,13 +5,16 @@ import random
 import unicodedata
 import pandas as pd
 import numpy as np
+import math
+
+import store_data
 
 _thisDir = os.path.dirname(os.path.abspath(__file__)).decode(sys.getfilesystemencoding())
 _parentDir = os.path.abspath(os.path.join(_thisDir, os.pardir))
 dataDir = _parentDir + '/data/'
 
 """
-Returns a list of all stimuli in the stim folder (assuming all the .bmp files are stimulus images)
+Returns a list of all stimuli in the stim folder (assuming all the .jpg files are stimulus images)
 """
 def get_stimuli(folder, prepend, fileextension):
 	'''
@@ -48,16 +51,16 @@ def get_foodq():
 Creates list of dictionaries where each dictionary holds the variables for one trial
 """
 def get_ratingtask_expVariables(stimFolder, demo):
-	stimuli = get_stimuli(stimFolder,'','.bmp')
-	random.shuffle(stimuli)
+	stimuli = get_stimuli(stimFolder,'','.jpg')
 
 	expVariables = [] # array of dictionaries
 
 	foodq = get_foodq()
 	random.shuffle(foodq);
 
-	for i in range(0,len(stimuli)):
-		for j in range(0, len(foodq)):
+	for j in range(0, len(foodq)):
+		random.shuffle(stimuli)
+		for i in range(0,len(stimuli)):
 			question = foodq[j]['question']
 			leftRatingText = foodq[j]['leftText']
 			middleRatingText = foodq[j]['middleText']
@@ -66,8 +69,8 @@ def get_ratingtask_expVariables(stimFolder, demo):
 			rs_max=10
 			rs_tickIncrement=1
 			rs_increment=0.01
-			rs_labelNames=["0", "", "", "", "", "5", "", "", "", "", "10"]
-			expVariables.append({'stimulus':stimuli[i], 'fullStimName':stimuli[i]+'.bmp', 'question':question, 'leftRatingText':leftRatingText, 'middleRatingText':middleRatingText, 'rightRatingText':rightRatingText, 'rs_min':rs_min, 'rs_max':rs_max, 'rs_tickIncrement':rs_tickIncrement, 'rs_increment':rs_increment, 'rs_labelNames':rs_labelNames})
+			rs_labelNames=["", "", "", "", "", "", "", "", "", "", ""]
+			expVariables.append({'stimulus':stimuli[i], 'fullStimName':stimuli[i]+'.jpg', 'question':question, 'leftRatingText':leftRatingText, 'middleRatingText':middleRatingText, 'rightRatingText':rightRatingText, 'rs_min':rs_min, 'rs_max':rs_max, 'rs_tickIncrement':rs_tickIncrement, 'rs_increment':rs_increment, 'rs_labelNames':rs_labelNames})
 	return expVariables
 
 """
@@ -115,7 +118,7 @@ neutralDimensions = {'taste':'How TASTY is this food?','health':'How HEALTHY is 
 """
 Returns a dictionary of the stimuli as keys and their bids as values
 csv_name is the location + name of the csv file where the bids are located
-The csv must have the stimulus name in a column with the heading "stimulus1"
+The csv must have the stimulus name in a column with the heading "stimulus"
 	the bid must be in a column with the heading "rating"
 # dim is dimension - key in neutralDimensions
 """
@@ -125,10 +128,10 @@ def get_bid_responses(dim, csv_name):
 	'''
 	df = pd.read_csv(csv_name)
 	df = df.loc[df['question']==neutralDimensions[dim]]
-	stim = df.loc[:,'stimulus1']
+	stim = df.loc[:,'stimulus']
 	bids = df.loc[:,'rating']
 	stimBidDF = pd.concat([bids,stim],axis=1)
-	stimBidDF = stimBidDF.rename(index=str, columns={"rating": "bid", "stimulus1": "stimulus"})
+	stimBidDF = stimBidDF.rename(index=str, columns={"rating": "rating", "stimulus": "stimulus"})
 	return stimBidDF
 
 
@@ -150,171 +153,95 @@ def get_common_item(l1,l2):
 		return referenceItem
 	return None
 
-### need to test, need to fix comments
-def get_reference_item():
-	taste=get_bid_responses('taste','/Users/alicexue/Documents/GitHub/MTurk/data/SCP/SCP_0008/SCP_0008_RatingsResults.csv')
-	health=get_bid_responses('health','/Users/alicexue/Documents/GitHub/MTurk/data/SCP/SCP_0008/SCP_0008_RatingsResults.csv')
-	taste=taste.sort_values("bid")
-	health=health.sort_values("bid")
+def get_choicetask_expVariables(expID, subjectID, stimFolder, demo):
+	if demo:
+		refItem = 'saltines'
+	else:
+		refItem = get_reference_item(expID,subjectID)
+	stimuli = get_stimuli(stimFolder,'','.jpg')
+	random.shuffle(stimuli)
+	expVariables = []
+	for stim in stimuli:
+		if stim != refItem:
+			leftRatingText = 'Strongly prefer reference'
+			middleRatingText = 'Neutral'
+			rightRatingText = 'Strongly prefer food'
+			rs_min=0
+			rs_max=10
+			rs_tickIncrement=1
+			rs_increment=0.01
+			rs_labelNames=["", "", "", "", "", "", "", "", "", "", ""]
+			expVariables.append({"question":"Do you prefer the reference item on the left or the food on the right?", "referenceItem":refItem,"secondFoodItem":stim,"fullReferenceItemName":refItem+".jpg", "fullSecondFoodItemName":stim+".jpg", 'leftRatingText':leftRatingText, 'middleRatingText':middleRatingText, 'rightRatingText':rightRatingText, 'rs_min':rs_min, 'rs_max':rs_max, 'rs_tickIncrement':rs_tickIncrement, 'rs_increment':rs_increment, 'rs_labelNames':rs_labelNames})
+	return expVariables
+
+def get_reference_item(expID,subjectID):
+	taste=get_bid_responses('taste', dataDir + '/' + expID + '/' + subjectID+'/'+subjectID+'_RatingsResults.csv')
+	health=get_bid_responses('health', dataDir + '/' + expID + '/' + subjectID+'/'+subjectID+'_RatingsResults.csv')
+	taste=taste.sort_values("rating")
+	health=health.sort_values("rating")
 	taste.reset_index(drop=True,inplace=True)
 	health.reset_index(drop=True,inplace=True)
 	sorted_taste=taste['stimulus'].values
 	sorted_health=health['stimulus'].values
 	nStim=len(taste)
-	binSize = int(round(nStim / 5.0)) # round up
+	binSize = int(math.ceil(nStim / 5.0)) # round up
 	midBin = int(nStim/binSize)/2 # round down
+
 	midBinIndices = [binSize*midBin,binSize*(midBin+1)]
 	neutral_taste=sorted_taste[midBinIndices[0]:midBinIndices[1]]
 	neutral_health=sorted_health[midBinIndices[0]:midBinIndices[1]]
-	print neutral_taste
-	print taste
-	print neutral_health
-	print health
-	referenceItem=get_common_item(neutral_taste,neutral_health)
-	# if not found
-	# find neutral on HEALTH and +1 positive on TASTE
-	bin_plus1Indices=midBinIndices = [binSize*(midBin+1),binSize*(midBin+2)]
-	taste_plus1=sorted_taste[midBinIndices[0]:midBinIndices[1]]
-	print 'neutral on HEALTH and +1 positive on TASTE'
-	referenceItem=get_common_item(taste_plus1,neutral_health)
-	if referenceItem != None: # found reference item based on HEALTH and +1 positive on TASTE
-		return referenceItem
-	# neutral HEALTH & -1 on TASTE
-	bin_minus1Indices=midBinIndices = [binSize*(midBin-1),binSize*(midBin)]
-	taste_minus1=sorted_taste[midBinIndices[0]:midBinIndices[1]]
-	print 'neutral HEALTH & -1 on TASTE'
-	referenceItem=get_common_item(taste_minus1,neutral_health)
-	if referenceItem != None: # found reference item based on HEALTH and +1 positive on TASTE
-		return referenceItem
-	# neutral TASTE & +1 HEALTH
-	print 'neutral TASTE & +1 HEALTH'
-	bin_plus1Indices=midBinIndices = [binSize*(midBin+1),binSize*(midBin+2)]
-	health_plus1=sorted_health[midBinIndices[0]:midBinIndices[1]]
-	referenceItem=get_common_item(neutral_taste,health_plus1)
-	if referenceItem != None: # found reference item based on HEALTH and +1 positive on TASTE
-		return referenceItem
-	# neutral TASTE, -1 on HEALTH
-	print 'neutral TASTE, -1 on HEALTH'
-	bin_minus1Indices=midBinIndices = [binSize*(midBin-1),binSize*(midBin)]
-	health_minus1=sorted_taste[midBinIndices[0]:midBinIndices[1]]
-	referenceItem=get_common_item(neutral_taste,health_minus1)
-	if referenceItem != None: # found reference item based on HEALTH and +1 positive on TASTE
-		return referenceItem
 
+	refItemInfo = []
 
-#print "REFERENCE ITEM", get_reference_item()
-
-
-"""
-Pair up lists of stimuli without taking bids into account
-"""
-def get_two_stimuli_lists_without_bids(folder, prepend, fileextension):
-	stimuli1 = get_stimuli(folder, prepend, fileextension)
-	random.shuffle(stimuli1)
-	stimuli2 = get_stimuli(folder, prepend, fileextension)
-	random.shuffle(stimuli2)
-	shamBids = []
-	for i in range(0,len(stimuli1)):
-		shamBids.append(-1)
-		if stimuli1[i] == stimuli2[i]:
-			newIndex = random.randint(0,len(stimuli1)-1)
-			while newIndex == i or stimuli1[newIndex] == stimuli2[newIndex]:
-				newIndex = random.randint(0,len(stimuli1)-1)
-			oldStimulus = stimuli2[i]
-			stimuli2[i] = stimuli2[newIndex]
-			stimuli2[newIndex] = oldStimulus
-	return [stimuli1, shamBids, stimuli2, shamBids]
-
-"""
-Get lists of two stimuli for choice task
-Stimuli are first rank ordered by bid
-pairDiff determines the various differences between the indices of each pair
-For each pair in pairDiff, there are unique pairings for each stimulus
-Since there are 7 elements in pairDiff and 60 stimuli, there are 7 * (60/2) = 210 pairings in total
-The order of the pairings is randomized so that on one trial, the first stimulus may be 2 indices apart from the second stimulus
-	and then on the next trial, the first stimulus may be 10 indices apart from the second stimulus
-The order of the stimuli within pairings is also randomized so that the stimulus with the higher bid 
-	is randomly put on the left or the right
-The array returned contains lists of the stimuli names and their respective bids
-"""
-def get_two_stimuli_lists(stimBidDF, folder, prepend, fileextension):
-	result = stimBidDF.sort_values("bid")
-
-	result = result.reset_index(drop=True)
-
-	if len(stimBidDF) == 2:
-		pairDiff = [1, 2]
-
-	if len(stimBidDF) == 60:
-		pairDiff = [1, 2, 3, 6, 10, 15, 30]
-	elif len(stimBidDF) == 80:
-		pairDiff = [1, 2, 5, 8, 10, 20, 40] # could be any combo of 1, 2, 4, 5, 8, 10, 20, 40
-	else: ##### change later
-		pairDiff = [1, 2]
-	stimuli = get_stimuli(folder, prepend, fileextension)
+	referenceItem = None
+	if referenceItem == None:
+		# neutral TASTE and HEALTH
+		print 'neutral on TASTE and HEALTH'
+		referenceItem=get_common_item(neutral_taste,neutral_health)
+		refItemInfo.append({'bin_1_type':'TASTE','bin_2_type':'HEALTH','bin_1_items':neutral_taste,'bin_2_items':neutral_health,'reference_item':referenceItem})
 	
-	nStim = len(stimuli)
-	pairingIndices = get_pairingIndices(pairDiff, nStim)
-	df = get_stimulus_pairings(result, pairingIndices)
-	shuffledDf = df.sample(frac=1)
-	stim1Names = shuffledDf['stimulus1'].values
-	stim2Names = shuffledDf['stimulus2'].values
-	stim1Bids = shuffledDf['stim1Bid'].values
-	stim2Bids = shuffledDf['stim2Bid'].values
-	return [stim1Names, stim1Bids, stim2Names, stim2Bids]
+	if referenceItem == None:
+		# find neutral on HEALTH and +1 on TASTE
+		bin_plus1Indices=midBinIndices = [binSize*(midBin+1),binSize*(midBin+2)]
+		taste_plus1=sorted_taste[midBinIndices[0]:midBinIndices[1]]
+		print 'neutral on HEALTH and +1 on TASTE'
+		referenceItem=get_common_item(taste_plus1,neutral_health)
+		refItemInfo.append({'bin_1_type':'+1 TASTE','bin_2_type':'HEALTH','bin_1_items':taste_plus1,'bin_2_items':neutral_health,'reference_item':referenceItem})
+	
+	if referenceItem == None:
+		# neutral HEALTH & -1 on TASTE
+		bin_minus1Indices=midBinIndices = [binSize*(midBin-1),binSize*(midBin)]
+		taste_minus1=sorted_taste[midBinIndices[0]:midBinIndices[1]]
+		print 'neutral HEALTH & -1 on TASTE'
+		referenceItem=get_common_item(taste_minus1,neutral_health)
+		refItemInfo.append({'bin_1_type':'-1 TASTE','bin_2_type':'HEALTH','bin_1_items':taste_minus1,'bin_2_items':neutral_health,'reference_item':referenceItem})
+	
+	if referenceItem == None:
+		# neutral TASTE & +1 HEALTH
+		print 'neutral TASTE & +1 HEALTH'
+		bin_plus1Indices=midBinIndices = [binSize*(midBin+1),binSize*(midBin+2)]
+		health_plus1=sorted_health[midBinIndices[0]:midBinIndices[1]]
+		referenceItem=get_common_item(neutral_taste,health_plus1)
+		refItemInfo.append({'bin_1_type':'TASTE','bin_2_type':'+1 HEALTH','bin_1_items':neutral_taste,'bin_2_items':health_plus1,'reference_item':referenceItem})
+	
+	if referenceItem == None:
+		# neutral TASTE, -1 on HEALTH
+		print 'neutral TASTE, -1 on HEALTH'
+		bin_minus1Indices=midBinIndices = [binSize*(midBin-1),binSize*(midBin)]
+		health_minus1=sorted_taste[midBinIndices[0]:midBinIndices[1]]
+		referenceItem=get_common_item(neutral_taste,health_minus1)
+		refItemInfo.append({'bin_1_type':'TASTE','bin_2_type':'-1 HEALTH','bin_1_items':neutral_taste,'bin_2_items':health_minus1,'reference_item':referenceItem})
 
-"""
-Helper method used in get_two_stimuli_lists to get list of pairings of stimuli
-"""
-def get_pairingIndices(pairDiff, nStim):
+	if referenceItem == None:
+		# otherwise return saltines
+		referenceItem = 'saltines'
+		refItemInfo.append({'bin_1_type':'None','bin_2_type':'None','bin_1_items':[],'bin_2_items':[],'reference_item':referenceItem})
+	
+	if subjectID.startswith(expID):
+		filePath = dataDir + expID + '/' + subjectID + '/'
+		store_data.results_to_csv(expID, subjectID, filePath, 'ReferenceItem.csv', refItemInfo, {})
+	return referenceItem
 
-	pairingIndices = []
-	for x in pairDiff:
-		stimUsed = resetStimUsed(nStim) # keep track of whether stimulus has been used in a pairing for this difference already
-		for i in range(0,nStim-x):
-			if stimUsed[i] == False:
-				pairingIndices.append([i, i+x])
-				stimUsed[i] = True
-				stimUsed[i+x] = True
-	return pairingIndices
-
-"""
-Helper method used in get_two_stimuli_lists to get dictionary of pairings of stimuli and their rank bid differences
-"""
-def get_stimulus_pairings(result, pairingIndices):
-	dfList = []
-	for pair in pairingIndices:
-		trialStim = {}
-		# shuffles indices within pairings
-		stim1Index = random.randint(0,1)
-		if stim1Index == 0:
-			stim2Index = 1
-		else:
-			stim2Index = 0
-		stimulus1 = result.loc[pair[stim1Index]]['stimulus']
-		stimulus2 = result.loc[pair[stim2Index]]['stimulus']
-		stim1Bid = float(result.loc[pair[stim1Index]]['bid'])
-		stim2Bid = float(result.loc[pair[stim2Index]]['bid'])
-		
-		trialStim['bidRankDifference'] = pair[1] - pair[0]
-		trialStim['stimulus1'] = stimulus1
-		trialStim['stimulus2'] = stimulus2
-		trialStim['stim1Bid'] = stim1Bid
-		trialStim['stim2Bid'] = stim2Bid
-
-		dfList.append(trialStim)
-	df = pd.DataFrame(dfList)
-	return df
-
-"""
-Helper method for get_two_stimuli_lists
-Returns a dictionary with keys from 0 to nStim-1, with each value as false
-"""
-def resetStimUsed(nStim):
-	stimUsed = {}
-	for i in range(0,nStim):
-		stimUsed[i] = False
-	return stimUsed
 
 """
 Checks request.args has assignmentId, hitId, turkSubmitTo, workerId, live - all but live is passed by MTurk

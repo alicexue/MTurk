@@ -8,6 +8,10 @@
 <body>
 	
 	<form method="POST">
+	
+	<p>
+	Here are the instructions again: You will see a series of pictures of food. For each picture, please rate only according to your own opinion about the food. There are no right or wrong answers. When rating the pictures, think about a snack sized portion of the food rather than the exact amount of food shown in the picture.
+	</p>
 	<center>
 	<p>
 	If you would like to repeat the demo, click here: <input type="submit" name="submit" value="Repeat Demo" style="font-size: 30px;"> 
@@ -16,14 +20,12 @@
 	To continue with the experiment, click here: <input type="submit" name="submit" value="Continue" style="font-size: 30px;">
 	</p>
 	</center>
-	<p>
-	You will see a series of pictures of food. For each picture, please rate only according to your own opinion about the food. There are no right or wrong answers.
-	</p>
-	
 	</form> 
 	
 	<center>
-	<img id="instructions" src="{{ url_for('static', filename = 'auction_instructions.png') }}">
+		<hr>
+			<img src="{{ url_for('static', filename = 'stimcharproj/scp_ratingtask.png') }}" width="700px">
+		<hr>
 	</center>
 </body>
 </html>

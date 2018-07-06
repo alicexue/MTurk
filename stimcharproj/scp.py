@@ -12,7 +12,7 @@ from store_data import *
 from manage_subject_info import *
 
 expId='SCP'
-foodStimFolder='/static/foodstim2/'
+foodStimFolder='/static/scp_foodstim/'
 
 scp = Blueprint('scp',  __name__, url_prefix='/SCP')
 
@@ -36,6 +36,7 @@ def consent_form():
 				return render_template('return_hit.html')
 			elif not workerId_exists(expId, workerId):
 				store_subject_info(expId, workerId, expTasksToComplete, assignmentId, hitId, turkSubmitTo) 
+			return redirect(url_for('.ratehunger', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 		elif 'assignmentId' in request.args and request.args.get('assignmentId') == 'ASSIGNMENT_ID_NOT_AVAILABLE':
 			# worker previewing HIT
 			workerId = 'testWorker' + str(random.randint(1000, 10000))
@@ -43,7 +44,7 @@ def consent_form():
 			hitId = 'testHIT' + str(random.randint(10000, 100000))
 			turkSubmitTo = 'www.calkins.psych.columbia.edu'
 			live = request.args.get('live') == "True"
-
+			return redirect(url_for('.ratingtask_demo_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 		else:
 			# in testing - accessed site through www.calkins.psych.columbia.edu
 			workerId = 'testWorker' + str(random.randint(1000, 10000))
@@ -52,7 +53,27 @@ def consent_form():
 			turkSubmitTo = 'www.calkins.psych.columbia.edu'
 			live = False
 			store_subject_info(expId, workerId, expTasksToComplete, assignmentId, hitId, turkSubmitTo) 
-		return redirect(url_for('.ratingtask_demo_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+			return redirect(url_for('.ratehunger', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+
+@scp.route("/ratehunger", methods = ["GET","POST"])
+def ratehunger():
+	containsAllMTurkArgs = contains_necessary_args(request.args)
+	if containsAllMTurkArgs:
+		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
+	if request.method == "GET" and containsAllMTurkArgs:
+		return render_template('stimcharproj/ratehunger.html')
+	elif containsAllMTurkArgs:
+		subjectId = get_subjectId(expId, workerId)
+		filePath = dataDir + expId + '/' + subjectId + '/'
+		hungerRatingResults=json.loads(request.form['hungerRatingResults'])
+		if not os.path.exists(os.path.join(filePath,subjectId+'_HungerRating1.csv')): 
+			results_to_csv(expId, subjectId, filePath, 'HungerRating1.csv', hungerRatingResults, {})
+			return redirect(url_for('.ratingtask_demo_instructions',demo=True,expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+		else:
+			results_to_csv(expId, subjectId, filePath, 'HungerRating2.csv', hungerRatingResults, {})
+			return redirect(url_for('.TFEQr18',demo=True,expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+	else:
+		return redirect(url_for('unauthorized_error'))
 
 @scp.route("/ratingtask_demo_instructions", methods = ["GET","POST"])
 def ratingtask_demo_instructions():
@@ -85,8 +106,8 @@ def ratingtask():
 
 	if 'demo' in request.args and containsAllMTurkArgs:
 		if request.method == "GET" and request.args.get('demo') == 'True':
-			expVariables = get_ratingtask_expVariables(stimFolder='/static/foodstim2/demo/',demo=True)
-			return render_template('stimcharproj/ratingtask.html', demo='True',expVariables=expVariables, stimFolder='/static/foodstim2/demo/')
+			expVariables = get_ratingtask_expVariables(stimFolder=foodStimFolder+'demo/',demo=True)
+			return render_template('stimcharproj/ratingtask.html', demo='True',expVariables=expVariables, stimFolder=foodStimFolder+'demo/')
 		else:
 			[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
 			"""
@@ -103,16 +124,12 @@ def ratingtask():
 				# trialVariables should be an array of dictionaries 
 				# each element of the array represents the condition for one trial
 				# set the variable conditions to the array of conditions
-				expVariables = get_ratingtask_expVariables(stimFolder='/static/foodstim2/',demo=False)
+				expVariables = get_ratingtask_expVariables(stimFolder=foodStimFolder,demo=False)
 
-				return render_template('stimcharproj/ratingtask.html', demo='False', expVariables=expVariables, stimFolder='/static/foodstim2/')
+				return render_template('stimcharproj/ratingtask.html', demo='False', expVariables=expVariables, stimFolder=foodStimFolder)
 			else:
 				subjectId = get_subjectId(expId, workerId)
-
 				filePath = dataDir + expId + '/' + subjectId + '/'
-
-				hungerRatingResults=json.loads(request.form['hungerRatingResults'])
-				results_to_csv(expId, subjectId, filePath, 'HungerRating1.csv', hungerRatingResults, {})
 
 				expResults = json.loads(request.form['experimentResults'])
 				set_completed_task(expId, workerId, 'completedRatingsTask', True)
@@ -131,7 +148,14 @@ def choicetask_demo_instructions():
 	if containsAllMTurkArgs:
 		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
 	if request.method == "GET" and containsAllMTurkArgs:
-		return render_template('stimcharproj/choicetask_demo_instructions.html')
+		refItem = 'saltines'
+		stimuli = get_stimuli(foodStimFolder,'','.jpg')
+		stimuli.remove(refItem)
+		random.shuffle(stimuli)
+		secondItem = stimuli[0]
+		refItem=foodStimFolder+refItem+'.jpg'
+		secondItem=foodStimFolder+secondItem+'.jpg'
+		return render_template('stimcharproj/choicetask_demo_instructions.html', refItem=refItem, secondItem=secondItem)
 	elif containsAllMTurkArgs:
 		if 'submit' in request.form.keys() and request.form['submit'] == 'Continue':
 			return redirect(url_for('.choicetask', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
@@ -148,7 +172,16 @@ def choicetask_instructions():
 	if containsAllMTurkArgs:
 		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
 	if request.method == "GET" and containsAllMTurkArgs:
-		return render_template('stimcharproj/choicetask_instructions.html')
+		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
+		subjectId = get_subjectId(expId, workerId)
+		refItem = get_reference_item(expId,subjectId)
+		stimuli = get_stimuli(foodStimFolder,'','.jpg')
+		stimuli.remove(refItem)
+		random.shuffle(stimuli)
+		secondItem = stimuli[0]
+		refItem=foodStimFolder+refItem+'.jpg'
+		secondItem=foodStimFolder+secondItem+'.jpg'
+		return render_template('stimcharproj/choicetask_instructions.html', refItem=refItem, secondItem=secondItem)
 	elif containsAllMTurkArgs:
 		if 'submit' in request.form.keys() and request.form['submit'] == 'Continue':
 			return redirect(url_for('.choicetask', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
@@ -166,15 +199,7 @@ def choicetask():
 
 	if 'demo' in request.args and containsAllMTurkArgs:
 		if request.method == "GET" and request.args.get('demo') == 'True':
-			[stim1Names, stim1Bids, stim2Names, stim2Bids] = get_two_stimuli_lists_without_bids(foodStimFolder+'demo/', '', '.bmp')
-			expVariables = [] # array of dictionaries
-
-			deltas = []
-			for i in range(0,len(stim1Bids)):
-				deltas.append(stim2Bids[i] - stim1Bids[i])
-
-			for i in range(0,len(stim1Bids)):
-				expVariables.append({"stimulus1":stim1Names[i],"stimulus2":stim2Names[i],"stim1Bid":stim1Bids[i],"stim2Bid":stim2Bids[i], "delta":deltas[i], "fullStim1Name":stim1Names[i]+".bmp", "fullStim2Name":stim2Names[i]+".bmp"})
+			expVariables = get_choicetask_expVariables(expId, '', foodStimFolder+'demo/', demo=True)
 			return render_template('stimcharproj/choicetask.html', expId=expId, expVariables=expVariables, stimFolder=foodStimFolder+'demo/')
 		else:
 			[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
@@ -196,21 +221,7 @@ def choicetask():
 				# each element of the array represents the condition for one trial
 				# set the variable conditions to the array of conditions
 
-				stim1Bids = [];
-				stim2Bids = [];
-
-				ratingsResultsFileName = '_RatingsResults.csv'
-				stimBidDict = get_bid_responses('taste',dataDir + expId + '/' + subjectId + '/' + subjectId + ratingsResultsFileName)
-				[stim1Names, stim1Bids, stim2Names, stim2Bids] = get_two_stimuli_lists(stimBidDict, foodStimFolder, '', '.bmp')
-				expVariables = [] # array of dictionaries
-
-				deltas = []
-				for i in range(0,len(stim1Bids)):
-					deltas.append(stim2Bids[i] - stim1Bids[i])
-
-				for i in range(0,len(stim1Bids)):
-					expVariables.append({"stimulus1":stim1Names[i],"stimulus2":stim2Names[i],"stim1Bid":stim1Bids[i],"stim2Bid":stim2Bids[i], "delta":deltas[i], "fullStim1Name":stim1Names[i]+".bmp", "fullStim2Name":stim2Names[i]+".bmp"})
-
+				expVariables = get_choicetask_expVariables(expId, subjectId, foodStimFolder, demo=False)
 				return render_template('stimcharproj/choicetask.html', expId=expId, expVariables=expVariables, stimFolder=foodStimFolder)
 			else:
 				expResults = json.loads(request.form['experimentResults'])
@@ -219,7 +230,7 @@ def choicetask():
 
 				set_completed_task(expId, workerId, 'completedChoiceTask', True)
 
-				return redirect(url_for('.TFEQr18', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+				return redirect(url_for('.ratehunger', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 		else:
 			return redirect(url_for('unauthorized_error'))
 	else:
@@ -272,9 +283,6 @@ def EAT26():
 			q_and_a.append(tmp)
 
 		filePath = dataDir + expId + '/' + subjectId + '/'
-
-		hungerRatingResults=json.loads(request.form['hungerRatingResults'])
-		results_to_csv(expId, subjectId, filePath, 'HungerRating2.csv', hungerRatingResults, {})
 
 		set_completed_task(expId, workerId, 'completedEAT26', True)
 		results_to_csv(expId, subjectId, filePath, 'EAT26.csv', q_and_a, {})
