@@ -30,7 +30,6 @@ svg.setAttribute("height", winHeight.toString());
 var t1, t2; 
 // t1: start time of trial
 // t2: end time of trial
-var t1_UNIX, t2_UNIX;
 
 var origImgWidth = 600; // necessary for rescaling images and positioning scale
 var origImgHeight = 600; // necessary for rescaling images
@@ -169,10 +168,7 @@ var pushTrialInfo = function() {
 	}
 
 	t1 = performance.now(); // start timer for this trial
-	t1_UNIX = Date.now();
-
 	allTrials[currTrialN].trialStartTime = t1;
-	allTrials[currTrialN].trialStartTime_UNIX = t1_UNIX;
 
 	allTrials[currTrialN]['referenceItem']=expVariables[currTrialN]['referenceItem']
 	allTrials[currTrialN]['secondFoodItem']=expVariables[currTrialN]['secondFoodItem']
@@ -184,7 +180,6 @@ var pushTrialInfo = function() {
 */
 var endTrial = function() {
 	t2 = performance.now();
-	t2_UNIX = Date.now();
 	allTrials[currTrialN]['stimulusLoaded'] = stimuli[currTrialN][0].loaded;
 	if (allTrials[currTrialN].rating == null) { // did not respond
 		drawNextTrial = true;
@@ -193,8 +188,6 @@ var endTrial = function() {
 		allTrials[currTrialN].rating = 'NaN';
 		allTrials[currTrialN].trialEndTime = t2;
 		allTrials[currTrialN].trialDuration = t2 - t1;
-		allTrials[currTrialN].trialEndTime_UNIX = t2_UNIX;
-		allTrials[currTrialN].rt_UNIX = t2_UNIX - t1_UNIX;
 	}
 	nextTrial();
 }

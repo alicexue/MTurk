@@ -510,14 +510,13 @@ var ratingScale = class ratingScale {
 		}
 
 		var rating = clickX - this.ratingBarX + this.min;
-		console.log(rating)
 		rating = rating / nScaleValues * nRatingValues;
 		rating = rating/this.increment;
 		rating = Math.floor(rating);
 		rating = rating*this.increment;
 		t2 = evt.timeStamp;
 		//console.log(t2-t1);
-		console.log(rating);
+		//console.log(rating);
 		allTrials[currTrialN].rt = t2 - t1; 
 		allTrials[currTrialN].receivedResponse = true;
 		allTrials[currTrialN].rating = rating;
@@ -563,7 +562,6 @@ var moveSelector = function(evt) {
 */
 var getRating = function(evt) {
 	if (!svg.contains(blankScreenCover)) { 
-		t2_UNIX = Date.now();
 		scale.recordRating(evt);
 	}
 }

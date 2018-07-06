@@ -29,7 +29,6 @@ svg.setAttribute("height", winHeight.toString());
 var t1, t2; 
 // t1: start time of trial
 // t2: end time of trial
-var t1_UNIX, t2_UNIX;
 
 var origImgWidth = 600; // necessary for rescaling images and positioning scale
 var origImgHeight = 600; // necessary for rescaling images
@@ -37,6 +36,9 @@ var origImgHeight = 600; // necessary for rescaling images
 var widthPercent = .80;
 var rescaleHeight = true;
 var stimNames = ["stimulus"];
+
+var questionTimer;
+var questionDisplayDuration=2000;
 
 const GREY = "#808080";
 
@@ -64,7 +66,7 @@ var drawStimuliToCanvas = function(trialVariables, trialN, canvasCtx) {
 
 var startFirstTrial = function() {
 	removeLoadingText();
-	drawTrialDisplay(expVariables[currTrialN]); 
+	drawQuestionDisplay(); 
 }
 
 /*
@@ -79,9 +81,14 @@ var instructions;
 var leftRating;
 var middleRating;
 var rightRating;
-var drawTrialDisplay = function(trialVariables) {
+var drawTrialDisplay = function() {
+	trialVariables = expVariables[currTrialN];
+	clearTimeout(questionTimer);
 	// condition is a dictionary - each key can be used to set trial conditions
 	ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+	if (question!=null) {
+		question.removeText();
+	}
 	var stimulus = trialVariables['stimulus'];
 
 	var trialCanvas = document.getElementById("trial"+currTrialN);
@@ -142,9 +149,45 @@ var drawTrialDisplay = function(trialVariables) {
 	}
 	rightRating.setText(rightRatingText);
 	rightRating.showText(0 + scale.ratingBarWidth/2, canvas.height/2 + scaledHeight/2 + 65);
-
 }
 
+var removeTrialDisplay = function() {
+	ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+	if (instructions != null) {
+		instructions.removeText();
+	}
+	if (scale!=null) {
+		scale.removeScale();
+	}
+	if (leftRating != null) {
+		leftRating.removeText();
+	}
+	if (middleRating != null) {
+		middleRating.removeText();
+	}
+	if (rightRating != null) {
+		rightRating.removeText();
+	}
+}
+
+var question;
+var drawQuestionDisplay = function() {
+	if (currTrialN == 0 || (currTrialN - 1 > 0 && expVariables[currTrialN]['question'] != expVariables[currTrialN-1]['question'])) { // question is the same as the one on the previous trial
+		removeTrialDisplay();
+		trialVariables = expVariables[currTrialN];
+		instructionsText=trialVariables['question']
+		if (question == null) {
+			question = new textBox(question, instructionsText, 25, BLACK);
+		} else {
+			question.removeText();
+		}
+		question.setText(instructionsText);
+		question.showText(0, canvas.height/2);
+		questionTimer = setTimeout(drawTrialDisplay,questionDisplayDuration);
+	} else {
+		drawTrialDisplay(expVariables[currTrialN]);
+	}
+}
 
 /*
  * Initializes set of trial information and adds to allTrials
@@ -162,12 +205,9 @@ var pushTrialInfo = function() {
 			specialKeys.push(stimuli[currTrialN][i].key);
 		}
 	}
-
 	t1 = performance.now(); // start timer for this trial
-	t1_UNIX = Date.now();
 
 	allTrials[currTrialN].trialStartTime = t1;
-	allTrials[currTrialN].trialStartTime_UNIX = t1_UNIX;
 
 	allTrials[currTrialN]['stimulus'] = stimuli[currTrialN][0].id;
 }
@@ -178,7 +218,6 @@ var pushTrialInfo = function() {
 */
 var endTrial = function() {
 	t2 = performance.now();
-	t2_UNIX = Date.now();
 	var i;
 	for (i=0;i<stimuli[currTrialN].length;i++) {
 		allTrials[currTrialN]['stimulus' + parseInt(i+1,10) + 'Loaded'] = stimuli[currTrialN][i].loaded;
@@ -190,8 +229,6 @@ var endTrial = function() {
 		allTrials[currTrialN].rating = 'NaN';
 		allTrials[currTrialN].trialEndTime = t2;
 		allTrials[currTrialN].trialDuration = t2 - t1;
-		allTrials[currTrialN].trialEndTime_UNIX = t2_UNIX;
-		allTrials[currTrialN].rt_UNIX = t2_UNIX - t1_UNIX;
 	}
 	nextTrial();
 }
@@ -210,7 +247,7 @@ var nextTrial = function() {
 	rightRating.removeText();
 	currTrialN+=1; // iterate to next trial
 	if (currTrialN < expVariables.length) {
-		drawTrialDisplay(expVariables[currTrialN]);
+		drawQuestionDisplay();
 	} else {
 		var strExpResults = JSON.stringify(allTrials);
 		document.getElementById('experimentResults').value = strExpResults;
@@ -246,7 +283,7 @@ var resizeWindow = function() {
 		svg.removeChild(alertText);
 	}
 
-	drawTrialDisplay(expVariables[currTrialN]);
+	drawQuestionDisplay();
 }
 
 window.onresize = function() {
