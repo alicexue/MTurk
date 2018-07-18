@@ -106,8 +106,65 @@ def kanga_task():
 			filePath = dataDir + expId + '/' + subjectId + '/'
 			set_completed_task(expId, workerId, 'completedKangaTask', True)
 			results_to_csv(expId, subjectId, filePath, 'results.csv', expResults, {})
-			return redirect(url_for('thankyou',expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+			return redirect(url_for('.rating_task',expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 	else:
 		return redirect(url_for('unauthorized_error'))
 
+@curiosity_tasks.route("/rating_task", methods = ["GET","POST"])
+def rating_task():
+	containsAllMTurkArgs = contains_necessary_args(request.args)
 
+	if 'demo' in request.args and containsAllMTurkArgs:
+		if request.method == "GET" and request.args.get('demo') == 'True':
+			subjectId = get_subjectId(expId, workerId)
+			expVariables = get_ratingtask_expVariables(subjectId)
+			return render_template('kangacuriositytask/rating_task.html', demo='True',expVariables=expVariables)
+		else:
+			[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
+			if assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE':
+				return redirect(url_for('accept_hit'))
+			return redirect(url_for('.ratingtask_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+	elif containsAllMTurkArgs:
+		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
+
+		if workerId_exists(expId, workerId):
+			if request.method == "GET":
+				subjectId = get_subjectId(expId, workerId)
+				expVariables = get_ratingtask_expVariables(subjectId)
+
+				return render_template('kangacuriositytask/rating_task.html', demo='False', expVariables=expVariables)
+			else:
+				subjectId = get_subjectId(expId, workerId)
+				filePath = dataDir + expId + '/' + subjectId + '/'
+
+				set_completed_task(expId, workerId, 'completedRatingsTask', True)
+
+				expResults = json.loads(request.form['experimentResults'])
+
+				correctFormat = True
+				condensedExpResults = []
+				for i in range(0,len(expResults)):
+					if i%2 == 0: # question
+						trial = {}
+						trial['trialN']=i/2
+						trial['QuestionNum']=expResults[i]['QuestionNum']
+						trial['Question']=expResults[i]['Question']
+						trial['Answer']=expResults[i]['Answer']
+						trial['QuestionRating']=expResults[i]['rating']
+					else: # answer
+						if trial['Answer'] == expResults[i]['Answer']:
+							trial['AnswerRating']=expResults[i]['rating']
+							condensedExpResults.append(trial)
+						else:
+							correctFormat = False 
+				if correctFormat:
+					results_to_csv(expId, subjectId, filePath, 'RatingsResults.csv', condensedExpResults, {})
+				else: # raw results
+					results_to_csv(expId, subjectId, filePath, 'RawRatingsResults.csv', expResults, {})
+
+				return redirect(url_for('thankyou', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+		
+		else:
+			return redirect(url_for('unauthorized_error'))
+	else:
+		return redirect(url_for('unauthorized_error'))
