@@ -11,8 +11,9 @@ from utils import *
 from store_data import *
 from manage_subject_info import *
 
-subsetExpIds=["SCP_subset_1","SCP_subset_2"]
-subsets={"SCP_subset_1":'/static/scp_foodstim/',"SCP_subset_2":'/static/scp_foodstim/'}
+subsetExpIds=["SCP-12","SCP-13","SCP-14","SCP-15","SCP-16","SCP-23","SCP-24","SCP-25","SCP-26","SCP-34","SCP-35","SCP-36","SCP-45","SCP-46","SCP-56"]
+
+refItemDict={"SCP-12":"Pretzels", "SCP-13":"Pretzels", "SCP-14":"baked potato", "SCP-15":"saltines", "SCP-16":"Pretzels", "SCP-23":"air popcorn", "SCP-24":"baked potato", "SCP-25":"saltines", "SCP-26":"ritz", "SCP-34":"baked potato", "SCP-35":"saltines", "SCP-36":"ritz", "SCP-45":"saltines", "SCP-46":"baked potato", "SCP-56":"saltines"}
 
 scp = Blueprint('scp',  __name__, url_prefix='/SCP/<expId>')
 
@@ -35,16 +36,18 @@ def consent_form(expId):
 				[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
 				participatedInPreviousOrSameHIT=False
 				for exp in subsetExpIds:
-					if workerId_exists(exp, workerId) and completed_task(exp, workerId, 'completedRatingsTask'):
+					if workerId_exists(exp, workerId) and completed_task(exp, workerId, 'completedTFEQr18'):
 						participatedInPreviousOrSameHIT=True
 				if participatedInPreviousOrSameHIT:
 					return render_template('return_hit.html')
 				elif not workerId_exists(expId, workerId):
 					store_subject_info(expId, workerId, expTasksToComplete, assignmentId, hitId, turkSubmitTo) 
+				"""
 				if request.args.get('assignmentId') == 'ASSIGNMENT_ID_NOT_AVAILABLE':
 					return redirect(url_for('.ratingtask_demo_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 				else:
 					return redirect(url_for('.ratehunger', num=1, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+				"""
 			elif 'assignmentId' in request.args and request.args.get('assignmentId') == 'ASSIGNMENT_ID_NOT_AVAILABLE':
 				# worker previewing HIT
 				workerId = 'testWorker' + str(random.randint(1000, 10000))
@@ -52,7 +55,7 @@ def consent_form(expId):
 				hitId = 'testHIT' + str(random.randint(10000, 100000))
 				turkSubmitTo = 'www.calkins.psych.columbia.edu'
 				live = request.args.get('live') == "True"
-				return redirect(url_for('.ratingtask_demo_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+				#return redirect(url_for('.ratingtask_demo_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 			else:
 				# in testing - accessed site through www.calkins.psych.columbia.edu
 				workerId = 'testWorker' + str(random.randint(1000, 10000))
@@ -61,7 +64,23 @@ def consent_form(expId):
 				turkSubmitTo = 'www.calkins.psych.columbia.edu'
 				live = False
 				store_subject_info(expId, workerId, expTasksToComplete, assignmentId, hitId, turkSubmitTo) 
-				return redirect(url_for('.ratehunger', num=1, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+				#return redirect(url_for('.ratehunger', num=1, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+			return redirect(url_for('.intro', num=1, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+	else:
+		return redirect(url_for('unauthorized_error'))
+
+@scp.route("/intro", methods = ["GET","POST"])
+def intro(expId):
+	containsAllMTurkArgs = contains_necessary_args(request.args)
+	if containsAllMTurkArgs:
+		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
+	if request.method == "GET" and containsAllMTurkArgs:
+		return render_template('stimcharproj/intro.html')
+	elif containsAllMTurkArgs:
+		if request.args.get('assignmentId') == 'ASSIGNMENT_ID_NOT_AVAILABLE':
+			return redirect(url_for('.ratingtask_demo_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+		else:
+			return redirect(url_for('.ratehunger',num=1,expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 	else:
 		return redirect(url_for('unauthorized_error'))
 
@@ -86,11 +105,15 @@ def ratehunger(expId,num):
 
 @scp.route("/ratingtask_demo_instructions", methods = ["GET","POST"])
 def ratingtask_demo_instructions(expId):
+	foodStimFolder='/static/stimcharproj/'+expId+'/'
 	containsAllMTurkArgs = contains_necessary_args(request.args)
 	if containsAllMTurkArgs:
 		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
 	if request.method == "GET" and containsAllMTurkArgs:
-		return render_template('stimcharproj/ratingtask_demo_instructions.html')
+		foodStimFolder = foodStimFolder + 'demo/'
+		demo_stimuli = get_stimuli(foodStimFolder,'','.jpg')
+		refItem=foodStimFolder+demo_stimuli[0]+'.jpg'
+		return render_template('stimcharproj/ratingtask_demo_instructions.html', refItem=refItem)
 	elif containsAllMTurkArgs:
 		return redirect(url_for('.ratingtask', demo=True,expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 	else:
@@ -98,11 +121,14 @@ def ratingtask_demo_instructions(expId):
 
 @scp.route("/ratingtask_instructions", methods = ["GET","POST"])
 def ratingtask_instructions(expId):
+	foodStimFolder='/static/stimcharproj/'+expId+'/'
 	containsAllMTurkArgs = contains_necessary_args(request.args)
 	if containsAllMTurkArgs:
 		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
 	if request.method == "GET" and containsAllMTurkArgs:
-		return render_template('stimcharproj/ratingtask_instructions.html')
+		demo_stimuli = get_stimuli(foodStimFolder + 'demo/','','.jpg')
+		refItem=foodStimFolder+'demo/'+demo_stimuli[0]+'.jpg'
+		return render_template('stimcharproj/ratingtask_instructions.html', refItem=refItem)
 	elif containsAllMTurkArgs:
 		return redirect(url_for('.ratingtask',expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 	else:
@@ -110,13 +136,14 @@ def ratingtask_instructions(expId):
 
 @scp.route("/ratingtask", methods = ["GET","POST"])
 def ratingtask(expId):
-	foodStimFolder=subsets[expId]
+	foodStimFolder='/static/stimcharproj/'+expId+'/'
 	oneLineInstructions = "Rate how much you want to eat this food from 0 (least) to 10 (most)."
 	containsAllMTurkArgs = contains_necessary_args(request.args)
 
 	if 'demo' in request.args and containsAllMTurkArgs:
 		if request.method == "GET" and request.args.get('demo') == 'True':
 			expVariables = get_ratingtask_expVariables(stimFolder=foodStimFolder+'demo/',demo=True)
+			expVariables=expVariables[:6] # only first 2 questions - 3 stim per q
 			return render_template('stimcharproj/ratingtask.html', demo='True',expVariables=expVariables, stimFolder=foodStimFolder+'demo/')
 		else:
 			[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
@@ -152,19 +179,16 @@ def ratingtask(expId):
 
 @scp.route("/choicetask_demo_instructions", methods = ["GET","POST"])
 def choicetask_demo_instructions(expId):
-	foodStimFolder=subsets[expId]
+	foodStimFolder='/static/stimcharproj/'+expId+'/'
 	containsAllMTurkArgs = contains_necessary_args(request.args)
 	if containsAllMTurkArgs:
 		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
 	if request.method == "GET" and containsAllMTurkArgs:
-		refItem = 'saltines'
+		foodStimFolder = foodStimFolder + 'demo/'
 		stimuli = get_stimuli(foodStimFolder,'','.jpg')
-		stimuli.remove(refItem)
-		random.shuffle(stimuli)
-		secondItem = stimuli[0]
+		refItem=stimuli[0]
 		refItem=foodStimFolder+refItem+'.jpg'
-		secondItem=foodStimFolder+secondItem+'.jpg'
-		return render_template('stimcharproj/choicetask_demo_instructions.html', refItem=refItem, secondItem=secondItem)
+		return render_template('stimcharproj/choicetask_demo_instructions.html', refItem=refItem)
 	elif containsAllMTurkArgs:
 		if 'submit' in request.form.keys() and request.form['submit'] == 'Continue':
 			return redirect(url_for('.choicetask', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
@@ -177,21 +201,22 @@ def choicetask_demo_instructions(expId):
 
 @scp.route("/choicetask_instructions", methods = ["GET","POST"])
 def choicetask_instructions(expId):
-	foodStimFolder=subsets[expId]
+	foodStimFolder='/static/stimcharproj/'+expId+'/'
 	containsAllMTurkArgs = contains_necessary_args(request.args)
 	if containsAllMTurkArgs:
 		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
 	if request.method == "GET" and containsAllMTurkArgs:
 		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
 		subjectId = get_subjectId(expId, workerId)
-		refItem = get_reference_item(expId,subjectId)
+		defaultRefItem=refItemDict[expId]
+		refItem = get_reference_item(expId,subjectId,defaultRefItem)
 		stimuli = get_stimuli(foodStimFolder,'','.jpg')
 		stimuli.remove(refItem)
 		random.shuffle(stimuli)
 		secondItem = stimuli[0]
 		refItem=foodStimFolder+refItem+'.jpg'
 		secondItem=foodStimFolder+secondItem+'.jpg'
-		return render_template('stimcharproj/choicetask_instructions.html', refItem=refItem, secondItem=secondItem)
+		return render_template('stimcharproj/choicetask_instructions.html', refItem=refItem)
 	elif containsAllMTurkArgs:
 		if 'submit' in request.form.keys() and request.form['submit'] == 'Continue':
 			return redirect(url_for('.choicetask', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
@@ -204,13 +229,13 @@ def choicetask_instructions(expId):
 
 @scp.route("/choicetask", methods = ["GET","POST"])
 def choicetask(expId):
-	foodStimFolder=subsets[expId]
+	foodStimFolder='/static/stimcharproj/'+expId+'/'
 	name = 'choicetask'
 	containsAllMTurkArgs = contains_necessary_args(request.args)
 
 	if 'demo' in request.args and containsAllMTurkArgs:
 		if request.method == "GET" and request.args.get('demo') == 'True':
-			expVariables = get_choicetask_expVariables(expId, '', foodStimFolder+'demo/', demo=True)
+			expVariables = get_choicetask_expVariables(expId, '', foodStimFolder+'demo/', defaultRefItem=refItemDict[expId],demo=True)
 			return render_template('stimcharproj/choicetask.html', expId=expId, expVariables=expVariables, stimFolder=foodStimFolder+'demo/')
 		else:
 			[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
@@ -232,7 +257,7 @@ def choicetask(expId):
 				# each element of the array represents the condition for one trial
 				# set the variable conditions to the array of conditions
 
-				expVariables = get_choicetask_expVariables(expId, subjectId, foodStimFolder, demo=False)
+				expVariables = get_choicetask_expVariables(expId, subjectId, foodStimFolder, defaultRefItem=refItemDict[expId], demo=False)
 				return render_template('stimcharproj/choicetask.html', expId=expId, expVariables=expVariables, stimFolder=foodStimFolder)
 			else:
 				expResults = json.loads(request.form['experimentResults'])

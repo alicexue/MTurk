@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Food Rating Task Instructions</title>
-	<center><h2>Food Rating Task Instructions</h2></center>
+	<title>Food rating instructions</title>
+	<center><h2>Food rating instructions</h2></center>
 	<link href="/static/style.css" rel="stylesheet">
 </head>
 <body>
@@ -10,7 +10,7 @@
 	<form method="POST">
 	
 	<p>
-	Here are the instructions again: You will see a series of pictures of food. For each picture, please rate only according to your own opinion about the food. There are no right or wrong answers. When rating the pictures, think about a snack sized portion of the food rather than the exact amount of food shown in the picture.
+	Here are the instructions again: You will see a series of pictures of food (as shown below). For each picture, please rate only according to your own opinion about the food. There are no right or wrong answers. When rating the pictures, think about a snack sized portion of the food rather than the exact amount of food shown in the picture.
 	</p>
 	<center>
 	<p>
@@ -22,10 +22,13 @@
 	</center>
 	</form> 
 	
+	<hr>
 	<center>
-		<hr>
-			<img src="{{ url_for('static', filename = 'stimcharproj/scp_ratingtask.png') }}" width="700px">
-		<hr>
+		<p>Rate this food</p>
+		<img src="{{refItem}}">
+		<img src="{{ url_for('static', filename = 'stimcharproj/scp_ratingtask_scale_good_bad.png') }}" width="70%">
 	</center>
+	</hr>
+	<br><br>
 </body>
 </html>

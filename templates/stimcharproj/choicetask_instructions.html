@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Choice Task Instructions</title>
-	<center><h2>Choice Task Instructions</h2></center>
+	<title>Food choice instructions</title>
+	<center><h2>Food choice instructions</h2></center>
 	<link href="/static/style.css" rel="stylesheet">
 </head>
 <body>
 	<p>
-	Imagine you have to choose a food to eat right now. On each trial, you will see this reference food on the left - it is always the same. On the right the food picture will change on each trial. For each picture, indicate whether you prefer the food on the right or the reference food on the left. When rating the pictures, think about a snack sized portion of the food rather than the exact amount of food shown in the picture.
+	Here are the instructions again: Imagine you have to choose a food to eat right now. On each trial, you will see this reference food (shown below) on the left - it is always the same. On the right the food picture will change on each trial. For each picture, indicate whether you prefer the food on the right or the reference food on the left. When rating the pictures, think about a snack sized portion of the food rather than the exact amount of food shown in the picture.
 	</p>
+	<center>
+		<img src="{{refItem}}">
+	</center>
 	<center>
 	<form method="POST">
 	<p>
@@ -19,28 +22,6 @@
 	</p>
 	</center>
 	</form> 
-	<hr>
-	<center><p>Do you prefer the reference item on the left or the food on the right?</p></center>
-	<center>
-		<table>
-		  <tr>
-		  	<th>
-		    <img src="{{refItem}}" style="width:100%">
-		</th>
-		<th style="width:50px">
-		</th>
-		<th>
-		    <img src="{{secondItem}}" style="width:100%">
-		  </th>
-		</tr>
-		</table>
-	</center>
-	<center>
-	<img src="{{ url_for('static', filename = 'stimcharproj/scp_ratingtask_scale.png') }}" width="80%">
-	<hr>
-	</center>
-	<center>
-	</center>
 	<br><br>
 </body>
 </html>

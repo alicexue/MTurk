@@ -153,11 +153,17 @@ def get_common_item(l1,l2):
 		return referenceItem
 	return None
 
-def get_choicetask_expVariables(expID, subjectID, stimFolder, demo):
+def get_choicetask_expVariables(expID, subjectID, stimFolder, defaultRefItem, demo):
 	if demo:
-		refItem = 'saltines'
+		refItem = 'tomato'
 	else:
-		refItem = get_reference_item(expID,subjectID)
+		# check if get_reference_item was already called when instructions display was created
+		if os.path.exists(os.path.join(dataDir,expID,subjectID,subjectID+'_ReferenceItem.csv')):
+			print "EXISTS"
+			df=pd.read_csv(os.path.join(dataDir,expID,subjectID,subjectID+'_ReferenceItem.csv'))
+			refItem=df['reference_item'].values[-1]
+		else:
+			refItem = get_reference_item(expID,subjectID,defaultRefItem)
 	stimuli = get_stimuli(stimFolder,'','.jpg')
 	random.shuffle(stimuli)
 	expVariables = []
@@ -174,7 +180,7 @@ def get_choicetask_expVariables(expID, subjectID, stimFolder, demo):
 			expVariables.append({"question":"Do you prefer the reference item on the left or the food on the right?", "referenceItem":refItem,"secondFoodItem":stim,"fullReferenceItemName":refItem+".jpg", "fullSecondFoodItemName":stim+".jpg", 'leftRatingText':leftRatingText, 'middleRatingText':middleRatingText, 'rightRatingText':rightRatingText, 'rs_min':rs_min, 'rs_max':rs_max, 'rs_tickIncrement':rs_tickIncrement, 'rs_increment':rs_increment, 'rs_labelNames':rs_labelNames})
 	return expVariables
 
-def get_reference_item(expID,subjectID):
+def get_reference_item(expID,subjectID,defaultRefItem):
 	taste=get_bid_responses('taste', dataDir + '/' + expID + '/' + subjectID+'/'+subjectID+'_RatingsResults.csv')
 	health=get_bid_responses('health', dataDir + '/' + expID + '/' + subjectID+'/'+subjectID+'_RatingsResults.csv')
 	taste=taste.sort_values("rating")
@@ -234,7 +240,7 @@ def get_reference_item(expID,subjectID):
 
 	if referenceItem == None:
 		# otherwise return saltines
-		referenceItem = 'saltines'
+		referenceItem = defaultRefItem
 		refItemInfo.append({'bin_1_type':'None','bin_2_type':'None','bin_1_items':[],'bin_2_items':[],'reference_item':referenceItem})
 	
 	if subjectID.startswith(expID):

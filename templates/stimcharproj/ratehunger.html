@@ -17,6 +17,8 @@
 	<script src="{{ url_for('static', filename='stimcharproj/run_scp_ratingtask.js') }}"></script>
 
 	<script>
+
+
 		var expVariables=[];
 		var stimFolder = '';
 
@@ -39,48 +41,93 @@
 
 		getHungerRating();
 
-		function getHungerRating() {
-			svg.style="padding: 0; margin: auto; display: block; position: absolute; top: 0; bottom: 0; left: 0; right: 0; width: 100%";
+
+		var resizeWindow = function() {
 			var winWidth = window.innerWidth;
 			var winHeight = window.innerHeight;
 			canvas.width = winWidth;
 			canvas.height = winHeight;
-			var ctx = canvas.getContext('2d');
-			
-			instructionsText='How hungry are you right now?'
-			instructions = new textBox(instructions, instructionsText, 20, BLACK);
-			instructions.showText(0, canvas.height/2 - 60);
+			ctx = document.getElementById('myCanvas').getContext('2d');
+			svg.setAttribute("width", winWidth.toString());
+			svg.setAttribute("height", winHeight.toString());
+			if (svg.contains(blankScreenCover)) {
+				svg.removeChild(blankScreenCover);
+			}
+			if (svg.contains(alertText)) {
+				svg.removeChild(alertText);
+			}
+			getHungerRating();
 
-			scale = new ratingScale(rs_min,rs_max,1,0.01,canvas.width/2,canvas.height/2, ["", "", "", "", "", "", "", "", "", "", ""]);
-			scale.drawRatingScale(canvas.width/2,canvas.height/2, drawIndicatorLine = true); // draws/redraws scale
+		}
 
-			// 0 is the middle of the screen / the middle of the scale
+		function getHungerRating() {
+			svg.style="padding: 0; margin: auto; display: block; position: absolute; top: 0; bottom: 0; left: 0; right: 0; width: 100%";
+			var winWidth = window.innerWidth;
+			var winHeight = window.innerHeight;
 
-			var tb1Text=leftRatingText;
-			tb1 = new textBox(tb1, tb1Text, 20, BLACK);
-			tb1.showText(0 - scale.ratingBarWidth/2, canvas.height/2 + 65);
+			if (winWidth < 430) {
+				alertSmallWindow();
+			} else {
 
-			/*
-			var tb2Text='A little'
-			tb2 = new textBox(tb2, tb2Text, 20, BLACK);
-			tb2.showText(0 - scale.ratingBarWidth/4, canvas.height/2 + 65);
-			*/
+				canvas.width = winWidth;
+				canvas.height = winHeight;
+				var ctx = canvas.getContext('2d');
 
-			var tb3Text=middleRatingText;
-			tb3 = new textBox(tb3, tb3Text, 20, BLACK);
-			tb3.showText(0, canvas.height/2 + 65);
+				instructionsText='How hungry are you right now?'
+				if (instructions == null) {
+					instructions = new textBox(instructions, instructionsText, 20, BLACK);
+				} else {
+					instructions.removeText();
+				}
+				instructions.showText(0, canvas.height/2 - 60);
 
-			/*
-			var tb4Text='Very'
-			tb4 = new textBox(tb4, tb4Text, 20, BLACK);
-			tb4.showText(0 + scale.ratingBarWidth/4, canvas.height/2 + 65);
-			*/
+				if (scale == null) {
+					scale = new ratingScale(rs_min,rs_max,1,0.01,canvas.width/2,canvas.height/2, ["", "", "", "", "", "", "", "", "", "", ""]);
+				} else {
+					scale.removeScale();
+				}
+				scale.drawRatingScale(canvas.width/2,canvas.height/2, drawIndicatorLine = true); // draws/redraws scale
 
-			var tb5Text=rightRatingText;
-			tb5 = new textBox(tb5, tb5Text, 20, BLACK);
-			tb5.showText(0 + scale.ratingBarWidth/2, canvas.height/2 + 65);
-			
-			t1 = performance.now();
+				// 0 is the middle of the screen / the middle of the scale
+
+				var tb1Text=leftRatingText;
+				if (tb1 == null) {
+					tb1 = new textBox(tb1, tb1Text, 20, BLACK);
+				} else {
+					tb1.removeText();
+				}
+				tb1.showText(0 - scale.ratingBarWidth/2, canvas.height/2 + 65);
+
+				/*
+				var tb2Text='A little'
+				tb2 = new textBox(tb2, tb2Text, 20, BLACK);
+				tb2.showText(0 - scale.ratingBarWidth/4, canvas.height/2 + 65);
+				*/
+
+				var tb3Text=middleRatingText;
+				if (tb3 == null) {
+					tb3 = new textBox(tb3, tb3Text, 20, BLACK);
+				} else {
+					tb3.removeText();
+				}
+				tb3.showText(0, canvas.height/2 + 65);
+
+				/*
+				var tb4Text='Very'
+				tb4 = new textBox(tb4, tb4Text, 20, BLACK);
+				tb4.showText(0 + scale.ratingBarWidth/4, canvas.height/2 + 65);
+				*/
+
+				var tb5Text=rightRatingText;
+				if (tb5 == null) {
+					tb5 = new textBox(tb5, tb5Text, 20, BLACK);
+				} else {
+					tb5.removeText();
+				}
+				tb5.showText(0 + scale.ratingBarWidth/2, canvas.height/2 + 65);
+				
+				t1 = performance.now();
+			}
 		}
 
 		// overwrite the function getRating(evt) in components.js

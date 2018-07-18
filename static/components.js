@@ -437,7 +437,7 @@ var ratingScale = class ratingScale {
 	drawTickLabels(labelNames) {
 		var nRatingValues = (this.max - this.min)/this.increment;
 		var nScaleValues = this.ratingBarWidth/this.increment;
-		var nTicks = (this.max - this.min)*this.tickIncrement + 1;
+		var nTicks = (this.max - this.min)/this.tickIncrement + 1;
 
 		if (labelNames != null && labelNames.length != nTicks) {
 			alert("Number of label names given does not match number of ticks.");
@@ -448,8 +448,8 @@ var ratingScale = class ratingScale {
 		var fontSize = 25;
 		for (i = 0; i <= nTicks - 1; i++) {
 			var label = document.createElementNS("http://www.w3.org/2000/svg", "text");
-			var x = (i*nScaleValues/nRatingValues)+this.ratingBarX;
-			var y = this.ratingBarY + this.ratingBarHeight + fontSize
+			var x = (i*this.tickIncrement*nScaleValues/nRatingValues)+this.ratingBarX;
+			var y = this.ratingBarY + this.ratingBarHeight + fontSize;
 			label.setAttribute("x",x.toString());
 			label.setAttribute("y",y.toString());
 			label.setAttribute("font-family","Arial");

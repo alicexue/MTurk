@@ -1,5 +1,5 @@
 Question,LeftText,MiddleText,RightText
-Do you know what this food is?,Don't know,Know but have never eaten,Have eaten before
+Do you know what this type of food is?,Don't know,Know but have never eaten,Have eaten before
 How high is the food in PROTEIN?,Low,,High
 How high is the food in FAT?,Low,,High
 How high is the food in CARBOHYDRATES?,Low,,High

@@ -55,13 +55,13 @@ environments = {
             "endpoint": "https://mturk-requester.us-east-1.amazonaws.com",
             "preview": "https://www.mturk.com/mturk/preview",
             "manage": "https://requester.mturk.com/mturk/manageHITs",
-            "reward": "5.00"
+            "reward": "7.25"
         },
         "sandbox": {
             "endpoint": "https://mturk-requester-sandbox.us-east-1.amazonaws.com",
             "preview": "https://workersandbox.mturk.com/mturk/preview",
             "manage": "https://requestersandbox.mturk.com/mturk/manageHITs",
-            "reward": "5.00"
+            "reward": "7.25"
         },
 }
 mturk_environment = environments["live"] if create_hits_in_live else environments["sandbox"]
@@ -133,7 +133,13 @@ worker_requirements_options = {
     'IntegerValues': [100],
     'RequiredToPreview': True,
     },
-    master_quals],
+    {
+    # Worker_PercentAssignmentsApproved
+    'QualificationTypeId': '000000000000000000L0',
+    'Comparator': 'GreaterThanOrEqualTo',
+    'IntegerValues': [90],
+    'RequiredToPreview': True,
+    }],
     "sandbox":[
     {
     # Worker_Locale
@@ -153,13 +159,13 @@ else:
 
 # Create the HIT
 response = client.create_hit(
-    MaxAssignments=90,
+    MaxAssignments=2,
     LifetimeInSeconds=604800,
-    AssignmentDurationInSeconds=4500,
+    AssignmentDurationInSeconds=5400,
     Reward=mturk_environment['reward'],
-    Title='What snack do you prefer?',
+    Title='What do you think about these foods?',
     Keywords='research,psych,psychology,food,preferences',
-    Description='You will rate how much you like snack foods and which one you prefer. We have allocated 75 minutes for you to complete this study, but it should take you up to 45 minutes. This HIT cannot be completed on a mobile device. You need a mouse and a keyboard.',
+    Description='Rate a list of foods based on what kind of nutrients you think they have and how much you like them. Fill out surveys about yourself. We have allocated 90 minutes for you to complete this HIT, but it should take about 1 hr. Please return this HIT if you have participated in it before.',
     Question=question_sample,
     QualificationRequirements=worker_requirements,
 )

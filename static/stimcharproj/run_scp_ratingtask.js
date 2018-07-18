@@ -87,8 +87,11 @@ var drawTrialDisplay = function() {
 	clearTimeout(questionTimer);
 	// condition is a dictionary - each key can be used to set trial conditions
 	ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-	if (question!=null) {
-		question.removeText();
+	if (question1!=null) {
+		question1.removeText();
+	}
+	if (question2!=null) {
+		question2.removeText();
 	}
 	if (button!=null) {
 		button.removeRect();
@@ -177,21 +180,33 @@ var removeTrialDisplay = function() {
 	}
 }
 
-var question;
+var question1;
+var question2;
 var button;
 var buttonText;
 var drawQuestionDisplay = function() {
 	if (currTrialN == 0 || (currTrialN - 1 > 0 && expVariables[currTrialN]['question'] != expVariables[currTrialN-1]['question'])) { // question is the same as the one on the previous trial
 		removeTrialDisplay();
 		trialVariables = expVariables[currTrialN];
-		instructionsText=trialVariables['question']
-		if (question == null) {
-			question = new textBox(question, instructionsText, 25, BLACK);
+
+		instructionsText1='Now you will be shown a series of food pictures.'
+		instructionsText2='For each picture give your answer to: ' + trialVariables['question']
+		
+		if (question1 == null) {
+			question1 = new textBox(question1, instructionsText1, 22, BLACK);
 		} else {
-			question.removeText();
+			question1.removeText();
 		}
-		question.setText(instructionsText);
-		question.showText(0, canvas.height/2);
+		question1.setText(instructionsText1);
+		question1.showText(0, canvas.height/2-30);
+
+		if (question2 == null) {
+			question2 = new textBox(question2, instructionsText2, 22, BLACK);
+		} else {
+			question2.removeText();
+		}
+		question2.setText(instructionsText2);
+		question2.showText(0, canvas.height/2);
 
 		if (button == null) {
 			button = new rect(button);
@@ -230,8 +245,10 @@ var pushTrialInfo = function() {
 		}
 	}
 	t1 = performance.now(); 
+	t1_UNIX = Date.now();
 
 	allTrials[currTrialN].trialStartTime = t1;
+	allTrials[currTrialN].trialStartTime_UNIX = t1_UNIX;
 
 	allTrials[currTrialN]['stimulus'] = stimuli[currTrialN][0].id;
 }

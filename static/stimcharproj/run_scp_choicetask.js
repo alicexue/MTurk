@@ -170,6 +170,9 @@ var pushTrialInfo = function() {
 	t1 = performance.now(); // start timer for this trial
 	allTrials[currTrialN].trialStartTime = t1;
 
+	t1_UNIX = Date.now(); 
+	allTrials[currTrialN].trialStartTime_UNIX = t1_UNIX;
+
 	allTrials[currTrialN]['referenceItem']=expVariables[currTrialN]['referenceItem']
 	allTrials[currTrialN]['secondFoodItem']=expVariables[currTrialN]['secondFoodItem']
 }
