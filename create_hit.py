@@ -38,6 +38,7 @@ if(len(sys.argv) < 4):
     print("You must pass profile name as the second argument or None.")
     print("You must pass 'live' or 'sandbox' as the third argument.")
     print("You must pass the expId as the fourth argument.")
+    print("You must pass the number of assignments as the fifth argument.")
     sys.exit(-1)
 
 if sys.argv[2] == 'sandbox':
@@ -49,6 +50,7 @@ else:
     sys.exit(-1)
 
 expId = sys.argv[3]
+nAssignments = int(sys.argv[4])
 
 environments = {
         "live": {
@@ -159,7 +161,7 @@ else:
 
 # Create the HIT
 response = client.create_hit(
-    MaxAssignments=2,
+    MaxAssignments=nAssignments,
     LifetimeInSeconds=604800,
     AssignmentDurationInSeconds=5400,
     Reward=mturk_environment['reward'],

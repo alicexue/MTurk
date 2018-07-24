@@ -30,11 +30,13 @@ if len(sys.argv) == 3:
 		args.append("list-hits")
 		args.append("--output")
 		args.append("table")
+		args.append("--max-results")
+		args.append("20")
 		args.append("--query")
 		args.append('HITs[].{"1. HITId": HITId, "2. Title": Title, "3. Status":HITStatus, "4. Creation": CreationTime, "5. Expiration": Expiration, "6. MaxAsgmts": MaxAssignments, "7. #AsgmtAvail" : NumberOfAssignmentsAvailable, "8. #AsgmtReviewed": NumberOfAssignmentsCompleted}')
 		args+=endpoint
 		print "\nCurrent UNIX time: ", time.time()
-		print "Note: By default the table only prints the 10 most recent HITs"
+		print "Note: By default the table only prints the 20 most recent HITs"
 		subprocess.call(args)
 		sys.exit()
 	else:
@@ -79,7 +81,7 @@ elif op_request == "list_asgmts":
 	args.append("--output")
 	args.append("table")
 	args.append("--max-results")
-	args.append("100")
+	args.append("200")
 
 if not live:
 	args.append("--endpoint-url")
