@@ -116,9 +116,39 @@ Scene Choice Task Instructions
 @instructions.route("/scenechoicetask_instructions", methods = ["GET","POST"])
 def scenechoicetask_instructions(expId):
 	taskEndpoint = 'tasks.scenechoicetask'
+	#taskEndpoint = 'tasks.instructions_questions'
 	taskHTML = 'foodchoicestudies/scenechoicetask_instructions.html'
 	demo = False 
-	return route_for_instructions(expId, taskHTML, taskEndpoint, demo, request)
+	assignmentId = None
+	if 'assignmentId' in request.args:
+		assignmentId = request.args.get('assignmentId')
+
+	if contains_necessary_args(request.args) or assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE':
+		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
+		if workerId_exists(expId, workerId) or assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE':
+			if request.method == "GET":
+				if assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE' and demo == False: # preview -> go to next demo
+					name = taskEndpoint[taskEndpoint.find('.')+1:]
+					nextTask = get_next_task(name, expTaskOrders[expId])
+					return redirect(url_for(nextTask, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+				else:
+					return render_template(taskHTML, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live)
+			else:
+				if 'submit' in request.form.keys() and request.form['submit'] == 'Continue':
+					return redirect(url_for('tasks.instructions_questions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+				elif 'submit' in request.form.keys() and request.form['submit'] == 'Repeat Demo':
+					return redirect(url_for(taskEndpoint, demo='TRUE', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+				else:
+					if demo:
+						demoValue = 'TRUE'
+					else:
+						demoValue = 'FALSE'
+					return redirect(url_for(taskEndpoint, demo=demoValue, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+		else:
+			return redirect(url_for('unauthorized_error'))
+	else:
+		return redirect(url_for('unauthorized_error'))
+
 
 """
 Scene Task Demo Instructions

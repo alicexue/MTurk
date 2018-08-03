@@ -16,34 +16,44 @@ homepages = Blueprint('homepages',  __name__)
 """
 Consent Form (home page)
 """
+@homepages.route("/MDMRTST", methods = ["GET","POST"], endpoint="MDMRTST")
+@homepages.route("/MDMRTST/consentform", methods = ["GET","POST"], endpoint="MDMRTST")
 @homepages.route("/MDMRTS", methods = ["GET","POST"], endpoint="MDMRTS")
 @homepages.route("/MDMMT", methods = ["GET","POST"], endpoint="MDMMT")
 @homepages.route("/MDMRTS/consentform", methods = ["GET","POST"], endpoint="MDMRTS")
 @homepages.route("/MDMMT/consentform", methods = ["GET","POST"], endpoint="MDMMT")
 def foodchoicestudies():
 	validExpId=False
-	if "MDMMT" in request.path:
+	if request.path.startswith("/MDMMT"):
 		expId = "MDMMT"
+		consentFormPath=expId
 		validExpId=True
-	elif "MDMRTS" in request.path:
+	elif request.path.startswith("/MDMRTST"):
+		expId = "MDMRTST"
+		consentFormPath="MDMRTS"
+		validExpId=True
+	elif request.path.startswith("/MDMRTS"):
 		expId = "MDMRTS"
+		consentFormPath=expId
 		validExpId=True
 	if validExpId:
 		if request.method == "GET":
 			if 'preview' in request.args and request.args.get('preview') == 'True':
-				return render_template('foodchoicestudies/' + expId + '_consent_form.html')
+				return render_template('foodchoicestudies/' + consentFormPath + '_consent_form.html')
 			elif 'assignmentId' in request.args and 'hitId' in request.args and request.args.get('assignmentId') == 'ASSIGNMENT_ID_NOT_AVAILABLE':
 				assignmentId = request.args.get('assignmentId')
 				hitId = request.args.get('hitId')
 				return redirect(url_for('tasks.check_eligibility', expId=expId, assignmentId=assignmentId, hitId=hitId))
 			else:
-				return render_template('foodchoicestudies/' + expId + '_consent_form.html')
+				return render_template('foodchoicestudies/' + consentFormPath + '_consent_form.html')
 		else:
-
 			if contains_necessary_args(request.args): 
 				# worker accepted HIT 
 				[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
-				if workerId_exists(expId, workerId) and (completed_task(expId, workerId, 'completedAuction') or completed_task(expId, workerId, 'completedAuction1')):
+				participatedInMDMMT = workerId_exists('MDMMT', workerId)
+				participatedInMDMRTS = workerId_exists('MDMRTS', workerId)
+				participatedInMDMRTST = workerId_exists('MDMRTST', workerId)
+				if participatedInMDMMT or participatedInMDMRTS or participatedInMDMRTST:
 					return render_template('return_hit.html')
 				elif not workerId_exists(expId, workerId):
 					store_subject_info(expId, workerId, expTasksToComplete[expId], assignmentId, hitId, turkSubmitTo) 

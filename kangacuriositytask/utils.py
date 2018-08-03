@@ -115,6 +115,44 @@ def get_ratingtask_expVariables(subjectId):
 		expVariables.append(trial)
 	return expVariables
 
+questionnaire_dict={1:'FiveDimensionalCuriosityScale',2:'BigFiveInventory',3:'EpistemicCuriosityScale',4:'NeedForClosure',5:'NeedForCognition',6:'PerceptualCuriosity',7:'ArnettInventoryOfSensationSeeking'}
+
+def get_questionnaire(n):
+	qName = questionnaire_dict[n]
+	info = pd.read_csv(_thisDir + '/'+qName+'.csv')
+	questions=info['Question']
+	info=info.set_index('Question')
+	new_info=[]
+	for j in range(0,len(questions)):
+		q = questions[j]
+		tmp=info.loc[q].values
+		options=[]
+		for i in tmp:
+			if type(i) == str: # remove nan values
+				options.append(i)
+		new_info.append({q:options})
+	return new_info
+
+def get_questionnaire_instructions(n):
+	qName = questionnaire_dict[n]
+	info = pd.read_csv(_thisDir + '/QuestionnaireInstructions.csv')
+	return info.loc[info['Questionnaire']==qName,'Instructions'].values[0]
+
+def get_demographicq():
+	info = pd.read_csv(_thisDir + '/DemographicQuestions.csv')
+	questions=info['Question']
+	info=info.set_index('Question')
+	new_info=[]
+	for j in range(0,len(questions)):
+		q = questions[j]
+		tmp=info.loc[q].values
+		options=[]
+		for i in tmp:
+			if type(i) == str: # remove nan values
+				options.append(i)
+		new_info.append({q:options})
+	return new_info
+
 """
 Checks request.args has assignmentId, hitId, turkSubmitTo, workerId, live - all but live is passed by MTurk
 live refers to whether HIT is live or in sandbox

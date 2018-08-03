@@ -20,8 +20,8 @@
 		<input type="hidden" id="experimentResults" name="experimentResults" value="[]">
 
 		<script src="{{ url_for('static', filename='components.js') }}"></script>
-
-		<script src="{{ url_for('static', filename='run_choicetask.js') }}"></script>
+		<script src="{{ url_for('static', filename='page_interaction_tracker.js') }}"></script>
+		<script src="{{ url_for('static', filename='foodchoicestudies/run_choicetask.js') }}"></script>
 
 		<script>
 			var expVariables={{expVariables|tojson|safe}};

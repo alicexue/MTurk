@@ -105,7 +105,7 @@ def kanga_task():
 			expResults = json.loads(request.form['experimentResults'])
 			filePath = dataDir + expId + '/' + subjectId + '/'
 			set_completed_task(expId, workerId, 'completedKangaTask', True)
-			results_to_csv(expId, subjectId, filePath, 'results.csv', expResults, {})
+			results_to_csv(expId, subjectId, filePath, 'CuriosityTaskResults.csv', expResults, {})
 			return redirect(url_for('.rating_task',expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 	else:
 		return redirect(url_for('unauthorized_error'))
@@ -162,9 +162,117 @@ def rating_task():
 				else: # raw results
 					results_to_csv(expId, subjectId, filePath, 'RawRatingsResults.csv', expResults, {})
 
-				return redirect(url_for('thankyou', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
-		
+				return redirect(url_for('curiosity_tasks.demographicq', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 		else:
 			return redirect(url_for('unauthorized_error'))
+	else:
+		return redirect(url_for('unauthorized_error'))
+
+
+@curiosity_tasks.route("/demographicq", methods = ["GET", "POST"])
+def demographicq():
+	info=get_demographicq()
+	instructions='Please answer each question as accurately as possible.'
+	containsAllMTurkArgs = contains_necessary_args(request.args)
+	if containsAllMTurkArgs:
+		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
+	if request.method == "GET" and containsAllMTurkArgs:
+		options=info[-1][info[-1].keys()[0]]
+		widthPercent=10
+		return render_template('kangacuriositytask/demographicq.html', info=info, instructions=instructions, widthPercent=widthPercent)
+	elif containsAllMTurkArgs: # in request.method == "POST"
+		subjectId = get_subjectId(expId, workerId)
+		q_and_a = [] # list of dictionaries where questions are keys and answers are values
+		nQuestions = len(info) 
+		for i in range(0,nQuestions):
+			tmp = {}
+			tmp['questionN'] = i+1
+			tmp['question'] = request.form['q'+str(i+1)]
+			tmp['answer'] = request.form['a'+str(i+1)] # set keys and values in dictionary
+			q_and_a.append(tmp)
+
+		filePath = dataDir + expId + '/' + subjectId + '/'
+
+		set_completed_task(expId, workerId, 'completedQuestionnaire', True)
+		results_to_csv(expId, subjectId, filePath, 'DemographicQuestionnaire.csv', q_and_a, {})
+
+		return redirect(url_for('curiosity_tasks.questionnaire', n=1, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+	else:
+		return redirect(url_for('unauthorized_error'))
+
+
+@curiosity_tasks.route("/questionnaire/<n>", methods = ["GET", "POST"])
+def questionnaire(n):
+	n = int(n)
+	if n in questionnaire_dict.keys():
+		info=get_questionnaire(n)
+		instructions=get_questionnaire_instructions(n)
+		containsAllMTurkArgs = contains_necessary_args(request.args)
+		if containsAllMTurkArgs:
+			[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
+		if request.method == "GET" and containsAllMTurkArgs:
+			options=info[0][info[0].keys()[0]]
+			widthPercent=70.0/len(options)
+			return render_template('kangacuriositytask/questionnaire.html', info=info, instructions=instructions, widthPercent=widthPercent)
+		elif containsAllMTurkArgs: # in request.method == "POST"
+			subjectId = get_subjectId(expId, workerId)
+			q_and_a = [] # list of dictionaries where questions are keys and answers are values
+			nQuestions = len(info) 
+			for i in range(0,nQuestions):
+				tmp = {}
+				tmp['questionN'] = i+1
+				tmp['question'] = request.form['q'+str(i+1)]
+				tmp['answer'] = request.form['a'+str(i+1)] # set keys and values in dictionary
+				q_and_a.append(tmp)
+
+			filePath = dataDir + expId + '/' + subjectId + '/'
+
+			set_completed_task(expId, workerId, 'completedQuestionnaire', True)
+			results_to_csv(expId, subjectId, filePath, questionnaire_dict[n]+'.csv', q_and_a, {})
+
+			if n < len(questionnaire_dict.keys()):
+				return redirect(url_for('curiosity_tasks.questionnaire', n=n+1, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+			else:
+				return redirect(url_for('thankyou',expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+		else:
+			return redirect(url_for('unauthorized_error'))
+	return redirect(url_for('page_not_found'))
+
+@curiosity_tasks.route("/memory_test", methods = ["GET","POST"])
+def memory_test():
+	containsAllMTurkArgs = contains_necessary_args(request.args)
+	if containsAllMTurkArgs:
+		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
+	if request.method == "GET" and containsAllMTurkArgs:
+
+		subjectId = get_subjectId(expId, workerId)
+		kangaresults = os.path.join(dataDir,'Kanga',subjectId,subjectId+'_CuriosityTaskResults.csv')
+		ratingresults = os.path.join(dataDir,'Kanga',subjectId,subjectId+'_RatingsResults.csv')
+		questions = []
+		if os.path.exists(kangaresults) and os.path.exists(ratingresults):
+			df1 = pd.read_csv(kangaresults)
+			df2 = pd.read_csv(ratingresults)
+			questions += df1.loc[df1['C_SWK']=='W']['Question'].values.tolist()
+			questions += df2['Question'].values.tolist()
+		random.shuffle(questions)
+		expVariables = []
+		for q in questions:
+			expVariables.append({'Question':q})
+		expVariables
+		return render_template('kangacuriositytask/memory_test.html', expVariables = expVariables)
+	elif containsAllMTurkArgs: # request.method == "POST"
+		if 'demo' in request.args and request.args.get('demo') == 'True':
+			[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
+			if assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE':
+				return redirect(url_for('accept_hit'))
+			return redirect(url_for('thankyou', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+		else:
+			subjectId = get_subjectId(expId, workerId)
+			expResults = json.loads(request.form['experimentResults'])
+			print expResults
+			filePath = dataDir + expId + '/' + subjectId + '/'
+			set_completed_task(expId, workerId, 'completedMemoryTask', True)
+			results_to_csv(expId, subjectId, filePath, 'MemoryTestResults.csv', expResults, {})
+			return redirect(url_for('thankyou',expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 	else:
 		return redirect(url_for('unauthorized_error'))

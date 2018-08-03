@@ -1,4 +1,5 @@
 console.log("loaded run_ratingtask.js ");
+const GREY = "#999999";
 
 // var expVariables set in HTML
 
@@ -43,6 +44,7 @@ var stimNames = ["stimulus"];
 var nStimuli;
 var nImagesLoaded = 0;
 var startExperiment = function() {
+	document.body.style.backgroundColor = GREY;
 	startFirstTrial();
 }
 
@@ -93,7 +95,7 @@ var drawRatingDisplay = function(trialVariables) {
 	}
 
 	if (instructions == null) {
-		instructions = new textBox(instructions, instructionsText, 18, BLACK);
+		instructions = new textBox(instructions, instructionsText, 22, BLACK);
 	} else {
 		instructions.removeText();
 	}
@@ -105,7 +107,7 @@ var drawRatingDisplay = function(trialVariables) {
 	if (trialVariables['TrialType'] == 'RateQuestion') {
 		text=trialVariables['Question']
 		if (textToRate == null) {
-			textToRate = new textBox(textToRate, text, 22, BLACK);
+			textToRate = new textBox(textToRate, text, 24, BLACK);
 		} else {
 			textToRate.removeText();
 		}

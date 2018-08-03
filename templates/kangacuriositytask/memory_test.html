@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Memory Test</title>
+	<link href="/static/style.css" rel="stylesheet">
+</head>
+<body>
+
+	<center><p id="html_text"> This text is from the HTML </p></center>
+
+	<script type="text/javascript"> 
+	// from http://webcheatsheet.com/javascript/disable_enter_key.php
+	function stopRKey(evt) { 
+	  var evt = (evt) ? evt : ((event) ? event : null); 
+	  var node = (evt.target) ? evt.target : ((evt.srcElement) ? evt.srcElement : null); 
+	  if ((evt.keyCode == 13) && (node.type=="text"))  {
+	  	registerResponse();
+	  	return false;} 
+	} 
+
+	document.onkeypress = stopRKey; 
+
+	</script>
+
+	<center>
+	<form id="exp" method="POST">
+
+		<div>
+		<canvas id="myCanvas" style="padding: 0; margin: auto; display: block; position: absolute; top: 0; bottom: 0; left: 0; right: 0;">
+		</canvas>
+		</div>
+
+		<input type="text" id="response" value="">
+		<button type="button" class="btn" onclick="registerResponse()">Submit</button>
+
+		<div>
+		<svg id="mySVG" style="padding: 0; margin: auto; display: block; position: absolute; top: 0; bottom: 0; left: 0; right: 0; width: 100%"></svg>
+		</div>
+
+		<input type="hidden" id="experimentResults" name="experimentResults" value="[]">
+
+		<script src="{{ url_for('static', filename='components.js') }}"></script>
+		<script src="{{ url_for('static', filename='page_interaction_tracker.js') }}"></script>
+		<script src="{{ url_for('static', filename='kanga/run_memory_test.js') }}"></script>
+
+		<script>
+			var expVariables={{expVariables|tojson|safe}};
+			// curly brackets are for jinja2 templates, which returns expVariables from app.py
+			startExperiment();
+		</script>
+	</form>
+	</center>
+</body>
+</html>

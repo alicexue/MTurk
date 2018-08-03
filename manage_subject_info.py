@@ -117,11 +117,11 @@ def get_turkSubmitTo(expId, subjectId):
 		return False
 
 def workerId_exists(expId, workerId):
-	subjectId = get_subjectId(expId, workerId)
-	if subjectId == False:
-		return False
-	else:
+	csvWorkerIds = _thisDir + '/data/' + expId +'/' + expId + '_subject_worker_ids.csv'
+	df = pd.read_csv(csvWorkerIds)
+	if workerId in df['workerId'].values:
 		return True
+	return False
 
 def completed_task(expId, workerId, task):
 	csvLocation = _thisDir + '/data/' + expId +'/' + expId + '_subject_assignment_info.csv'
@@ -162,6 +162,36 @@ def set_completed_task(expId, workerId, task, boole):
 			subjectId = get_subjectId(expId, workerId)
 			idx = df[df['subjectId'] == subjectId].index[0]
 			df.loc[idx, task] = boole
+			df.to_csv(csvLocation,index=False)
+
+"""
+name: name of note
+"""
+def get_worker_notes(expId, subjectId, name):
+	csvLocation = _thisDir + '/data/' + expId +'/' + expId + '_subject_assignment_info.csv'
+	if os.path.exists(csvLocation):
+		df = pd.read_csv(csvLocation)
+		#print subjectId
+		#df=df.set_index('subjectId')
+		#print int(df.loc[[subjectId],name])
+		if name in df.columns:
+			#print df.loc[df[subjectId] == subjectId][name].values
+			value = df.loc[df['subjectId'] == subjectId][name].values[0]
+			return value
+	return None
+
+"""
+name: name of note
+value: value of note with the given name
+"""
+def add_worker_notes(expId, workerId, name, value):
+	csvLocation = _thisDir + '/data/' + expId +'/' + expId + '_subject_assignment_info.csv'
+	if os.path.exists(csvLocation):
+		df = pd.read_csv(csvLocation)
+		if workerId_exists(expId, workerId):
+			subjectId = get_subjectId(expId, workerId)
+			idx = df[df['subjectId'] == subjectId].index[0]
+			df.loc[idx, name] = value
 			df.to_csv(csvLocation,index=False)
 
 def store_feedback(expId, workerId, feedback):

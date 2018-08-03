@@ -20,16 +20,25 @@
 		<input type="hidden" id="experimentResults" name="experimentResults" value="[]">
 
 		<script src="{{ url_for('static', filename='components.js') }}"></script>
-
-		<script src="{{ url_for('static', filename='run_scenechoicetask.js') }}"></script>
+		<script src="{{ url_for('static', filename='page_interaction_tracker.js') }}"></script>
+		<script id="taskScript"></script>
 
 		<script>
 			var expVariables={{expVariables|tojson|safe}};
 			var sceneStimFolder = {{sceneStimFolder|tojson|safe}};
 			var foodStimFolder = {{foodStimFolder|tojson|safe}};
-			// curly brackets are for jinja2 templates, which returns expVariables from app.py
-			startExperiment();
+			// curly brackets are for jinja2 templates, which returns expVariables from app.py	
 		</script>
+
+		<script>
+			var js={{js_task_filename|tojson|safe}};
+			document.getElementById('taskScript').src = js;
+			window.onload = function() {
+				startExperiment();
+			}
+		</script>
+
+		
 	</form>
 	</center>
 </body>

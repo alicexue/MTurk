@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link href="/static/style.css" rel="stylesheet">
+		<title>Demographic Questionnaire</title>
+		<center><h2>Demographic Questionnaire</h2></center>
+	</head>
+
+	<p><i>{{instructions|safe}}</i></p>
+	
+	<form method="POST" style="padding: 0px 30px;">
+		<table>
+		{% for i in range(0,info|length) %}
+			{% set q_a_pair = info[i] %}
+			{% for q, a in q_a_pair.items() %}
+				<tr>
+				{% if a|length > 0 %}
+					<td align="left"></td>
+					{% for option in a %}
+					<td style="width:{{widthPercent}}%"><br><br><center>{{ option }}</center></td>		
+					{% endfor %}
+					</tr>
+				{% endif %}
+
+				<input type="hidden" name={{"q"+(i+1)|string}} value="{{ q }}">
+				<tr>
+				<td>{{i+1}}. {{ q }}</td>
+				<input type="hidden" name={{"q"+(i+1)|string}} value="{{ q }}">
+				{% if a|length > 0 %}
+					{% for option in a %}
+					<td><center><input type="radio" name={{"a"+(i+1)|string}} value="{{option}}" required></center></td>
+					{% endfor %}
+				{% else %}
+					<td>
+						<input type="number" name={{"a"+(i+1)|string}} required></input> 
+					<td>
+				{% endif %}
+				</tr> 
+			{% endfor %}
+		{% endfor %}
+		</table>
+
+		<br>
+		<center><input type="submit" value="Submit" style="font-size: 30px;"></center>
+		<br>
+	</form>
+	
+</html>

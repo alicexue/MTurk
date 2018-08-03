@@ -174,18 +174,13 @@ def check_eligibility(expId):
 		workerId = request.form['workerId']
 		assignmentId = request.args.get('assignmentId')
 		hitId = request.args.get('hitId')
-		if expId == "MDMMT":
-			if workerId_exists(expId, workerId) and completed_task(expId, workerId, 'completedAuction') and completed_task(expId, workerId, 'completedChoiceTask'):
-				return render_template('return_hit.html')
-			else:
-				return redirect(url_for("homepages."+expId, preview='True', assignmentId=assignmentId, hitId=hitId))
-		elif expId == "MDMRTS":
-			if workerId_exists(expId, workerId) and completed_task(expId, workerId, 'completedAuction1') and completed_task(expId, workerId, 'completedFamiliarityTask'):
-				return render_template('return_hit.html')
-			else:
-				return redirect(url_for("homepages."+expId, preview='True', assignmentId=assignmentId, hitId=hitId))
+		participatedInMDMMT = completed_task('MDMMT', workerId, 'completedChoiceTask')
+		participatedInMDMRTS = completed_task('MDMRTS', workerId, 'completedSceneChoiceTask')
+		participatedInMDMRTST = completed_task('MDMRTST', workerId, 'completedSceneChoiceTask')
+		if participatedInMDMMT or participatedInMDMRTS or participatedInMDMRTST:
+			return render_template('return_hit.html')
 		else:
-			return redirect(url_for('unauthorized_error'))
+			return redirect(url_for("homepages."+expId, preview='True', assignmentId=assignmentId, hitId=hitId))
 	else:
 		return redirect(url_for('unauthorized_error'))
 
@@ -202,41 +197,6 @@ def auction_error(expId):
 			return redirect(url_for(nextTask, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 	else:
 		return redirect(url_for('unauthorized_error'))
-
-"""
-@tasks.route("/dummy_MDMMT", methods = ["GET","POST"])
-def dummy_MDMMT():
-	expId = "MDMMT"
-	if request.method == "GET" and 'assignmentId' in request.args and 'hitId' in request.args:
-		assignmentId = request.args.get('assignmentId')
-		hitId = request.args.get('hitId')
-		return render_template('dummy_hit.html', assignmentId=assignmentId, hitId=hitId)
-	elif request.method == "POST" and 'assignmentId' in request.args and 'hitId' in request.args:
-		if 'workerId' in request.args:
-			workerId = request.args.get('workerId')
-		else:
-			workerId = request.form['workerId']
-		assignmentId = request.args.get('assignmentId')
-		hitId = request.args.get('hitId')
-		live = True
-		if workerId_exists(expId, workerId):
-			if 'workerId' in request.args and 'turkSubmitTo' in request.args:
-				workerId = request.args.get('workerId')
-				turkSubmitTo = request.args.get('turkSubmitTo')
-				store_subject_info("dummyMDMMT", workerId, expTasksToComplete["MDMMT"], assignmentId, hitId, turkSubmitTo) 
-				return redirect(url_for('thankyou', assignmentId=assignmentId, live=live))
-			else:
-				return redirect(url_for('accept_hit'))
-		else:
-			return redirect(url_for('return_dummy_MDMMT', preview='True', assignmentId=assignmentId, hitId=hitId))
-	else:
-		return redirect(url_for('unauthorized_error'))
-
-@tasks.route("/return_dummy_MDMMT", methods = ["GET"])
-def return_dummy_MDMMT():
-	return render_template('return_dummy_hit.html')
-"""
-
 
 """ 
 Scene Task
@@ -286,6 +246,32 @@ def scenetask(expId):
 	else:
 		return redirect(url_for('unauthorized_error'))
 
+@tasks.route("/instructions_questions", methods = ["GET", "POST"])
+def instructions_questions(expId):
+	containsAllMTurkArgs = contains_necessary_args(request.args)
+	if containsAllMTurkArgs:
+		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
+	if request.method == "GET" and containsAllMTurkArgs:
+		return render_template('foodchoicestudies/instructions_questions.html')
+	elif containsAllMTurkArgs: # in request.method == "POST"
+		subjectId = get_subjectId(expId, workerId)
+		prevN = get_worker_notes(expId, subjectId, 'numberTimesSceneChoiceTaskInstructionsQuizWasTaken')
+		if prevN == None:
+			prevN = 0
+		add_worker_notes(expId, workerId, 'numberTimesSceneChoiceTaskInstructionsQuizWasTaken', prevN + 1)
+		keys=request.form.keys()
+		if request.form['submit'] == 'Submit' and 'a1' in keys and 'a2' in keys and 'a3' in keys:
+			a1 = request.form['a1']
+			a2 = request.form['a2']
+			a3 = request.form['a3']
+			if a1 == 'D' and a2 == 'E' and a3 == 'B':
+				return redirect(url_for('tasks.scenechoicetask', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+		else:
+			return redirect(url_for('instructions.scenechoicetask_instructions', expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+		return redirect(url_for('tasks.scenechoicetask',expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+	else:
+		return redirect(url_for('unauthorized_error'))
+
 """ 
 Scene and Choice Task
 
@@ -297,14 +283,20 @@ POST: Saves choice task data and stimuli to csv files, redirects to thank you pa
 @tasks.route("/scenechoicetask", methods = ["GET","POST"])
 def scenechoicetask(expId):
 	name = 'scenechoicetask'
+	if expId == 'MDMRTS':
+		js_task_filename = '/static/foodchoicestudies/run_scenechoicetask.js'
+		nTrials = 280
+	elif expId == 'MDMRTST':
+		js_task_filename = '/static/foodchoicestudies/run_timed_scenechoicetask.js'
+		nTrials = 320
 
 	containsAllMTurkArgs = contains_necessary_args(request.args)
 
 	if 'demo' in request.args and containsAllMTurkArgs:
 		if request.method == "GET" and request.args.get('demo') == 'TRUE':
 
-			expVariables = get_scenechoicetask_expVariables(expId, subjectId=None, demo=True)
-			return render_template('foodchoicestudies/scenechoicetask.html', expId=expId, expVariables=expVariables, sceneStimFolder='/static/scenes_konk/demo/',foodStimFolder=foodStimFolder[expId]+'demo/')
+			expVariables = get_scenechoicetask_expVariables(expId, subjectId=None, demo=True, nTrials=nTrials)
+			return render_template('foodchoicestudies/scenechoicetask.html', expId=expId, expVariables=expVariables, sceneStimFolder='/static/scenes_konk/demo/',foodStimFolder=foodStimFolder[expId]+'demo/', js_task_filename=js_task_filename)
 		else:
 			[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
 			if assignmentId == 'ASSIGNMENT_ID_NOT_AVAILABLE':
@@ -318,38 +310,38 @@ def scenechoicetask(expId):
 		completedAuction = completed_task(expId, workerId, 'completedAuction2')
 		completedChoiceTask = completed_task(expId, workerId, 'completedSceneChoiceTask')
 
-		if workerId_exists(expId, workerId) and completedChoiceTask == False:
+		if workerId_exists(expId, workerId):
 			if request.method == "GET":
 				### set experiment conditions here and pass to experiment.html 
 				# trialVariables should be an array of dictionaries 
 				# each element of the array represents the condition for one trial
 				# set the variable conditions to the array of conditions
 
-				if completed_task(expId, workerId, 'completedAuction2'):
-					expVariables = get_scenechoicetask_expVariables(expId, subjectId, demo=False)
-					return render_template('foodchoicestudies/scenechoicetask.html', expId=expId, expVariables=expVariables, sceneStimFolder='/static/scenes_konk/',foodStimFolder=foodStimFolder[expId])
-				else:
-					return redirect(url_for('unauthorized_error'))
+				trialListPath = dataDir + expId + '/' + subjectId + '/' + subjectId + '_TrialList_SceneChoiceTask.csv'
+				dataPath = dataDir + expId + '/' + subjectId + '/' + subjectId + '_SceneChoiceTaskData.csv'
+				if os.path.exists(trialListPath and dataPath):
+					trialsDf = pd.read_csv(trialListPath)
+					resultsDf = pd.read_csv(dataPath)
+					if len(trialsDf) <= len(resultsDf): # already completed all trials of task
+						nextTask = 'instructions.familiaritytask_instructions'
+						return redirect(url_for(nextTask, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
+				expVariables = get_scenechoicetask_expVariables(expId, subjectId, demo=False, nTrials=nTrials)
+				return render_template('foodchoicestudies/scenechoicetask.html', expId=expId, expVariables=expVariables, sceneStimFolder='/static/scenes_konk/',foodStimFolder=foodStimFolder[expId], js_task_filename=js_task_filename)
 			else:
 				expResults = json.loads(request.form['experimentResults'])
 				filePath = dataDir + expId + '/' + subjectId + '/'
 				if not os.path.exists(dataDir + expId + '/' + subjectId + '/' + subjectId + '_SceneChoiceTaskData.csv'):
 					results_to_csv(expId, subjectId, filePath, 'SceneChoiceTaskData.csv', expResults, {})
-					nextTask = get_next_task(name, expTaskOrders[expId])
+					nextTask = 'tasks.take_break'
 				else:
 					append_results_to_csv(expId, subjectId, filePath, 'SceneChoiceTaskData.csv', expResults, {})
 					set_completed_task(expId, workerId, 'completedSceneChoiceTask', True)
 					nextTask = 'instructions.familiaritytask_instructions'
-				
 				return redirect(url_for(nextTask, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
-
-		elif workerId_exists(expId, workerId) and completedChoiceTask == True:
-			return redirect(url_for('tasks.repeat_error', task=name, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 		else:
 			return redirect(url_for('unauthorized_error'))
 	else:
 		return redirect(url_for('unauthorized_error'))
-
 
 """ 
 Familiarity Task
@@ -362,16 +354,13 @@ def familiaritytask(expId):
 
 	if containsAllMTurkArgs:
 		[workerId, assignmentId, hitId, turkSubmitTo, live] = get_necessary_args(request.args)
-
-		completedFamiliarityTask = completed_task(expId, workerId,'completedFamiliarityTask') 
-
-		if workerId_exists(expId, workerId) and completedFamiliarityTask == False:
+		if workerId_exists(expId, workerId):
 			if request.method == "GET":
 				### set experiment conditions here and pass to experiment.html 
 				# trialVariables should be an array of dictionaries 
 				# each element of the array represents the condition for one trial
 				# set the variable conditions to the array of conditions
-				expVariables = get_ratingtask_expVariables(expId, subjectId=None, demo=False, question=oneLineInstructions, leftRatingText='never eaten before', rightRatingText='eaten the most', rs_min=0, rs_max=10, rs_tickIncrement=1, rs_increment=0.01, rs_labelNames=["0", "", "", "", "", "5", "", "", "", "", "10"])
+				expVariables = get_ratingtask_expVariables(expId, subjectId=None, demo=False, question=oneLineInstructions, leftRatingText='never eaten before', middleRatingText='', rightRatingText='eaten the most', rs_min=0, rs_max=10, rs_tickIncrement=1, rs_increment=0.01, rs_labelNames=["0", "", "", "", "", "5", "", "", "", "", "10"])
 				return render_template('foodchoicestudies/familiaritytask.html', expVariables=expVariables, stimFolder=foodStimFolder[expId])
 			else:
 				subjectId = get_subjectId(expId, workerId)
@@ -384,8 +373,6 @@ def familiaritytask(expId):
 				results_to_csv(expId, subjectId, filePath, fileName, expResults, {})
 
 				return redirect(url_for(nextTask, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
-		elif workerId_exists(expId, workerId) and completedFamiliarityTask == True:
-			return redirect(url_for('tasks.repeat_error', task=name, expId=expId, workerId=workerId, assignmentId=assignmentId, hitId=hitId, turkSubmitTo=turkSubmitTo, live=live))
 		else:
 			return redirect(url_for('unauthorized_error'))
 	else:

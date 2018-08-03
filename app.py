@@ -78,6 +78,10 @@ def unauthorized_error():
 def accept_hit():
 	return render_template('accept_hit.html')
 
+@app.route("/page_not_found", methods = ["GET"])
+def page_not_found():
+    return render_template('404.html')
+
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
